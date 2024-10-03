@@ -163,21 +163,21 @@ ForwardingStrategy::OnInterest (Ptr<Face> inFace,
 
 ///////////////////////////////////////////////////////////////////
   //  can see how to move packet
-  /*
+
   Ptr<Node> node = inFace -> GetNode();
   uint32_t nodeID = node -> GetId();
   Ptr<Limits> faceLimits = inFace -> GetObject<Limits>();
   double rate = faceLimits -> GetCurrentLimit();
   uint32_t faceid = inFace->GetId();
-  if ((nodeID == 10 && faceid == 3) || nodeID == 14 || nodeID == 15){
+  //  if ((nodeID == 10 && faceid == 3) || nodeID == 14 || nodeID == 15){
   std::cout << Simulator::Now ().ToDouble (Time::S) << " " //time
             << "Node:" << nodeID << " "
             << "interfaceID:" << inFace -> GetId() << " "  // incomingDataFaceID
             // << m_pit->GetSize() << "\t"
             << "rate:" << rate << "\n";
   //          << "comeInterest" << "\n";
-  }
-  */
+  //  }
+  
 //////////////////////////////////////////////////////////////////
   
   FwFeedbackPitsizeTag bwFeedbackPitsizeTag;
@@ -558,7 +558,7 @@ ForwardingStrategy::SatisfyPendingInterestDTCC (Ptr<Face> inFace,
       double pitsizedif = pitsize - f_pitsize; // データが入ってきたFaceのPITサイズ差  ///LEE : InPIT-OutPIT
       // if (nodeID == 14){
         // NS_LOG_DEBUG ("nodeID 14: pitsize: " << pitsize );
-      // }
+      // }      double pitsizedif = pitsize - f_pitsize; // データが入ってきたFaceのPITサイズ差  ///LEE : InPIT-OutPIT
       // if(nodeID == 16 || nodeID == 17 || nodeID == 18 || nodeID == 19 || nodeID == 20) //20211019 for ndn-congestion-topo54src.cc
       if(nodeID == 8 || nodeID == 9 || nodeID == 10 || nodeID == 11) //20220921 for ndn-congestion-topo-dumbbell-12nodes.cc
       {
@@ -953,7 +953,9 @@ ForwardingStrategy::TrySendOutInterest (Ptr<Face> inFace,
   Ptr<Limits> faceLimits = outFace -> GetObject<Limits>();
   double rate = faceLimits -> GetCurrentLimit();
   uint32_t faceid = outFace->GetId();
-  
+
+  pitEntry->AddOutgoing (outFace);  
+
   Ptr<pit::Entry> pe = m_pit->Begin();
   double pc = 0;
   while(pe)
@@ -988,7 +990,7 @@ ForwardingStrategy::TrySendOutInterest (Ptr<Face> inFace,
     std::cout << "--------------------------------\n";
   } */
 
-  pitEntry->AddOutgoing (outFace);
+//  pitEntry->AddOutgoing (outFace);
 
   //transmission
   bool successSend = outFace->SendInterest (interest);

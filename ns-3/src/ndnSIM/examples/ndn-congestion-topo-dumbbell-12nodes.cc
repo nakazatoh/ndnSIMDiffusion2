@@ -57,7 +57,7 @@ PeriodicStatsPrinter (Ptr<Node> node, Time next)
   /*
   std::cout << Simulator::Now ().ToDouble (Time::S) << "\t"
             << node->GetId () << "\t"
-            << Names::FindName (node) << "\t"
+            << Names::FindName (node) << "\t"      << std::endl;
             << pitsize << "\t"
             << pitsizedif <<"\n";
   */
@@ -99,7 +99,7 @@ main (int argc, char *argv[])
   // Install NDN stack on all nodes
   ndn::StackHelper ndnHelper;
   ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute::PerOutFaceLimits","Limit","ns3::ndn::Limits::Rate");
-  ndnHelper.EnableLimits(true, Seconds(0.2),0,1250);
+  ndnHelper.EnableLimits(true, Seconds(0.2),1250,40);
   ndnHelper.SetContentStore ("ns3::ndn::cs::Lru", "MaxSize", "0");
   ndnHelper.SetPit ("ns3::ndn::pit::SerializedSize", "MaxSize", "0");
   ndnHelper.SetPit ("ns3::ndn::pit::SerializedSize", "MaxPitEntryLifetime", "0");
@@ -122,32 +122,33 @@ main (int argc, char *argv[])
   Ptr<Node> producer4 = Names::Find<Node> ("Dst4");
 
   ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerCbr");
-  consumerHelper.SetAttribute ("Frequency", StringValue ("50")); // 200 interests a second
-  consumerHelper.SetAttribute("Randomize", StringValue("exponential"));
+  consumerHelper.SetAttribute ("Frequency", StringValue ("70")); // 200 interests a second
+  // consumerHelper.SetAttribute("Randomize", StringValue("exponential"));
+  // consumerHelper.SetAttribute("Randomize", StringValue("uniform"));
 
   // on the first consumer node install a Consumer application
   // that will express interests in /dst1 namespace
   consumerHelper.SetPrefix ("/dst1");
-  consumerHelper.Install (consumer1);
+  ApplicationContainer app1 = consumerHelper.Install (consumer1);
 
   // on the second consumer node install a Consumer application
   // that will express interests in /dst2 namespace
 
   //lee2005
-  consumerHelper.SetAttribute ("Frequency", StringValue ("10"));
+  consumerHelper.SetAttribute ("Frequency", StringValue ("10")); // 10 interests a second
   //
   consumerHelper.SetPrefix ("/dst2");
-  consumerHelper.Install (consumer2);
+  ApplicationContainer app2 = consumerHelper.Install (consumer2);
 
-  consumerHelper.SetAttribute ("Frequency", StringValue ("25")); // 200 interests a second
+  consumerHelper.SetAttribute ("Frequency", StringValue ("30")); 
   // consumerHelper.SetAttribute("Randomize", StringValue("exponential"));
   consumerHelper.SetPrefix ("/dst3");
-  consumerHelper.Install (consumer3);
+  ApplicationContainer app3 = consumerHelper.Install (consumer3);
 
-  consumerHelper.SetAttribute ("Frequency", StringValue ("50")); // 200 interests a second
+  consumerHelper.SetAttribute ("Frequency", StringValue ("50")); // 50 interests a second
   // consumerHelper.SetAttribute("Randomize", StringValue("none"));
   consumerHelper.SetPrefix ("/dst4");
-  consumerHelper.Install (consumer4);
+  ApplicationContainer app4 = consumerHelper.Install (consumer4);
 
   // std::cout << "Number of Applications:" << consumer3->GetNApplications() << std::endl;
   // consumer3->GetApplication(0)->SetStopTime(Seconds(2.0));
@@ -188,6 +189,11 @@ main (int argc, char *argv[])
 
   // Calculate and install FIBs
   ndn::GlobalRoutingHelper::CalculateRoutes ();
+
+  app2.Start(Seconds(1.0));
+  app2.Stop(Seconds(8.0));
+  app3.Start(Seconds(2.0));
+  app3.Stop(Seconds(7.0));
 
   Simulator::Stop (Seconds (10.0));
 
