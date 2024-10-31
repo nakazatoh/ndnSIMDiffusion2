@@ -55,14 +55,14 @@
 #include <boost/tuple/tuple.hpp>
 #include <iostream>
 
+NS_LOG_COMPONENT_DEFINE ("ndn.ForwardingStrategy");
+
 namespace ll = boost::lambda;
 
 namespace ns3 {
 namespace ndn {
 
 NS_OBJECT_ENSURE_REGISTERED (ForwardingStrategy);
-
-NS_LOG_COMPONENT_DEFINE (ForwardingStrategy::GetLogName ().c_str ());
 
 std::string
 ForwardingStrategy::GetLogName ()
@@ -170,13 +170,10 @@ ForwardingStrategy::OnInterest (Ptr<Face> inFace,
   double rate = faceLimits -> GetCurrentLimit();
   uint32_t faceid = inFace->GetId();
   //  if ((nodeID == 10 && faceid == 3) || nodeID == 14 || nodeID == 15){
-  std::cout << Simulator::Now ().ToDouble (Time::S) << " " //time
-            << "Node:" << nodeID << " "
-            << "interfaceID:" << inFace -> GetId() << " "  // incomingDataFaceID
+  /* NS_LOG_DEBUG("Node: " << nodeID 
+            << " interfaceID: " << inFace -> GetId() 
             // << m_pit->GetSize() << "\t"
-            << "rate:" << rate << "\n";
-  //          << "comeInterest" << "\n";
-  //  }
+            << " rate: " << rate); */
   
 //////////////////////////////////////////////////////////////////
   
@@ -459,7 +456,7 @@ ForwardingStrategy::SatisfyPendingInterestDTCC (Ptr<Face> inFace,
                                                 Ptr<Data> data,
                                                 Ptr<pit::Entry> pitEntry)
 {
-  std::cout << "Node:" << inFace->GetNode()->GetId() << " infaceID:" << inFace->GetId() << std::endl;
+  // std::cout << "Node:" << inFace->GetNode()->GetId() << " infaceID:" << inFace->GetId() << std::endl;
   if (inFace != 0)
     pitEntry->RemoveIncoming (inFace);
   //std::cout << Simulator::Now ().ToDouble (Time::S) << "\n"; // time
@@ -581,15 +578,18 @@ ForwardingStrategy::SatisfyPendingInterestDTCC (Ptr<Face> inFace,
         rate = (incoming.m_face->GetObject<Limits>())->GetCurrentLimit();
         newRate = rate;
         m_interestRateTable[outFace_data][infaceId] = rate;
-        std::cout << "Node: " << nodeID << "\t Interest-in-face: " << outFace_data 
-          << "\t Interest-out-face: " << infaceId << "\t b_pitsize: " << b_pitsize 
-          << "\t pitsize_in: " << pitsize_in << "\t pitsize_out: " << pitsize_out
-          << "\t f_pitsize: " << f_pitsize << "\t b_pitsizedif: " << b_pitsizedif
-          << "\t f_pitsizedif: " << f_pitsizedif << "\t f_rate: " << f_rate 
-          << "\t new rate: " << rate << "\t newRate: " << newRate << std::endl;
-        std::cout << "\t Data#: " << DataPacketNum[nodeID] << "\t time: " << tm 
-          << "\t Name: " << data->GetName() << std::endl;
-        // std::cout << "m_interestRateTable size:" << m_interestRateTable.size() << std::endl;
+        /* NS_LOG_DEBUG("Node: " << nodeID << " Interest-in-face: " << outFace_data 
+          << " Interest-out-face: " << infaceId << " b_pitsize: " << b_pitsize 
+          << " pitsize_in: " << pitsize_in << " pitsize_out: " << pitsize_out
+          << " f_pitsize: " << f_pitsize << " b_pitsizedif: " << b_pitsizedif
+          << " f_pitsizedif: " << f_pitsizedif << " f_rate: " << f_rate 
+          << " new_rate: " << rate << " newRate: " << newRate 
+          << " Data#: " << DataPacketNum[nodeID] << " time: " << tm 
+          << " Name: " << data->GetName()); */
+        NS_LOG_DEBUG("Node: " << nodeID << " Interest-in-face: " << outFace_data 
+          << " Interest-out-face: " << infaceId << " b_pitsize: " << b_pitsize 
+          << " pitsize_in: " << pitsize_in << " pitsize_out: " << pitsize_out
+          << " f_pitsize: " << f_pitsize << " rateLimit: " << rate);
       }  
                                  
       /* update interest sendinrg rate limit */
@@ -622,34 +622,42 @@ ForwardingStrategy::SatisfyPendingInterestDTCC (Ptr<Face> inFace,
           newRate = f_rate + d * (b_pitsizedif - f_pitsizedif);
         }
         if (newRate < 1) newRate = 1;
+        if (newRate > faceLimits->GetMaxRate()) newRate = faceLimits->GetMaxRate();
         //rate = (1 - alpha) * oldRate + alpha * (f_rate - d*(f_pitsizedif - pitsizedif + DataPacketNum[nodeID]));
         rate = (1 - alpha) * oldRate + alpha * newRate;
         if (rate < 1) rate = 1;
+        faceLimits -> UpdateCurrentLimit(rate);
+        rate = faceLimits -> GetCurrentLimit();
         /*
         NS_LOG_DEBUG("Node " << nodeID << " infaceID " << infaceId << ": old rate:" << oldRate
                     << " new rate:" << rate << " f_rate:" << f_rate
                     << " pitsize:" << pitsize << " f_pitsize:" << f_pitsize 
                     << "pitsizedif:" << pitsizedif << " f_pitsizedif:" << f_pitsizedif 
                     << std::endl); */
-        /* std::cout << "Before limit: Node:" << nodeID << " infaceID:" << infaceId << " old rate:" << oldRate
-          << " new rate:" << rate << " newRate:" << newRate << " f_rate:" << f_rate
-          << " pitsize:" << pitsize << " f_pitsize:" << f_pitsize 
-          << " pitsizedif:" << pitsizedif << " f_pitsizedif:" << f_pitsizedif 
-          << " Data#:" << DataPacketNum[nodeID] << std::endl;
-        std::cout << "---------------------------" << std::endl; */
+        /*
         std::cout << "Node: " << nodeID << "\t Interest-in-face: " << outFace_data 
           << "\t Interest-out-face: " << infaceId << "\t b_pitsize: " << b_pitsize 
           << "\t pitsize_in: " << pitsize_in << "\t pitsize_out: " << pitsize_out
           << "\t f_pitsize: " << f_pitsize << "\t b_pitsizedif: " << b_pitsizedif
-          << "\t f_pitsizedif: " << f_pitsizedif << "\t f_rate: " << f_rate << "\t old rate: " << oldRate
-          << "\t new rate: " << rate << "\t computed newRate: " << newRate << std::endl;
-        // }
+          << "\t f_pitsizedif: " << f_pitsizedif << "\t f_rate: " << f_rat\e << "\t old rate: " << oldRate
+          << "\t new rate: " << rate << "\t computed newRate: " << newRate << std::endl;        // }
+        */
+        /* NS_LOG_DEBUG("Node: " << nodeID << " Interest-in-face: " << outFace_data 
+          << " Interest-out-face: " << infaceId << " b_pitsize: " << b_pitsize 
+          << " pitsize_in: " << pitsize_in << " pitsize_out: " << pitsize_out
+          << " f_pitsize: " << f_pitsize << " b_pitsizedif: " << b_pitsizedif
+          << " f_pitsizedif: " << f_pitsizedif << " f_rate: " << f_rate << " old_rate: " << oldRate
+          << " new_rate: " << rate << " computed_newRate: " << newRate); */
+        NS_LOG_DEBUG("Node: " << nodeID << " Interest-in-face: " << outFace_data 
+          << " Interest-out-face: " << infaceId << " b_pitsize: " << b_pitsize 
+          << " pitsize_in: " << pitsize_in << " pitsize_out: " << pitsize_out
+          << " f_pitsize: " << f_pitsize << " rateLimit: " << rate);
          
         // if(rate < 0) rate = 1;
-        faceLimits -> UpdateCurrentLimit(rate);
-        rate = faceLimits -> GetCurrentLimit();
+//        faceLimits -> UpdateCurrentLimit(rate);
+//        rate = faceLimits -> GetCurrentLimit();
         // if (newRate <= 0) newRate = 1;
-        if (newRate > faceLimits->GetMaxRate()) newRate = faceLimits->GetMaxRate();
+//        if (newRate > faceLimits->GetMaxRate()) newRate = faceLimits->GetMaxRate();
 
         m_interestRateTable[outFace_data][infaceId] = rate;
         // std::cout << "nodeID:" << nodeID << " inface:" << outFace_data << " outface:" << infaceId << " rate:" << rate << std::endl;
@@ -658,20 +666,19 @@ ForwardingStrategy::SatisfyPendingInterestDTCC (Ptr<Face> inFace,
         // if((nodeID == 10 && infaceId == 7) || nodeID == 7 || nodeID == 8 || nodeID == 14){
         // if ((nodeID == 2 || nodeID == 7 || (nodeID == 10 && infaceId == 7) || nodeID == 14 || nodeID == 15)){
         // if(nodeID == 10){
-        NS_LOG_DEBUG("Node " << nodeID << " infaceID " << infaceId << " | rate:" << rate
-                    << " pitsizedif:" << pitsizedif << " f_pitsizedif:" << f_pitsizedif
-                    << " DataPacketNum:" << DataPacketNum[nodeID] 
-                    << " face-info:" << *inFace);
+        /* NS_LOG_DEBUG("Node " << nodeID << " infaceID " << infaceId << " rate:" << rate
+          << " pitsizedif:" << pitsizedif << " f_pitsizedif:" << f_pitsizedif
+          << " DataPacketNum:" << DataPacketNum[nodeID] 
+          << " face-info:" << *inFace << " new_rate_after_limit: " << rate 
+          << " newRate_after_limit: " << newRate << " f_rate: " << f_rate
+          << " Data#: " << DataPacketNum[nodeID] << " time: " << tm 
+          << " Name: " << data->GetName() << " inPitsize" << inPitsize); */
         /* std::cout << "After limit: " << tm << " Node:" << nodeID << " infaceID:" << infaceId << " old rate:" << oldRate
           << " new rate:" << rate << " newRate:" << newRate << " f_rate:" << f_rate
           << " pitsize:" << pitsize << " f_pitsize:" << f_pitsize 
           << " pitsizedif:" << pitsizedif << " f_pitsizedif:" << f_pitsizedif 
           << " Data#:" << DataPacketNum[nodeID] << std::endl;
         std::cout << "---------------------------" << std::endl; */
-        std::cout << "new rate after limit:\t" << rate << "\t newRate after limit:\t" << newRate << "\t f_rate:\t" << f_rate
-          << "\t Data#:\t" << DataPacketNum[nodeID] << "\t time:\t" << tm 
-          << "\t Name:\t" << data->GetName() << "\t inPitsize\t" << inPitsize << std::endl;
-        // }
 
         //std::cout << "!!!!!!!!!!__pitsizedif_didn't set_the value_at_neighbor_router__!!!!!!!!!!" << "\n";
 
@@ -780,7 +787,7 @@ ForwardingStrategy::SatisfyPendingInterestDTCC (Ptr<Face> inFace,
 
     DidSendOutData (inFace, incoming.m_face, data, pitEntry);
     DataPacketNum[nodeID]--;
-    NS_LOG_DEBUG ("Satisfy " << *incoming.m_face);
+    // NS_LOG_DEBUG ("Satisfy " << *incoming.m_face);
 
     if (!ok)
     {
@@ -920,7 +927,7 @@ ForwardingStrategy::CanSendOutInterest (Ptr<Face> inFace,
 
   pit::Entry::out_iterator outgoing =
     pitEntry->GetOutgoing ().find (outFace);
-NS_LOG_DEBUG(pitEntry->GetOutgoing().size());
+// NS_LOG_DEBUG(pitEntry->GetOutgoing().size());
   if (outgoing != pitEntry->GetOutgoing ().end ())
     {
       

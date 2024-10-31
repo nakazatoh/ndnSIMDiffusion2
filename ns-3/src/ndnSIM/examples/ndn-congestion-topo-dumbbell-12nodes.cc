@@ -85,7 +85,7 @@ main (int argc, char *argv[])
   //LogComponentEnable("UdpEchoClientApplication",LOG_LEVEL_ALL);
   //LogComponentEnable("UdpEchoSeverApplication",LOG_LEVEL_ALL);
   //aikawa
-  //Config::SetDefault("ns3::DropTailQueue::MaxPackets",StringValue("10"));
+  Config::SetDefault("ns3::DropTailQueue::MaxPackets", StringValue("100"));
   //Config::SetDefault("ns3::ndn::Pit::PitEntryPruningTimeout",StringValue("9999"));
 
   CommandLine cmd;
