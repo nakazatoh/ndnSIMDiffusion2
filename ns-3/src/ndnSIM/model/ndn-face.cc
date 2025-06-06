@@ -77,6 +77,9 @@ Face::Face (Ptr<Node> node)
   , m_metric (0)
   , m_flags (0)
   , m_pitsizedif(0)
+  , m_f_pitsize(0)
+  , m_b_pitsize(0)
+//  , m_a_t_index (0)
 {
   NS_LOG_FUNCTION (this << node);
 
@@ -250,6 +253,8 @@ Face::ReceiveData (Ptr<Data> data)
     }
 
   m_upstreamDataHandler (this, data);
+/*  m_arrival_time[m_a_t_index] = Simulator::Now ().ToDouble (Time::S);
+  m_a_t_index %= ++m_a_t_index; */
   return true;
 }
 
@@ -271,7 +276,14 @@ Face::SetFlags (uint32_t flags)
 {
   m_flags = flags;
 }
-
+/*
+double
+Face::GetBW () const
+{
+  double duration = m_arrival_time[(m_a_t_index + 4) % 5] - m_arrival_time[m_a_t_index % 5];
+  return 4.0 / duration;
+}
+*/
 bool
 Face::operator== (const Face &face) const
 {

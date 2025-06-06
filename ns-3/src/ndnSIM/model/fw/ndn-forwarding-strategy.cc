@@ -119,6 +119,7 @@ ForwardingStrategy::ForwardingStrategy ()
 {
   ad = 5.0;
   DataPacketNum[20] = {};//LEE
+  m_interestRateTable ={};
 }
 //////////////////////////////////////////////
 ForwardingStrategy::~ForwardingStrategy ()
@@ -557,7 +558,8 @@ ForwardingStrategy::SatisfyPendingInterestDTCC (Ptr<Face> inFace,
         // NS_LOG_DEBUG ("nodeID 14: pitsize: " << pitsize );
       // }      double pitsizedif = pitsize - f_pitsize; // データが入ってきたFaceのPITサイズ差  ///LEE : InPIT-OutPIT
       // if(nodeID == 16 || nodeID == 17 || nodeID == 18 || nodeID == 19 || nodeID == 20) //20211019 for ndn-congestion-topo54src.cc
-      if(nodeID == 8 || nodeID == 9 || nodeID == 10 || nodeID == 11) //20220921 for ndn-congestion-topo-dumbbell-12nodes.cc
+//      if(nodeID == 8 || nodeID == 9 || nodeID == 10 || nodeID == 11) //20220921 for ndn-congestion-topo-dumbbell-12nodes.cc
+      if(nodeID == 6 || nodeID == 7) // for ndn-simple-dumbbell-8nodes-1bottleneck.cc
       {
         // pitsize = 0;
         pitsizedif = 0; // Half size of uint32_t (MAX uint32_t = 4294967295 )
@@ -572,7 +574,8 @@ ForwardingStrategy::SatisfyPendingInterestDTCC (Ptr<Face> inFace,
       double tm = Simulator::Now ().ToDouble (Time::S);
            
       // if(nodeID == 16 || nodeID == 17 || nodeID == 18 || nodeID == 19 || nodeID == 20) //20211019 for ndn-congestion-topo54src.cc
-      if(nodeID == 8 || nodeID == 9 || nodeID == 10 || nodeID == 11) //20220921 for ndn-congestion-topo-dumbbell-12nodes.cc
+//      if(nodeID == 8 || nodeID == 9 || nodeID == 10 || nodeID == 11) //20220921 for ndn-congestion-topo-dumbbell-12nodes.cc
+      if(nodeID == 6 || nodeID == 7) // for ndn-simple-dumbbell-8nodes-1bottleneck.cc
       {
         // rate = 100000;
         rate = (incoming.m_face->GetObject<Limits>())->GetCurrentLimit();
@@ -594,7 +597,8 @@ ForwardingStrategy::SatisfyPendingInterestDTCC (Ptr<Face> inFace,
                                  
       /* update interest sendinrg rate limit */
       // if(nodeID != 16 && nodeID != 17 && nodeID != 18 && nodeID != 19 && nodeID != 20) //20211019 for ndn-congestion-topo54src.cc
-      if(nodeID != 8 && nodeID != 9 && nodeID != 10 && nodeID != 11) //20220921 for ndn-congestion-topo-dumbbell-12nodes.cc
+//      if(nodeID != 8 && nodeID != 9 && nodeID != 10 && nodeID != 11) //20220921 for ndn-congestion-topo-dumbbell-12nodes.cc
+      if(nodeID != 6 && nodeID != 7) //for ndn-simple-dumbbell-8nodes-1bottleneck.cc
       {
         // if(nodeID == 0 || nodeID == 1 || nodeID == 2 || nodeID == 3 || nodeID ==4)//for src 1 , src 2, src3, src4, src5//aikawa
         /* if(nodeID == 0 || nodeID == 1 || nodeID == 2 || nodeID == 3)//for src 1 , src 2, src3, src4//nakazato
@@ -609,7 +613,8 @@ ForwardingStrategy::SatisfyPendingInterestDTCC (Ptr<Face> inFace,
         double d = 0.12; //0.1 * 1500 * 8 / 10000;
         double oldRate = rate;
         double alpha = 0.2;
-        if(nodeID == 0 || nodeID == 1 || nodeID == 2 || nodeID == 3)
+//        if(nodeID == 0 || nodeID == 1 || nodeID == 2 || nodeID == 3)
+        if(nodeID == 0 || nodeID == 1)
         {
           newRate = f_rate - d * f_pitsizedif;
         }
@@ -876,7 +881,7 @@ ForwardingStrategy::ShouldSuppressIncomingInterest (Ptr<Face> inFace,
 
 void
 ForwardingStrategy::PropagateInterest (Ptr<Face> inFace,
-                                       Ptr<Interest> interest,
+                                       Ptr<const Interest> interest,
                                        Ptr<pit::Entry> pitEntry)
 {
   bool isRetransmitted = m_detectRetransmissions && // a small guard
@@ -947,7 +952,7 @@ ForwardingStrategy::CanSendOutInterest (Ptr<Face> inFace,
 bool
 ForwardingStrategy::TrySendOutInterest (Ptr<Face> inFace,
                                         Ptr<Face> outFace,
-                                        Ptr<Interest> interest,
+                                        Ptr<const Interest> interest,
                                         Ptr<pit::Entry> pitEntry)
 {
   if (!CanSendOutInterest (inFace, outFace, interest, pitEntry))
@@ -984,7 +989,9 @@ ForwardingStrategy::TrySendOutInterest (Ptr<Face> inFace,
 
   Ptr<Packet> payload = interest->GetPayload()->Copy();
   payload->ReplacePacketTag(feedbackPitsizeTag);
-  interest->SetPayload(payload);
+  const Interest* imutableInterest = &(*interest);
+  Interest* mutableInterest = const_cast<Interest*>(imutableInterest);
+  mutableInterest->SetPayload(payload);
   
   double tm = Simulator::Now().ToDouble(Time::S);
   // if (nodeID == 2 || nodeID == 7 || (nodeID == 10 && faceid == 7) || nodeID == 14 || nodeID == 15){

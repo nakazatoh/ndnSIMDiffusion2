@@ -45,7 +45,7 @@ protected:
 
   virtual bool
   DoPropagateInterest (Ptr<Face> inFace,
-                       Ptr<Interest> interest,
+                       Ptr<const Interest> interest,
                        Ptr<pit::Entry> pitEntry);
 
   virtual void

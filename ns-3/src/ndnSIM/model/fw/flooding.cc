@@ -66,7 +66,7 @@ Flooding::Flooding ()
 
 bool
 Flooding::DoPropagateInterest (Ptr<Face> inFace,
-                               Ptr<Interest> interest,
+                               Ptr<const Interest> interest,
                                Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this);

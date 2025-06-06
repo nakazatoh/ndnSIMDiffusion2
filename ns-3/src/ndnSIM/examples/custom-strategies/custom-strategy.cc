@@ -44,7 +44,7 @@ CustomStrategy::CustomStrategy ()
 
 bool
 CustomStrategy::DoPropagateInterest (Ptr<Face> inFace,
-                                     Ptr<Interest> interest,
+                                     Ptr<const Interest> interest,
                                      Ptr<pit::Entry> pitEntry)
 {
   typedef fib::FaceMetricContainer::type::index<fib::i_metric>::type FacesByMetric;

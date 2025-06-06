@@ -66,7 +66,7 @@ SmartFlooding::SmartFlooding ()
 
 bool
 SmartFlooding::DoPropagateInterest (Ptr<Face> inFace,
-                                    Ptr<Interest> interest,
+                                    Ptr<const Interest> interest,
                                     Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this);
