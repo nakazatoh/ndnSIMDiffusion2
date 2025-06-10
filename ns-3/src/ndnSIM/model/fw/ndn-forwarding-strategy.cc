@@ -962,7 +962,7 @@ ForwardingStrategy::SatisfyPendingInterestQSF (Ptr<Face> inFace,
         NS_LOG_DEBUG("Node: " << nodeID << " Interest-in-face: " << outFace_data 
           << " Interest-out-face: " << infaceId << " b_pitsize: " << b_pitsize 
           << " pitsize_in: " << pitsize_in << " pitsize_out: " << pitsize_out
-          << " f_pitsize: " << f_pitsize << " rateLimit: " << rate << " bandwidth:" << bw);
+          << " f_pitsize: " << f_pitsize << " rateLimit: " << rate << " bandwidth: " << bw);
          
         m_interestRateTable[outFace_data][infaceId] = rate;
 
