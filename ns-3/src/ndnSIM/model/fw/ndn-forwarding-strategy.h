@@ -294,6 +294,11 @@ protected:
                               Ptr<Data> data,
                               Ptr<pit::Entry> pitEntry);
 
+  virtual void
+  SatisfyPendingInterestQSF (Ptr<Face> inFace,
+                              Ptr<Data> data,
+                              Ptr<pit::Entry> pitEntry);
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   virtual void

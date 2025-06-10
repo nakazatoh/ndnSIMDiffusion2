@@ -44,7 +44,7 @@
             "type": "cppdbg",
             "request": "launch",
             // my build folder is ${workspaceFolder}/build, substitute yours
-            "program": "${workspaceFolder}/build/src/ndnSIM/examples/ns3-dev-ndn-congestion-topo-dumbbell-12nodes-debug", //ここに実行したいプログラムを設定する
+            "program": "${workspaceFolder}/build/src/ndnSIM/examples/ns3-dev-ndn-simple-dumbbell-8nodes-1bottleneck-debug", //ここに実行したいプログラムを設定する
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",
             // replace the values below with those found from running
@@ -53,6 +53,8 @@
             "environment": [
             //    {"Name": "NS_LOG", "Value": "*=level_debug|prefix_func|prefix_time|prefix_node"},
             //    {"Name": "NS_LOG", "Value": "ndn.StackHelper=level_info|prefix_func|prefix_time|prefix_node"},
+            //    {"Name": "NS_LOG", "Value": "DropTailQueue=level_all|prefix_func|prefix_time|prefix_node:ndn.ForwardingStrategy=level_debug|prefix_func|prefix_time|prefix_node"},
+                {"Name": "NS_LOG", "Value": "DropTailQueue=level_debug|prefix_func|prefix_node:PointToPointNetDevice=level_debug|prefix_func|prefix_time|prefix_node:ndn.ForwardingStrategy=level_debug|prefix_func|prefix_time|prefix_node"},
                 {"Name": "PYTHONPATH", "Value": "/home/nakazato/ndnSIM/ns-3/build/bindings/python:/home/nakazato/ndnSIM/ns-3/src/visualizer:/home/nakazato/ndnSIM/pybindgen"}, 
                 {"Name": "LD_LIBRARY_PATH", "Value": "/usr/lib/gcc/x86_64-linux-gnu/4.8:/home/nakazato/ndnSIM/ns-3/build"},
                 {"Name": "NS3_MODULE_PATH", "Value": "/usr/lib/gcc/x86_64-linux-gnu/4.8:/home/nakazato/ndnSIM/ns-3/build"},

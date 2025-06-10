@@ -1,0 +1,25 @@
+#topo-simple-dumbbell-8nodes-1bottleneck.txt
+
+router
+
+# node  comment     yPos    xPos
+Src1   NA        3       1
+Src2   NA        1       1
+Rtr1   NA        2       3
+Rtr2   NA        2       5
+Rtr3   NA        2       7
+Rtr4   NA        2       9
+Dst1   NA        3       11
+Dst2   NA        1       11
+
+
+link
+
+# srcNode   dstNode     bandwidth   metric  delay   queue
+Src1        Rtr1        10Mbps      1        1ms    100
+Src2        Rtr1        10Mbps      1        1ms    100
+Rtr1        Rtr2        10Mbps      1        1ms    100
+Rtr2        Rtr3        1Mbps       1        1ms    100
+Rtr3        Rtr4        10Mbps      1        1ms    100
+Rtr4        Dst1        10Mbps      1        1ms    100
+Rtr4        Dst2        10Mbps      1        1ms    100
