@@ -30,7 +30,7 @@ public:
 protected:
   virtual bool
   DoPropagateInterest (Ptr<Face> incomingFace,
-                       Ptr<Interest> interest,
+                       Ptr<const Interest> interest,
                        Ptr<pit::Entry> pitEntry);
 
 public:

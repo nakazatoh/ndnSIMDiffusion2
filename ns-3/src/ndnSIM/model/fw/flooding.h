@@ -68,7 +68,7 @@ protected:
   // inherited from  Nacks/ForwardingStrategy
   virtual bool
   DoPropagateInterest (Ptr<Face> inFace,
-                       Ptr<Interest> interest,
+                       Ptr<const Interest> interest,
                        Ptr<pit::Entry> pitEntry);
 
 protected:

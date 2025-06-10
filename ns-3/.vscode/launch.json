@@ -17,7 +17,7 @@
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
-            "pipeTransport": {
+            "pipeTransport": {./waf --run=ndn-simple-dumbbell-8nodes-1bottleneck
                 "debuggerPath": "",  // leave blank
                 "pipeProgram": "${workspaceFolder}/waf",
                 // pipeArgs is essentially the entire waf command line arguments

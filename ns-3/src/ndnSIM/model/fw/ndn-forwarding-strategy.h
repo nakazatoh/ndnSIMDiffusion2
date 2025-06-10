@@ -278,15 +278,6 @@ protected:
                           Ptr<const Data> data,
                           Ptr<pit::Entry> pitEntry);
 
-  /**
-   * @brief Event which is fired just after data was send out on the face
-   *
-   * @param inFace   incoming face of the Data
-   * @param outFace  outgoing face
-   * @param data     Data packet
-   * @param pitEntry an existing PIT entry, corresponding to the duplicated Interest
-   */
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   virtual void
@@ -300,6 +291,15 @@ protected:
                               Ptr<pit::Entry> pitEntry);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * @brief Event which is fired just after data was send out on the face
+   *
+   * @param inFace   incoming face of the Data
+   * @param outFace  outgoing face
+   * @param data     Data packet
+   * @param pitEntry an existing PIT entry, corresponding to the duplicated Interest
+   */
 
   virtual void
   DidSendOutData (Ptr<Face> inFace,
@@ -387,7 +387,7 @@ protected:
   virtual bool
   TrySendOutInterest (Ptr<Face> inFace,
                       Ptr<Face> outFace,
-                      Ptr<Interest> interest,
+                      Ptr<const Interest> interest,
                       Ptr<pit::Entry> pitEntry);
 
   /**
@@ -418,7 +418,7 @@ protected:
    */
   virtual void
   PropagateInterest (Ptr<Face> inFace,
-                     Ptr<Interest> interest,
+                     Ptr<const Interest> interest,
                      Ptr<pit::Entry> pitEntry);
 
   /**
@@ -441,7 +441,7 @@ protected:
    */
   virtual bool
   DoPropagateInterest (Ptr<Face> inFace,
-                       Ptr<Interest> interest,
+                       Ptr<const Interest> interest,
                        Ptr<pit::Entry> pitEntry) = 0;
 
 protected:
@@ -457,7 +457,8 @@ protected:
 /////////////////////////////////////////////
   double ad;
   double DataPacketNum[20];///LEE 
-  std::vector<std::vector<double> > m_interestRateTable{};
+//  std::vector<std::vector<double> > m_interestRateTable{};
+  std::vector<std::vector<double> > m_interestRateTable;
 ////////////////////////
 
   bool m_cacheUnsolicitedDataFromApps;

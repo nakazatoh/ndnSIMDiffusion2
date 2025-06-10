@@ -119,6 +119,7 @@ ForwardingStrategy::ForwardingStrategy ()
 {
   ad = 5.0;
   DataPacketNum[20] = {};//LEE
+  m_interestRateTable ={};
 }
 //////////////////////////////////////////////
 ForwardingStrategy::~ForwardingStrategy ()
@@ -1120,7 +1121,7 @@ ForwardingStrategy::ShouldSuppressIncomingInterest (Ptr<Face> inFace,
 
 void
 ForwardingStrategy::PropagateInterest (Ptr<Face> inFace,
-                                       Ptr<Interest> interest,
+                                       Ptr<const Interest> interest,
                                        Ptr<pit::Entry> pitEntry)
 {
   bool isRetransmitted = m_detectRetransmissions && // a small guard
@@ -1191,7 +1192,7 @@ ForwardingStrategy::CanSendOutInterest (Ptr<Face> inFace,
 bool
 ForwardingStrategy::TrySendOutInterest (Ptr<Face> inFace,
                                         Ptr<Face> outFace,
-                                        Ptr<Interest> interest,
+                                        Ptr<const Interest> interest,
                                         Ptr<pit::Entry> pitEntry)
 {
   if (!CanSendOutInterest (inFace, outFace, interest, pitEntry))
@@ -1228,7 +1229,9 @@ ForwardingStrategy::TrySendOutInterest (Ptr<Face> inFace,
 
   Ptr<Packet> payload = interest->GetPayload()->Copy();
   payload->ReplacePacketTag(feedbackPitsizeTag);
-  interest->SetPayload(payload);
+  const Interest* imutableInterest = &(*interest);
+  Interest* mutableInterest = const_cast<Interest*>(imutableInterest);
+  mutableInterest->SetPayload(payload);
   
   double tm = Simulator::Now().ToDouble(Time::S);
   // if (nodeID == 2 || nodeID == 7 || (nodeID == 10 && faceid == 7) || nodeID == 14 || nodeID == 15){
