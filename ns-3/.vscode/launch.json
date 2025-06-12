@@ -44,7 +44,8 @@
             "type": "cppdbg",
             "request": "launch",
             // my build folder is ${workspaceFolder}/build, substitute yours
-            "program": "${workspaceFolder}/build/src/ndnSIM/examples/ns3-dev-ndn-simple-dumbbell-8nodes-1bottleneck-debug", //ここに実行したいプログラムを設定する
+            // "program": "${workspaceFolder}/build/src/ndnSIM/examples/ns3-dev-ndn-simple-dumbbell-8nodes-1bottleneck-debug", //ここに実行したいプログラムを設定する
+            "program": "${workspaceFolder}/build/src/ndnSIM/examples/ns3-dev-ndn-qsf-debug",
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",
             // replace the values below with those found from running
