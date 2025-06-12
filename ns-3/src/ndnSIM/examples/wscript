@@ -53,6 +53,9 @@ def build(bld):
         obj = bld.create_ns3_program('ndn-simple-dumbbell-8nodes-1bottleneck', all_modules)
         obj.source = 'ndn-simple-dumbbell-8nodes-1bottleneck.cc'
 
+        obj = bld.create_ns3_program('ndn-qsf', all_modules)
+        obj.source = 'ndn-qsf.cc'
+
         obj = bld.create_ns3_program('ndn-congestion-topo-plugin', all_modules)
         obj.source = 'ndn-congestion-topo-plugin.cc'
 

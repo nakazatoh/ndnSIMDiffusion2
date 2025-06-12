@@ -731,7 +731,7 @@ ForwardingStrategy::SatisfyPendingInterestDTCC (Ptr<Face> inFace,
 
       } //if(nodeID != 19  && nodeID != 20) close
 
-      //std::cout << " upd_rate = " << rate << "\n"; 
+      //std::cout << " upd_rate = " << rate << "\n"; nodeID
  
       /* remove old tag? */      		
       Ptr<Packet> payloadCopy = data -> GetPayload() -> Copy();
@@ -911,7 +911,8 @@ ForwardingStrategy::SatisfyPendingInterestQSF (Ptr<Face> inFace,
       double pitsize = outPitsize[infaceId]; // データが入ってきたFaceのPITサイズ ///LEE: InPIT
       double pitsizedif = pitsize - f_pitsize; // データが入ってきたFaceのPITサイズ差  ///LEE : InPIT-OutPIT
 //      if(nodeID == 8 || nodeID == 9 || nodeID == 10 || nodeID == 11) //20220921 for ndn-congestion-topo-dumbbell-12nodes.cc
-      if(nodeID == 6 || nodeID == 7) // for ndn-simple-dumbbell-8nodes-1bottleneck.cc
+//      if(nodeID == 6 || nodeID == 7) // for ndn-simple-dumbbell-8nodes-1bottleneck.cc
+      if (nodeID == 5) //for ndn-qsf.cc
       {
         // pitsize = 0;
         pitsizedif = 0; // Half size of uint32_t (MAX uint32_t = 4294967295 )
@@ -926,7 +927,8 @@ ForwardingStrategy::SatisfyPendingInterestQSF (Ptr<Face> inFace,
       double tm = Simulator::Now ().ToDouble (Time::S);
            
 //      if(nodeID == 8 || nodeID == 9 || nodeID == 10 || nodeID == 11) //20220921 for ndn-congestion-topo-dumbbell-12nodes.cc
-      if(nodeID == 6 || nodeID == 7) // for ndn-simple-dumbbell-8nodes-1bottleneck.cc
+//      if(nodeID == 6 || nodeID == 7) // for ndn-simple-dumbbell-8nodes-1bottleneck.cc
+      if (nodeID == 5) //for ndn-qsf.cc
       {
         // rate = 100000;
         rate = (incoming.m_face->GetObject<Limits>())->GetCurrentLimit();
@@ -940,7 +942,8 @@ ForwardingStrategy::SatisfyPendingInterestQSF (Ptr<Face> inFace,
                       
       /* update interest sendinrg rate limit */ 
 //      if(nodeID != 8 && nodeID != 9 && nodeID != 10 && nodeID != 11) //20220921 for ndn-congestion-topo-dumbbell-12nodes.cc
-      if(nodeID != 6 && nodeID != 7) //for ndn-simple-dumbbell-8nodes-1bottleneck.cc
+//      if(nodeID != 6 && nodeID != 7) //for ndn-simple-dumbbell-8nodes-1bottleneck.cc
+      if (nodeID != 5) //for ndn-qsf.cc
       {
         double queueSize = f_pitsizedif;
         double bw = inFace->GetBW();
