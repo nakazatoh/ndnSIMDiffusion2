@@ -101,7 +101,7 @@ main (int argc, char *argv[])
   ndn::StackHelper ndnHelper;
   ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute::PerOutFaceLimits","Limit","ns3::ndn::Limits::Rate");
   ndnHelper.EnableLimits(true, Seconds(0.1),4500,40);
-  ndnHelper.SetContentStore ("ns3::ndn::cs::Lru", "MaxSize", "100");
+  ndnHelper.SetContentStore ("ns3::ndn::cs::Lru", "MaxSize", "1000");
   ndnHelper.SetPit ("ns3::ndn::pit::SerializedSize", "MaxSize", "0");
   ndnHelper.SetPit ("ns3::ndn::pit::SerializedSize", "MaxPitEntryLifetime", "0");
   ndnHelper.InstallAll ();
@@ -119,7 +119,7 @@ main (int argc, char *argv[])
   Ptr<Node> producer1 = Names::Find<Node> ("Dst1");
 
   ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerCbr");
-  consumerHelper.SetAttribute ("Frequency", StringValue ("1950")); // 1950 interests a second
+  consumerHelper.SetAttribute ("Frequency", StringValue ("195")); // 195 interests a second
   // consumerHelper.SetAttribute("Randomize", StringValue("exponential"));
   // consumerHelper.SetAttribute("Randomize", StringValue("uniform"));
 
