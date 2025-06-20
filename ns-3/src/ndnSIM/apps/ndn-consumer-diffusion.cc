@@ -33,6 +33,7 @@
 #include "ns3/ndn-app-face.h"
 #include "ns3/ndn-interest.h"
 #include "ns3/ndn-data.h"
+#include "ns3/ndnSIM/utils/ndn-fw-feedback-rate-tag.h"
 
 NS_LOG_COMPONENT_DEFINE ("ndn.ConsumerDiffusion");
 
@@ -143,6 +144,11 @@ ConsumerDiffusion::OnData (const Ptr<const Data> &contentObject,
                                const Ptr<const Packet> &payload)
 {
   Consumer::OnData (contentObject); // tracing inside
+  FwFeedbackRateTag feedbackRateTag;
+  if (contentObject->GetPayload ()->PeekPacketTag (feedbackRateTag))
+    {
+      m_frequency = feedbackRateTag.GetRate();
+    }
 }
 
 // void

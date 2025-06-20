@@ -138,6 +138,8 @@ protected:
   Name     m_interestName;        ///< \brief NDN Name of the Interest (use Name)
   Time               m_interestLifeTime;    ///< \brief LifeTime for interest packet
 
+  double m_f_pitsize;
+
 /// @cond include_hidden
   /**
    * \struct This struct contains sequence numbers of packets to be retransmitted

@@ -235,6 +235,7 @@ Consumer::OnData (Ptr<const Data> data)
 
   uint32_t seq = data->GetName ().get (-1).toSeqNum ();
   NS_LOG_INFO ("< DATA for " << seq);
+  NS_LOG_DEBUG ("< DATA for " << seq);
 
   int hopCount = -1;
   FwHopCountTag hopCountTag;

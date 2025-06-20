@@ -170,10 +170,11 @@ ForwardingStrategy::OnInterest (Ptr<Face> inFace,
   double rate = faceLimits -> GetCurrentLimit();
   uint32_t faceid = inFace->GetId();
   //  if ((nodeID == 10 && faceid == 3) || nodeID == 14 || nodeID == 15){
-  /* NS_LOG_DEBUG("Node: " << nodeID 
+  uint32_t seq = interest->GetName ().get (-1).toSeqNum ();
+  NS_LOG_DEBUG("Node: " << nodeID 
             << " interfaceID: " << inFace -> GetId() 
             // << m_pit->GetSize() << "\t"
-            << " rate: " << rate); */
+            << " rate: " << rate << " seq: " << seq);
   
 //////////////////////////////////////////////////////////////////
   
@@ -652,10 +653,11 @@ ForwardingStrategy::SatisfyPendingInterestDTCC (Ptr<Face> inFace,
           << " f_pitsize: " << f_pitsize << " b_pitsizedif: " << b_pitsizedif
           << " f_pitsizedif: " << f_pitsizedif << " f_rate: " << f_rate << " old_rate: " << oldRate
           << " new_rate: " << rate << " computed_newRate: " << newRate); */
+        uint32_t seq = data->GetName().get(-1).toSeqNum();
         NS_LOG_DEBUG("Node: " << nodeID << " Interest-in-face: " << outFace_data 
           << " Interest-out-face: " << infaceId << " b_pitsize: " << b_pitsize 
           << " pitsize_in: " << pitsize_in << " pitsize_out: " << pitsize_out
-          << " f_pitsize: " << f_pitsize << " rateLimit: " << rate);
+          << " f_pitsize: " << f_pitsize << " rateLimit: " << rate << " seq#: " << seq);
          
         // if(rate < 0) rate = 1;
 //        faceLimits -> UpdateCurrentLimit(rate);
@@ -962,10 +964,12 @@ ForwardingStrategy::SatisfyPendingInterestQSF (Ptr<Face> inFace,
         if (rate < 1) rate = 1;
         faceLimits -> UpdateCurrentLimit(rate);
         rate = faceLimits -> GetCurrentLimit();
+        uint32_t seq = data->GetName ().get (-1).toSeqNum ();
         NS_LOG_DEBUG("Node: " << nodeID << " Interest-in-face: " << outFace_data 
           << " Interest-out-face: " << infaceId << " b_pitsize: " << b_pitsize 
           << " pitsize_in: " << pitsize_in << " pitsize_out: " << pitsize_out
-          << " f_pitsize: " << f_pitsize << " rateLimit: " << rate << " bandwidth: " << bw);
+          << " f_pitsize: " << f_pitsize << " rateLimit: " << rate << " bandwidth: " << bw
+          << " seq#: " << seq);
          
         m_interestRateTable[outFace_data][infaceId] = rate;
 
