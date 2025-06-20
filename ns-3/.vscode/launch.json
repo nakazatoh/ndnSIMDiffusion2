@@ -55,7 +55,7 @@
             //    {"Name": "NS_LOG", "Value": "*=level_debug|prefix_func|prefix_time|prefix_node"},
             //    {"Name": "NS_LOG", "Value": "ndn.StackHelper=level_info|prefix_func|prefix_time|prefix_node"},
             //    {"Name": "NS_LOG", "Value": "DropTailQueue=level_all|prefix_func|prefix_time|prefix_node:ndn.ForwardingStrategy=level_debug|prefix_func|prefix_time|prefix_node"},
-                {"Name": "NS_LOG", "Value": "DropTailQueue=level_debug|prefix_func|prefix_node:PointToPointNetDevice=level_debug|prefix_func|prefix_time|prefix_node:ndn.ForwardingStrategy=level_debug|prefix_func|prefix_time|prefix_node"},
+                {"Name": "NS_LOG", "Value": "ndn.Producer=level_debug|prefix_func|prefix_time|prefix_node:ndn.Consumer=level_debug|prefix_func|prefix_time|prefix_node:DropTailQueue=level_debug|prefix_func|prefix_time|prefix_node:PointToPointNetDevice=level_debug|prefix_func|prefix_time|prefix_node:ndn.ForwardingStrategy=level_debug|prefix_func|prefix_time|prefix_node"},
                 {"Name": "PYTHONPATH", "Value": "/home/nakazato/ndnSIM/ns-3/build/bindings/python:/home/nakazato/ndnSIM/ns-3/src/visualizer:/home/nakazato/ndnSIM/pybindgen"}, 
                 {"Name": "LD_LIBRARY_PATH", "Value": "/usr/lib/gcc/x86_64-linux-gnu/4.8:/home/nakazato/ndnSIM/ns-3/build"},
                 {"Name": "NS3_MODULE_PATH", "Value": "/usr/lib/gcc/x86_64-linux-gnu/4.8:/home/nakazato/ndnSIM/ns-3/build"},

@@ -85,7 +85,7 @@ main (int argc, char *argv[])
   //LogComponentEnable("UdpEchoClientApplication",LOG_LEVEL_ALL);
   //LogComponentEnable("UdpEchoSeverApplication",LOG_LEVEL_ALL);
   //aikawa
-  Config::SetDefault("ns3::DropTailQueue::MaxPackets", StringValue("100"));
+  Config::SetDefault("ns3::DropTailQueue::MaxPackets", StringValue("500"));
   Config::SetDefault("ns3::PointToPointNetDevice::Mtu", StringValue ("5000"));
   //Config::SetDefault("ns3::ndn::Pit::PitEntryPruningTimeout",StringValue("9999"));
 
@@ -118,8 +118,12 @@ main (int argc, char *argv[])
 
   Ptr<Node> producer1 = Names::Find<Node> ("Dst1");
 
-  ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerCbr");
-  consumerHelper.SetAttribute ("Frequency", StringValue ("195")); // 195 interests a second
+  ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerDiffusion");
+  consumerHelper.SetAttribute ("RetxTimer", StringValue("100ms"));
+  consumerHelper.SetAttribute ("InitialFrequency", StringValue ("195")); // 195 interests a second
+//  ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerWindow");
+//  consumerHelper.SetAttribute ("Window", StringValue("5"));
+//  consumerHelper.SetAttribute ("PayloadSize", StringValue("1250"));
   // consumerHelper.SetAttribute("Randomize", StringValue("exponential"));
   // consumerHelper.SetAttribute("Randomize", StringValue("uniform"));
 

@@ -146,6 +146,8 @@ Producer::OnInterest (Ptr<const Interest> interest)
     }
 
   NS_LOG_INFO ("node("<< GetNode()->GetId() <<") respodning with Data: " << data->GetName ());
+  uint32_t seq = data->GetName ().get (-1).toSeqNum ();
+  NS_LOG_DEBUG ("data: " << seq);
 
   // Echo back FwHopCountTag if exists
   FwHopCountTag hopCountTag;

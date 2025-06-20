@@ -93,6 +93,7 @@ protected:
   bool                m_firstTime;
   RandomVariable      *m_random;
   std::string         m_randomType;
+  double              m_f_rate;
 };
 
 } // namespace ndn
