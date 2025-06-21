@@ -1128,7 +1128,7 @@ ForwardingStrategy::ShouldSuppressIncomingInterest (Ptr<Face> inFace,
 
 void
 ForwardingStrategy::PropagateInterest (Ptr<Face> inFace,
-                                       Ptr<const Interest> interest,
+                                       Ptr<Interest> interest,
                                        Ptr<pit::Entry> pitEntry)
 {
   bool isRetransmitted = m_detectRetransmissions && // a small guard
@@ -1199,7 +1199,7 @@ ForwardingStrategy::CanSendOutInterest (Ptr<Face> inFace,
 bool
 ForwardingStrategy::TrySendOutInterest (Ptr<Face> inFace,
                                         Ptr<Face> outFace,
-                                        Ptr<const Interest> interest,
+                                        Ptr<Interest> interest,
                                         Ptr<pit::Entry> pitEntry)
 {
   if (!CanSendOutInterest (inFace, outFace, interest, pitEntry))

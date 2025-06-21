@@ -387,7 +387,7 @@ protected:
   virtual bool
   TrySendOutInterest (Ptr<Face> inFace,
                       Ptr<Face> outFace,
-                      Ptr<const Interest> interest,
+                      Ptr<Interest> interest,
                       Ptr<pit::Entry> pitEntry);
 
   /**
@@ -418,7 +418,7 @@ protected:
    */
   virtual void
   PropagateInterest (Ptr<Face> inFace,
-                     Ptr<const Interest> interest,
+                     Ptr<Interest> interest,
                      Ptr<pit::Entry> pitEntry);
 
   /**
@@ -441,7 +441,7 @@ protected:
    */
   virtual bool
   DoPropagateInterest (Ptr<Face> inFace,
-                       Ptr<const Interest> interest,
+                       Ptr<Interest> interest,
                        Ptr<pit::Entry> pitEntry) = 0;
 
 protected:
