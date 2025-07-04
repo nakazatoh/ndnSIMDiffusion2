@@ -156,7 +156,7 @@ Producer::OnInterest (Ptr<const Interest> interest)
       data->GetPayload ()->AddPacketTag (hopCountTag);
     }
 /*ADD 2017/12/14*****************************************************************************/ 
-  /* FeedbackTag の初期化 */  
+  /* FeedbackTag の初期化 */  /*
   FwFeedbackPitsizeTag feedbackPitsizeTag;
   FwFeedbackRateTag feedbackRateTag;
   FwFeedbackPitsizeDifferenceTag feedbackPitsizeDifferenceTag;
@@ -168,12 +168,12 @@ Producer::OnInterest (Ptr<const Interest> interest)
   feedbackPitsizeTag.SetPitSize(pitsize);
   feedbackRateTag.SetRate(rate);
   feedbackPitsizeDifferenceTag.SetPitSizeDif(pitsizedif);
-
-  /* FeedbackTagの付与 */
+*/
+  /* FeedbackTagの付与 */ /*
   data->GetPayload ()->AddPacketTag (feedbackPitsizeTag);
   data->GetPayload ()->AddPacketTag (feedbackRateTag);
   data->GetPayload ()->AddPacketTag (feedbackPitsizeDifferenceTag);
-
+*/
   //std::cout << Simulator::Now ().ToDouble (Time::S) << "\t" //time
   //          << "producer_pitsize = " << feedbackPitsizeTag.GetPitSize() << "\t"
   //          << "producer_rate = " << feedbackRateTag.GetRate() << "\n";
