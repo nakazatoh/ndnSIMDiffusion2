@@ -247,6 +247,7 @@ public:
   inline double
   GetPitsize() const;
 
+
   inline void
   SetFPitsize(double pitsize);
 

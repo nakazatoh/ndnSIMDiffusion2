@@ -104,8 +104,15 @@ main (int argc, char *argv[])
   ndnHelper.SetContentStore ("ns3::ndn::cs::Lru", "MaxSize", "1000");
   ndnHelper.SetPit ("ns3::ndn::pit::SerializedSize", "MaxSize", "0");
   ndnHelper.SetPit ("ns3::ndn::pit::SerializedSize", "MaxPitEntryLifetime", "0");
-  ndnHelper.InstallAll ();
+  //ndnHelper.InstallAll ();
+  ndnHelper.Install(Names::Find<Node>("Rtr1"));
+  ndnHelper.Install(Names::Find<Node>("Rtr2"));
 
+  ndnHelper.SetContentStore("ns3::ndn::cs::Lru", "MaxSize", "0");
+  ndnHelper.Install(Names::Find<Node>("Src1"));
+  ndnHelper.Install(Names::Find<Node>("Src2"));
+  ndnHelper.Install(Names::Find<Node>("Src3"));
+  ndnHelper.Install(Names::Find<Node>("Dst1"));
 
   // Installing global routing interface on all nodes
   ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
