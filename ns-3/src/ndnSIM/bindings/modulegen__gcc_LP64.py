@@ -6087,7 +6087,7 @@ def register_Ns3NdnForwardingStrategy_methods(root_module, cls):
     ## ndn-forwarding-strategy.h (module 'ndnSIM'): bool ns3::ndn::ForwardingStrategy::DoPropagateInterest(ns3::Ptr<ns3::ndn::Face> inFace, ns3::Ptr<ns3::ndn::Interest const> interest, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
     cls.add_method('DoPropagateInterest', 
                    'bool', 
-                   [param('ns3::Ptr< ns3::ndn::Face >', 'inFace'), param('ns3::Ptr< ns3::ndn::Interest const >', 'interest'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
+                   [param('ns3::Ptr< ns3::ndn::Face >', 'inFace'), param('ns3::Ptr< ns3::ndn::Interest >', 'interest'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
                    is_pure_virtual=True, visibility='protected', is_virtual=True)
     ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::FailedToCreatePitEntry(ns3::Ptr<ns3::ndn::Face> inFace, ns3::Ptr<ns3::ndn::Interest const> interest) [member function]
     cls.add_method('FailedToCreatePitEntry', 
@@ -6102,7 +6102,7 @@ def register_Ns3NdnForwardingStrategy_methods(root_module, cls):
     ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::PropagateInterest(ns3::Ptr<ns3::ndn::Face> inFace, ns3::Ptr<ns3::ndn::Interest const> interest, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
     cls.add_method('PropagateInterest', 
                    'void', 
-                   [param('ns3::Ptr< ns3::ndn::Face >', 'inFace'), param('ns3::Ptr< ns3::ndn::Interest const >', 'interest'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
+                   [param('ns3::Ptr< ns3::ndn::Face >', 'inFace'), param('ns3::Ptr< ns3::ndn::Interest >', 'interest'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
                    visibility='protected', is_virtual=True)
     ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::SatisfyPendingInterest(ns3::Ptr<ns3::ndn::Face> inFace, ns3::Ptr<ns3::ndn::Data const> data, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
     cls.add_method('SatisfyPendingInterest', 
@@ -6117,7 +6117,7 @@ def register_Ns3NdnForwardingStrategy_methods(root_module, cls):
     ## ndn-forwarding-strategy.h (module 'ndnSIM'): bool ns3::ndn::ForwardingStrategy::TrySendOutInterest(ns3::Ptr<ns3::ndn::Face> inFace, ns3::Ptr<ns3::ndn::Face> outFace, ns3::Ptr<ns3::ndn::Interest const> interest, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
     cls.add_method('TrySendOutInterest', 
                    'bool', 
-                   [param('ns3::Ptr< ns3::ndn::Face >', 'inFace'), param('ns3::Ptr< ns3::ndn::Face >', 'outFace'), param('ns3::Ptr< ns3::ndn::Interest const >', 'interest'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
+                   [param('ns3::Ptr< ns3::ndn::Face >', 'inFace'), param('ns3::Ptr< ns3::ndn::Face >', 'outFace'), param('ns3::Ptr< ns3::ndn::Interest >', 'interest'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
                    visibility='protected', is_virtual=True)
     ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::WillSatisfyPendingInterest(ns3::Ptr<ns3::ndn::Face> inFace, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
     cls.add_method('WillSatisfyPendingInterest', 
