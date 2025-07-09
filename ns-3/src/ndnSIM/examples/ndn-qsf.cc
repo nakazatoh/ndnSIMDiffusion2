@@ -104,8 +104,15 @@ main (int argc, char *argv[])
   ndnHelper.SetContentStore ("ns3::ndn::cs::Lru", "MaxSize", "1000");
   ndnHelper.SetPit ("ns3::ndn::pit::SerializedSize", "MaxSize", "0");
   ndnHelper.SetPit ("ns3::ndn::pit::SerializedSize", "MaxPitEntryLifetime", "0");
-  ndnHelper.InstallAll ();
+  //ndnHelper.InstallAll ();
+  ndnHelper.Install(Names::Find<Node>("Rtr1"));
+  ndnHelper.Install(Names::Find<Node>("Rtr2"));
 
+  ndnHelper.SetContentStore("ns3::ndn::cs::Lru", "MaxSize", "0");
+  ndnHelper.Install(Names::Find<Node>("Src1"));
+  ndnHelper.Install(Names::Find<Node>("Src2"));
+  ndnHelper.Install(Names::Find<Node>("Src3"));
+  ndnHelper.Install(Names::Find<Node>("Dst1"));
 
   // Installing global routing interface on all nodes
   ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
@@ -185,10 +192,10 @@ main (int argc, char *argv[])
   s << std::setw(2) << std::setfill('0') << localTime->tm_min;
   s << std::setw(2) << std::setfill('0') << localTime->tm_sec;
 
-  std::string drop_trace("drop-trace-qsf.txt");
-  std::string rate_trace("rate-trace-qsf.txt");
-  std::string aggregate_trace("aggregate-trace-qsf.txt");
-  std::string app_delay_trace("app-delays-trace-qsf.txt");
+  std::string drop_trace("drop-trace-qsfO.txt");
+  std::string rate_trace("rate-trace-qsfO.txt");
+  std::string aggregate_trace("aggregate-trace-qsfO.txt");
+  std::string app_delay_trace("app-delays-trace-qsfO.txt");
 
   // L2RateTracer::InstallAll ("20220621-3_drop-trace-5src-1213.txt", Seconds (0.1));
   L2RateTracer::InstallAll (s.str() + drop_trace, Seconds (0.1));
