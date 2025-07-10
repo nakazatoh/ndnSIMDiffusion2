@@ -144,6 +144,7 @@ def build(bld):
         "model/ndn-data.h",
         "model/ndn-name-components.h",
         "model/ndn-name.h",
+        "model/ndn-delayed-interest.h",
 
         "ndn.cxx/blob.h",
         "ndn.cxx/name-component.h",

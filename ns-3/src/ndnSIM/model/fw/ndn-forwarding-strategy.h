@@ -456,8 +456,7 @@ protected:
 
 /////////////////////////////////////////////
   double ad;
-  double DataPacketNum[20];///LEE 
-//  std::vector<std::vector<double> > m_interestRateTable{};
+  bool m_consumerNeighbour;
   std::vector<std::vector<double> > m_interestRateTable;
 ////////////////////////
 
