@@ -465,7 +465,7 @@ ForwardingStrategy::SatisfyPendingInterestDTCC (Ptr<Face> inFace,
                                                 Ptr<Data> data,
                                                 Ptr<pit::Entry> pitEntry)
 {
-  if (inFace != 0)
+  if (inFace == 0)
   {
     BOOST_FOREACH (const pit::IncomingFace &incoming, pitEntry->GetIncoming())
     {
