@@ -29,10 +29,12 @@
 #include "ns3/nstime.h"
 #include "ns3/type-id.h"
 #include "ns3/traced-callback.h"
+#include "ndn-delayed-interest.h"
 #include "ns3/ndn-name.h"
 
 namespace ns3 {
 
+//class Queue;
 class Packet;
 class Node;
 
@@ -319,7 +321,7 @@ private:
   double m_b_pitsize;
   double m_arrival_time[5];
   int m_a_t_index;
-
+  //Queue<DelayedInterest>
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 };
