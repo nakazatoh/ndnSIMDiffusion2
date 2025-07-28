@@ -156,5 +156,18 @@ LimitsRate::LeakBucket (double interval)
   Simulator::Schedule (Seconds (newInterval), &LimitsRate::LeakBucket, this, newInterval);
 }
 
+void
+LimitsRate::RegisterAvailableSlotCallback (Callback<void, Ptr<Face> > handler)
+{
+  m_rate_handler = handler;
+}
+
+void
+LimitsRate::FireAvailableSlotCallback ()
+{
+  if (!m_rate_handler.IsNull ())
+    m_rate_handler (m_face);
+}
+
 } // namespace ndn
 } // namespace ns3

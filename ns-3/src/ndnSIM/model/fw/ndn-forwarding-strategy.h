@@ -390,6 +390,9 @@ protected:
                       Ptr<Interest> interest,
                       Ptr<pit::Entry> pitEntry);
 
+  virtual void
+  RetrySendOutInterest (Ptr<Face> face);
+
   /**
    * @brief Event fired just after forwarding the Interest
    *

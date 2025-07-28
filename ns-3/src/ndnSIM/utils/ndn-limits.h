@@ -24,6 +24,7 @@
 #include "ns3/ptr.h"
 #include "ns3/object.h"
 #include "ns3/traced-value.h"
+#include "ns3/ndn-face.h"
 
 namespace ns3 {
 namespace ndn {

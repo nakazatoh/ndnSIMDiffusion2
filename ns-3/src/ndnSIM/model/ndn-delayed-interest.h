@@ -17,7 +17,7 @@ namespace pit {
   class Entry;
 }
 
-  struct DelayedInterest
+  struct DelayedInterest : Object
   {
     Ptr<Face> inFace;
     Ptr<Face> outFace;

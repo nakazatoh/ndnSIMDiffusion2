@@ -168,6 +168,7 @@ def build(bld):
         "model/wire/ndn-wire.h",
 
         "utils/ndn-limits.h",
+        "utils/ndn-limits-rate.h",
         "utils/ndn-rtt-estimator.h",
 
         # "utils/tracers/ipv4-app-tracer.h",

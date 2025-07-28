@@ -1070,9 +1070,17 @@ ForwardingStrategy::TrySendOutInterest (Ptr<Face> inFace,
                                         Ptr<Interest> interest,
                                         Ptr<pit::Entry> pitEntry)
 {
+  pitEntry->AddOutgoing (outFace);  
+
   if (!CanSendOutInterest (inFace, outFace, interest, pitEntry))
     {
-      return false;
+      Ptr<DelayedInterest> di = Create<DelayedInterest>();
+      di->inFace = inFace;
+      di->outFace = outFace;
+      di->interest = interest;
+      di->pitEntry = pitEntry;
+      outFace->Enqueue(di);
+      return true;
     }
 
   Ptr<Node> node = inFace -> GetNode();
@@ -1081,7 +1089,7 @@ ForwardingStrategy::TrySendOutInterest (Ptr<Face> inFace,
   double rate = faceLimits -> GetCurrentLimit();
   uint32_t faceid = outFace->GetId();
 
-  pitEntry->AddOutgoing (outFace);  
+//  pitEntry->AddOutgoing (outFace);  
 
   Ptr<pit::Entry> pe = m_pit->Begin();
   double pc = 0;
@@ -1131,6 +1139,75 @@ ForwardingStrategy::TrySendOutInterest (Ptr<Face> inFace,
   DidSendOutInterest (inFace, outFace, interest, pitEntry);
 
   return true;
+}
+
+void
+ForwardingStrategy::RetrySendOutInterest (Ptr<Face> face)
+{
+  Ptr<DelayedInterest> di = face->Dequeue();
+  if (di == 0)
+    return;
+  Ptr<Face> inFace = di->inFace;
+  Ptr<Face> outFace = di->outFace;
+  Ptr<Interest> interest = di->interest;
+  Ptr<pit::Entry> pitEntry = di->pitEntry;
+
+  Ptr<Node> node = inFace -> GetNode();
+  uint32_t nodeID = node -> GetId();
+  Ptr<Limits> faceLimits = outFace -> GetObject<Limits>();
+  double rate = faceLimits -> GetCurrentLimit();
+  uint32_t faceid = outFace->GetId();
+
+//  pitEntry->AddOutgoing (outFace);  
+  pitEntry->UpdateLifetime (interest->GetInterestLifetime ());
+
+  Ptr<pit::Entry> pe = m_pit->Begin();
+  double pc = 0;
+  while(pe)
+  {
+    std::set<ndn::pit::OutgoingFace> outgoing_face = pe->GetOutgoing();
+    for(std::set<ndn::pit::OutgoingFace>::iterator out_itr = outgoing_face.begin();
+      out_itr != outgoing_face.end(); ++out_itr)
+      {
+        if(out_itr->m_face->GetId() == faceid)
+        {
+          pc++;
+        }
+      }
+    pe = m_pit->Next(pe);
+  }
+  
+  FwFeedbackPitsizeTag feedbackPitsizeTag;
+  feedbackPitsizeTag.SetPitSize(pc);
+
+  Ptr<Packet> payload = interest->GetPayload()->Copy();
+  payload->ReplacePacketTag(feedbackPitsizeTag);
+  const Interest* imutableInterest = &(*interest);
+  Interest* mutableInterest = const_cast<Interest*>(imutableInterest);
+  mutableInterest->SetPayload(payload);
+  
+  double tm = Simulator::Now().ToDouble(Time::S);
+  // if (nodeID == 2 || nodeID == 7 || (nodeID == 10 && faceid == 7) || nodeID == 14 || nodeID == 15){
+  /* if (nodeID == 2 || nodeID == 7){
+    std::cout << Simulator::Now ().ToDouble (Time::S) << " " //time
+              << "Node:" << nodeID << " "
+              << "interfaceID:" << faceid << " "  // incomingDataFaceID
+              // << m_pit->GetSize() << "\t"
+              << "rate:" << rate << "\n";
+    std::cout << "--------------------------------\n";
+  } */
+
+//  pitEntry->AddOutgoing (outFace);
+
+  //transmission
+  bool successSend = outFace->SendInterest (interest);
+  if (!successSend)
+    {
+      m_dropInterests (interest, outFace);
+    }
+
+  DidSendOutInterest (inFace, outFace, interest, pitEntry);
+
 }
 
 void
