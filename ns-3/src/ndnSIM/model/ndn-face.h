@@ -266,11 +266,14 @@ public:
   double
   GetBW() const;
 
-  inline void
+  void
   Enqueue(Ptr<DelayedInterest>);
 
-  inline Ptr<DelayedInterest>
+  Ptr<DelayedInterest>
   Dequeue();
+
+  bool
+  IsQueueEmpty();
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -422,23 +425,6 @@ Face::GetFPitsize() const
   return m_f_pitsize;
 }
 
-inline void
-Face::Enqueue(Ptr<DelayedInterest> di)
-{
-  m_interest_queue.push(di);
-}
-
-inline Ptr<DelayedInterest>
-Face::Dequeue()
-{
-  if (!m_interest_queue.empty())
-  {
-    Ptr<DelayedInterest> di = m_interest_queue.front();
-    m_interest_queue.pop();
-    return di;
-  }
-  return 0;
-}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 inline bool
