@@ -85,7 +85,7 @@ main (int argc, char *argv[])
   //LogComponentEnable("UdpEchoClientApplication",LOG_LEVEL_ALL);
   //LogComponentEnable("UdpEchoSeverApplication",LOG_LEVEL_ALL);
   //aikawa
-  Config::SetDefault("ns3::DropTailQueue::MaxPackets", StringValue("500"));
+  Config::SetDefault("ns3::DropTailQueue::MaxPackets", StringValue("1000"));
   Config::SetDefault("ns3::PointToPointNetDevice::Mtu", StringValue ("5000"));
   //Config::SetDefault("ns3::ndn::Pit::PitEntryPruningTimeout",StringValue("9999"));
 
@@ -180,7 +180,7 @@ main (int argc, char *argv[])
   app2.Start(Seconds(1.4));
   app3.Start(Seconds(1.8));
 
-  Simulator::Stop (Seconds (10.0));
+  Simulator::Stop (Seconds (5.0));
 
   time_t t = time(NULL);
   const tm* localTime = localtime(&t);
@@ -192,10 +192,10 @@ main (int argc, char *argv[])
   s << std::setw(2) << std::setfill('0') << localTime->tm_min;
   s << std::setw(2) << std::setfill('0') << localTime->tm_sec;
 
-  std::string drop_trace("drop-trace-qsfO.txt");
-  std::string rate_trace("rate-trace-qsfO.txt");
-  std::string aggregate_trace("aggregate-trace-qsfO.txt");
-  std::string app_delay_trace("app-delays-trace-qsfO.txt");
+  std::string drop_trace("drop-trace-qsf.txt");
+  std::string rate_trace("rate-trace-qsf.txt");
+  std::string aggregate_trace("aggregate-trace-qsf.txt");
+  std::string app_delay_trace("app-delays-trace-qsf.txt");
 
   // L2RateTracer::InstallAll ("20220621-3_drop-trace-5src-1213.txt", Seconds (0.1));
   L2RateTracer::InstallAll (s.str() + drop_trace, Seconds (0.1));

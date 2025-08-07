@@ -173,7 +173,7 @@ ForwardingStrategy::OnInterest (Ptr<Face> inFace,
   uint32_t faceid = inFace->GetId();
   //  if ((nodeID == 10 && faceid == 3) || nodeID == 14 || nodeID == 15){
   uint32_t seq = interest->GetName ().get (-1).toSeqNum ();
-  NS_LOG_DEBUG("Node: " << nodeID 
+  NS_LOG_LOGIC("Node: " << nodeID 
             << " interfaceID: " << inFace -> GetId() 
             << " seq#: " << seq);
   
@@ -248,7 +248,7 @@ ForwardingStrategy::OnInterest (Ptr<Face> inFace,
                 pitEntry->UpdateLifetime (interest->GetInterestLifetime ());
 
                 // Suppress this interest if we're still expecting data from some other face
-                NS_LOG_DEBUG ("Suppress interests");
+                NS_LOG_LOGIC ("Suppress interests");
                 m_dropInterests (interest, inFace);
 
                 DidSuppressSimilarInterest (inFace, interest, pitEntry);
@@ -277,7 +277,7 @@ Ptr<Node> node = inFace -> GetNode();
   double rate = faceLimits -> GetCurrentLimit();
   
   uint32_t seq = data->GetName ().get (-1).toSeqNum ();
-  NS_LOG_DEBUG("Node: " << nodeID 
+  NS_LOG_LOGIC("Node: " << nodeID 
             << " interfaceID: " << inFace -> GetId() 
             << " seq: " << seq);
 ///////////////////////////////  
@@ -494,7 +494,7 @@ ForwardingStrategy::SatisfyPendingInterestDTCC (Ptr<Face> inFace,
     Ptr<Packet> payloadCopy = data->GetPayload()->Copy();
 
     uint32_t seq = data->GetName ().get (-1).toSeqNum ();
-    NS_LOG_DEBUG("Node: " << nodeID << " Interest-in-face: " << outFace_data 
+    NS_LOG_LOGIC("Node: " << nodeID << " Interest-in-face: " << outFace_data 
       << " Cache HIT! seq#: " << seq << " pitsize_in: " << inPitsize);
 
     if (pitsizeTagPresent)
@@ -609,11 +609,12 @@ ForwardingStrategy::SatisfyPendingInterestDTCC (Ptr<Face> inFace,
         rate = (incoming.m_face->GetObject<Limits>())->GetCurrentLimit();
         newRate = rate;
         m_interestRateTable[outFace_data][infaceId] = rate;
+        uint32_t seq = data->GetName().get(-1).toSeqNum();
         NS_LOG_DEBUG("Node: " << nodeID << " Interest-in-face: " << outFace_data 
           << " Interest-out-face: " << infaceId << " b_pitsize: " << b_pitsize 
           << " pitsize_in: " << pitsize_in << " pitsize_out: " << pitsize_out
-          << " f_pitsize: " << f_pitsize  
-          << " rateLimit: " << rate);
+          << " f_pitsize: " << f_pitsize << " f_pitsize_portion: " << f_pitsize_portion
+          << " rateLimit: " << rate << " seq#: " << seq);
       } 
       else
       {
@@ -1081,7 +1082,7 @@ ForwardingStrategy::TrySendOutInterest (Ptr<Face> inFace,
 
   uint32_t nodeID = inFace->GetNode() -> GetId();
   uint32_t seq = interest->GetName ().get (-1).toSeqNum ();
-  NS_LOG_DEBUG("Enqueue: Node: " << nodeID 
+  NS_LOG_LOGIC("Enqueue: Node: " << nodeID 
             << " interfaceID: " << inFace -> GetId() 
             << " seq#: " << seq);
   //  pitEntry->AddOutgoing (outFace); 
@@ -1096,7 +1097,7 @@ ForwardingStrategy::TrySendOutInterest (Ptr<Face> inFace,
   pitEntry = di->pitEntry;
   nodeID = inFace->GetNode() -> GetId();
   seq = interest->GetName ().get (-1).toSeqNum ();
-  NS_LOG_DEBUG("Dequeue: Node: " << nodeID 
+  NS_LOG_LOGIC("Dequeue: Node: " << nodeID 
             << " interfaceID: " << inFace -> GetId() 
             << " seq#: " << seq);
   
@@ -1133,7 +1134,7 @@ ForwardingStrategy::TrySendOutInterest (Ptr<Face> inFace,
   Interest* mutableInterest = const_cast<Interest*>(imutableInterest);
   mutableInterest->SetPayload(payload);
   
-  NS_LOG_DEBUG("Node: " << nodeID
+  NS_LOG_LOGIC("Node: " << nodeID
               << " interfaceID: " << faceid
                << " pitsize: " << m_pit->GetSize()
               << " rate: " << rate);
@@ -1165,7 +1166,7 @@ ForwardingStrategy::RetrySendOutInterest (Ptr<Face> face)
   
   uint32_t nodeID = inFace->GetNode() -> GetId();
   uint32_t seq = interest->GetName ().get (-1).toSeqNum ();
-  NS_LOG_DEBUG("Dequeue: Node: " << nodeID 
+  NS_LOG_LOGIC("Dequeue: Node: " << nodeID 
             << " interfaceID: " << inFace -> GetId() 
             << " seq#: " << seq);
   pitEntry->AddOutgoing (outFace); 
@@ -1206,7 +1207,7 @@ ForwardingStrategy::RetrySendOutInterest (Ptr<Face> face)
   
   double tm = Simulator::Now().ToDouble(Time::S);
 
-  NS_LOG_DEBUG("Node: " << nodeID
+  NS_LOG_LOGIC("Node: " << nodeID
               << " interfaceID: " << faceid
                << " pitsize: " << m_pit->GetSize()
               << " rate: " << rate);
