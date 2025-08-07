@@ -1,0 +1,565 @@
+Waf: Entering directory `/home/nakazato/ndnSIM/ns-3/build'
+[1282/2546] cxx: src/ndnSIM/tools/rocketfuel-maps-cch-to-annotaded.cc -> build/src/ndnSIM/tools/rocketfuel-maps-cch-to-annotaded.cc.1.o
+[1283/2546] cxx: src/ndnSIM/examples/ndn-simple-wifi.cc -> build/src/ndnSIM/examples/ndn-simple-wifi.cc.39.o
+In file included from ./ns3/ndn-fib.h:27:0,
+                 from ./ns3/ndn-pit-entry.h:27,
+                 from ./ns3/ndn-delayed-interest.h:8,
+                 from ./ns3/ndn-face.h:32,
+                 from ./ns3/ndn-api-face.h:29,
+                 from ./ns3/ndnSIM-module.h:18,
+                 from ../src/ndnSIM/tools/rocketfuel-maps-cch-to-annotaded.cc:24:
+./ns3/ndn-fib-entry.h:74:19: error: ‘Face’ was not declared in this scope
+   FaceMetric (Ptr<Face> face, int32_t cost)
+                   ^
+./ns3/ndn-fib-entry.h:74:23: error: template argument 1 is invalid
+   FaceMetric (Ptr<Face> face, int32_t cost)
+                       ^
+./ns3/ndn-fib-entry.h:93:24: error: ‘Face’ was not declared in this scope
+   operator< (const Ptr<Face> &face) const { return *m_face < *face; }
+                        ^
+./ns3/ndn-fib-entry.h:93:28: error: template argument 1 is invalid
+   operator< (const Ptr<Face> &face) const { return *m_face < *face; }
+                            ^
+./ns3/ndn-fib-entry.h:98:7: error: ‘Face’ was not declared in this scope
+   Ptr<Face>
+       ^
+./ns3/ndn-fib-entry.h:98:11: error: template argument 1 is invalid
+   Ptr<Face>
+           ^
+./ns3/ndn-fib-entry.h:194:7: error: ‘Face’ was not declared in this scope
+   Ptr<Face> m_face; ///< Face
+       ^
+./ns3/ndn-fib-entry.h:194:11: error: template argument 1 is invalid
+   Ptr<Face> m_face; ///< Face
+           ^
+./ns3/ndn-fib-entry.h: In member function ‘bool ns3::ndn::fib::FaceMetric::operator<(const ns3::ndn::fib::FaceMetric&) const’:
+./ns3/ndn-fib-entry.h:87:52: error: invalid type argument of unary ‘*’ (have ‘int’)
+   operator< (const FaceMetric &fm) const { return *m_face < *fm.m_face; } // return identity of the face
+                                                    ^
+./ns3/ndn-fib-entry.h:87:65: error: invalid type argument of unary ‘*’ (have ‘int’)
+   operator< (const FaceMetric &fm) const { return *m_face < *fm.m_face; } // return identity of the face
+                                                                 ^
+./ns3/ndn-fib-entry.h: In member function ‘bool ns3::ndn::fib::FaceMetric::operator<(const int&) const’:
+./ns3/ndn-fib-entry.h:93:53: error: invalid type argument of unary ‘*’ (have ‘int’)
+   operator< (const Ptr<Face> &face) const { return *m_face < *face; }
+                                                     ^
+./ns3/ndn-fib-entry.h:93:63: error: invalid type argument of unary ‘*’ (have ‘int’)
+   operator< (const Ptr<Face> &face) const { return *m_face < *face; }
+                                                               ^
+In file included from ./ns3/ndn-fib.h:27:0,
+                 from ./ns3/ndn-pit-entry.h:27,
+                 from ./ns3/ndn-delayed-interest.h:8,
+                 from ./ns3/ndn-face.h:32,
+                 from ./ns3/ndn-api-face.h:29,
+                 from ./ns3/ndnSIM-module.h:18,
+                 from ../src/ndnSIM/tools/rocketfuel-maps-cch-to-annotaded.cc:24:
+./ns3/ndn-fib-entry.h: At global scope:
+./ns3/ndn-fib-entry.h:235:58: error: ‘Face’ was not declared in this scope
+         boost::multi_index::const_mem_fun<FaceMetric,Ptr<Face>,&FaceMetric::GetFace>
+                                                          ^
+./ns3/ndn-fib-entry.h:235:62: error: template argument 1 is invalid
+         boost::multi_index::const_mem_fun<FaceMetric,Ptr<Face>,&FaceMetric::GetFace>
+                                                              ^
+./ns3/ndn-fib-entry.h:235:84: error: template argument 2 is invalid
+         boost::multi_index::const_mem_fun<FaceMetric,Ptr<Face>,&FaceMetric::GetFace>
+                                                                                    ^
+./ns3/ndn-fib-entry.h:235:84: note: invalid template non-type parameter
+./ns3/ndn-fib-entry.h:236:7: error: template argument 2 is invalid
+       >,
+       ^
+./ns3/ndn-fib-entry.h:252:5: error: template argument 1 is invalid
+     >
+     ^
+./ns3/ndn-fib-entry.h:253:4: error: template argument 2 is invalid
+    > type;
+    ^
+./ns3/ndn-fib-entry.h:285:26: error: ‘Face’ was not declared in this scope
+   void UpdateStatus (Ptr<Face> face, FaceMetric::Status status);
+                          ^
+./ns3/ndn-fib-entry.h:285:30: error: template argument 1 is invalid
+   void UpdateStatus (Ptr<Face> face, FaceMetric::Status status);
+                              ^
+./ns3/ndn-fib-entry.h:292:38: error: ‘Face’ was not declared in this scope
+   void AddOrUpdateRoutingMetric (Ptr<Face> face, int32_t metric);
+                                      ^
+./ns3/ndn-fib-entry.h:292:42: error: template argument 1 is invalid
+   void AddOrUpdateRoutingMetric (Ptr<Face> face, int32_t metric);
+                                          ^
+./ns3/ndn-fib-entry.h:298:31: error: ‘Face’ was not declared in this scope
+   SetRealDelayToProducer (Ptr<Face> face, Time delay);
+                               ^
+./ns3/ndn-fib-entry.h:298:35: error: template argument 1 is invalid
+   SetRealDelayToProducer (Ptr<Face> face, Time delay);
+                                   ^
+./ns3/ndn-fib-entry.h:312:22: error: ‘Face’ was not declared in this scope
+   UpdateFaceRtt (Ptr<Face> face, const Time &sample);
+                      ^
+./ns3/ndn-fib-entry.h:312:26: error: template argument 1 is invalid
+   UpdateFaceRtt (Ptr<Face> face, const Time &sample);
+                          ^
+./ns3/ndn-fib-entry.h:332:25: error: ‘Face’ was not declared in this scope
+   RemoveFace (const Ptr<Face> &face)
+                         ^
+./ns3/ndn-fib-entry.h:332:29: error: template argument 1 is invalid
+   RemoveFace (const Ptr<Face> &face)
+                             ^
+./ns3/ndn-fib-entry.h: In member function ‘void ns3::ndn::fib::Entry::RemoveFace(const int&)’:
+./ns3/ndn-fib-entry.h:334:13: error: request for member ‘erase’ in ‘((ns3::ndn::fib::Entry*)this)->ns3::ndn::fib::Entry::m_faces’, which is of non-class type ‘ns3::ndn::fib::FaceMetricContainer::type {aka int}’
+     m_faces.erase (face);
+             ^
+In file included from ./ns3/ndn-pit-entry.h:27:0,
+                 from ./ns3/ndn-delayed-interest.h:8,
+                 from ./ns3/ndn-face.h:32,
+                 from ./ns3/ndn-api-face.h:29,
+                 from ./ns3/ndnSIM-module.h:18,
+                 from ../src/ndnSIM/tools/rocketfuel-maps-cch-to-annotaded.cc:24:
+./ns3/ndn-fib.h: At global scope:
+./ns3/ndn-fib.h:93:32: error: ‘Face’ was not declared in this scope
+   Add (const Name &prefix, Ptr<Face> face, int32_t metric) = 0;
+                                ^
+./ns3/ndn-fib.h:93:36: error: template argument 1 is invalid
+   Add (const Name &prefix, Ptr<Face> face, int32_t metric) = 0;
+                                    ^
+./ns3/ndn-fib.h:105:43: error: ‘Face’ was not declared in this scope
+   Add (const Ptr<const Name> &prefix, Ptr<Face> face, int32_t metric) = 0;
+                                           ^
+./ns3/ndn-fib.h:105:47: error: template argument 1 is invalid
+   Add (const Ptr<const Name> &prefix, Ptr<Face> face, int32_t metric) = 0;
+                                               ^
+./ns3/ndn-fib.h:129:22: error: ‘Face’ was not declared in this scope
+   RemoveFromAll (Ptr<Face> face) = 0;
+                      ^
+./ns3/ndn-fib.h:129:26: error: template argument 1 is invalid
+   RemoveFromAll (Ptr<Face> face) = 0;
+                          ^
+In file included from ./ns3/ndn-pit-entry.h:29:0,
+                 from ./ns3/ndn-delayed-interest.h:8,
+                 from ./ns3/ndn-face.h:32,
+                 from ./ns3/ndn-api-face.h:29,
+                 from ./ns3/ndnSIM-module.h:18,
+                 from ../src/ndnSIM/tools/rocketfuel-maps-cch-to-annotaded.cc:24:
+./ns3/ndn-pit-entry-incoming-face.h:39:8: error: ‘Face’ was not declared in this scope
+   Ptr< Face > m_face; ///< \brief face of the incoming Interest
+        ^
+./ns3/ndn-pit-entry-incoming-face.h:39:13: error: template argument 1 is invalid
+   Ptr< Face > m_face; ///< \brief face of the incoming Interest
+             ^
+./ns3/ndn-pit-entry-incoming-face.h:48:21: error: ‘Face’ was not declared in this scope
+   IncomingFace (Ptr<Face> face);
+                     ^
+./ns3/ndn-pit-entry-incoming-face.h:48:25: error: template argument 1 is invalid
+   IncomingFace (Ptr<Face> face);
+                         ^
+./ns3/ndn-pit-entry-incoming-face.h:68:24: error: ‘Face’ was not declared in this scope
+   bool operator== (Ptr<Face> face) const { return *m_face==*face; }
+                        ^
+./ns3/ndn-pit-entry-incoming-face.h:68:28: error: template argument 1 is invalid
+   bool operator== (Ptr<Face> face) const { return *m_face==*face; }
+                            ^
+./ns3/ndn-pit-entry-incoming-face.h: In member function ‘bool ns3::ndn::pit::IncomingFace::operator==(const ns3::ndn::pit::IncomingFace&) const’:
+./ns3/ndn-pit-entry-incoming-face.h:63:61: error: invalid type argument of unary ‘*’ (have ‘int’)
+   bool operator== (const IncomingFace &dst) const { return *m_face==*(dst.m_face); }
+                                                             ^
+./ns3/ndn-pit-entry-incoming-face.h:63:81: error: invalid type argument of unary ‘*’ (have ‘int’)
+   bool operator== (const IncomingFace &dst) const { return *m_face==*(dst.m_face); }
+                                                                                 ^
+./ns3/ndn-pit-entry-incoming-face.h: In member function ‘bool ns3::ndn::pit::IncomingFace::operator==(int) const’:
+./ns3/ndn-pit-entry-incoming-face.h:68:52: error: invalid type argument of unary ‘*’ (have ‘int’)
+   bool operator== (Ptr<Face> face) const { return *m_face==*face; }
+                                                    ^
+./ns3/ndn-pit-entry-incoming-face.h:68:61: error: invalid type argument of unary ‘*’ (have ‘int’)
+   bool operator== (Ptr<Face> face) const { return *m_face==*face; }
+                                                             ^
+./ns3/ndn-pit-entry-incoming-face.h: In member function ‘bool ns3::ndn::pit::IncomingFace::operator<(const ns3::ndn::pit::IncomingFace&) const’:
+./ns3/ndn-pit-entry-incoming-face.h:74:53: error: invalid type argument of unary ‘*’ (have ‘int’)
+   operator< (const IncomingFace &m) const { return *m_face < *(m.m_face); } // return identity of the face
+                                                     ^
+./ns3/ndn-pit-entry-incoming-face.h:74:72: error: invalid type argument of unary ‘*’ (have ‘int’)
+   operator< (const IncomingFace &m) const { return *m_face < *(m.m_face); } // return identity of the face
+                                                                        ^
+In file included from ./ns3/ndn-pit-entry.h:30:0,
+                 from ./ns3/ndn-delayed-interest.h:8,
+                 from ./ns3/ndn-face.h:32,
+                 from ./ns3/ndn-api-face.h:29,
+                 from ./ns3/ndnSIM-module.h:18,
+                 from ../src/ndnSIM/tools/rocketfuel-maps-cch-to-annotaded.cc:24:
+./ns3/ndn-pit-entry-outgoing-face.h: At global scope:
+./ns3/ndn-pit-entry-outgoing-face.h:39:7: error: ‘Face’ was not declared in this scope
+   Ptr<Face> m_face;     ///< \brief face of the outgoing Interest
+       ^
+./ns3/ndn-pit-entry-outgoing-face.h:39:11: error: template argument 1 is invalid
+   Ptr<Face> m_face;     ///< \brief face of the outgoing Interest
+           ^
+In file included from ./ns3/ndn-pit-entry.h:30:0,
+                 from ./ns3/ndn-delayed-interest.h:8,
+                 from ./ns3/ndn-face.h:32,
+                 from ./ns3/ndn-api-face.h:29,
+                 from ./ns3/ndnSIM-module.h:18,
+                 from ../src/ndnSIM/tools/rocketfuel-maps-cch-to-annotaded.cc:24:
+./ns3/ndn-pit-entry-outgoing-face.h:51:21: error: ‘Face’ was not declared in this scope
+   OutgoingFace (Ptr<Face> face);
+                     ^
+./ns3/ndn-pit-entry-outgoing-face.h:51:25: error: template argument 1 is invalid
+   OutgoingFace (Ptr<Face> face);
+                         ^
+./ns3/ndn-pit-entry-outgoing-face.h:78:24: error: ‘Face’ was not declared in this scope
+   bool operator== (Ptr<Face> face) { return *m_face==*face; }
+                        ^
+./ns3/ndn-pit-entry-outgoing-face.h:78:28: error: template argument 1 is invalid
+   bool operator== (Ptr<Face> face) { return *m_face==*face; }
+                            ^
+./ns3/ndn-pit-entry-outgoing-face.h: In member function ‘bool ns3::ndn::pit::OutgoingFace::operator==(const ns3::ndn::pit::OutgoingFace&)’:
+./ns3/ndn-pit-entry-outgoing-face.h:73:55: error: invalid type argument of unary ‘*’ (have ‘int’)
+   bool operator== (const OutgoingFace &dst) { return *m_face==*dst.m_face; }
+                                                       ^
+./ns3/ndn-pit-entry-outgoing-face.h:73:68: error: invalid type argument of unary ‘*’ (have ‘int’)
+   bool operator== (const OutgoingFace &dst) { return *m_face==*dst.m_face; }
+                                                                    ^
+./ns3/ndn-pit-entry-outgoing-face.h: In member function ‘bool ns3::ndn::pit::OutgoingFace::operator==(int)’:
+./ns3/ndn-pit-entry-outgoing-face.h:78:46: error: invalid type argument of unary ‘*’ (have ‘int’)
+   bool operator== (Ptr<Face> face) { return *m_face==*face; }
+                                              ^
+./ns3/ndn-pit-entry-outgoing-face.h:78:55: error: invalid type argument of unary ‘*’ (have ‘int’)
+   bool operator== (Ptr<Face> face) { return *m_face==*face; }
+                                                       ^
+./ns3/ndn-pit-entry-outgoing-face.h: In member function ‘bool ns3::ndn::pit::OutgoingFace::operator<(const ns3::ndn::pit::OutgoingFace&) const’:
+./ns3/ndn-pit-entry-outgoing-face.h:84:53: error: invalid type argument of unary ‘*’ (have ‘int’)
+   operator< (const OutgoingFace &m) const { return *m_face < *(m.m_face); } // return identity of the face
+                                                     ^
+./ns3/ndn-pit-entry-outgoing-face.h:84:72: error: invalid type argument of unary ‘*’ (have ‘int’)
+   operator< (const OutgoingFace &m) const { return *m_face < *(m.m_face); } // return identity of the face
+                                                                        ^
+In file included from ./ns3/ndn-delayed-interest.h:8:0,
+                 from ./ns3/ndn-face.h:32,
+                 from ./ns3/ndn-api-face.h:29,
+                 from ./ns3/ndnSIM-module.h:18,
+                 from ../src/ndnSIM/tools/rocketfuel-maps-cch-to-annotaded.cc:24:
+./ns3/ndn-pit-entry.h: At global scope:
+./ns3/ndn-pit-entry.h:142:20: error: ‘Face’ was not declared in this scope
+   AddIncoming (Ptr<Face> face);
+                    ^
+./ns3/ndn-pit-entry.h:142:24: error: template argument 1 is invalid
+   AddIncoming (Ptr<Face> face);
+                        ^
+./ns3/ndn-pit-entry.h:148:23: error: ‘Face’ was not declared in this scope
+   RemoveIncoming (Ptr<Face> face);
+                       ^
+./ns3/ndn-pit-entry.h:148:27: error: template argument 1 is invalid
+   RemoveIncoming (Ptr<Face> face);
+                           ^
+./ns3/ndn-pit-entry.h:163:20: error: ‘Face’ was not declared in this scope
+   AddOutgoing (Ptr<Face> face);
+                    ^
+./ns3/ndn-pit-entry.h:163:24: error: template argument 1 is invalid
+   AddOutgoing (Ptr<Face> face);
+                        ^
+./ns3/ndn-pit-entry.h:178:34: error: ‘Face’ was not declared in this scope
+   RemoveAllReferencesToFace (Ptr<Face> face);
+                                  ^
+./ns3/ndn-pit-entry.h:178:38: error: template argument 1 is invalid
+   RemoveAllReferencesToFace (Ptr<Face> face);
+                                      ^
+./ns3/ndn-pit-entry.h:186:25: error: ‘Face’ was not declared in this scope
+   SetWaitingInVain (Ptr<Face> face);
+                         ^
+./ns3/ndn-pit-entry.h:186:29: error: template argument 1 is invalid
+   SetWaitingInVain (Ptr<Face> face);
+                             ^
+./ns3/ndn-pit-entry.h:199:45: error: ‘Face’ was not declared in this scope
+   AreTherePromisingOutgoingFacesExcept (Ptr<Face> face) const;
+                                             ^
+./ns3/ndn-pit-entry.h:199:49: error: template argument 1 is invalid
+   AreTherePromisingOutgoingFacesExcept (Ptr<Face> face) const;
+                                                 ^
+In file included from ./ns3/ndn-face.h:32:0,
+                 from ./ns3/ndn-api-face.h:29,
+                 from ./ns3/ndnSIM-module.h:18,
+                 from ../src/ndnSIM/tools/rocketfuel-maps-cch-to-annotaded.cc:24:
+./ns3/ndn-delayed-interest.h:15:14: warning: declaration ‘class ns3::ndn::pit::Entry’ does not declare anything [enabled by default]
+   class pit::Entry;
+              ^
+In file included from ./ns3/ndn-fib.h:27:0,
+                 from ./ns3/ndn-pit-entry.h:27,
+                 from ./ns3/ndn-delayed-interest.h:8,
+                 from ./ns3/ndn-face.h:32,
+                 from ./ns3/ndn-api-face.h:29,
+                 from ./ns3/ndnSIM-module.h:18,
+                 from ../src/ndnSIM/examples/ndn-simple-wifi.cc:28:
+./ns3/ndn-fib-entry.h:74:19: error: ‘Face’ was not declared in this scope
+   FaceMetric (Ptr<Face> face, int32_t cost)
+                   ^
+./ns3/ndn-fib-entry.h:74:23: error: template argument 1 is invalid
+   FaceMetric (Ptr<Face> face, int32_t cost)
+                       ^
+./ns3/ndn-fib-entry.h:93:24: error: ‘Face’ was not declared in this scope
+   operator< (const Ptr<Face> &face) const { return *m_face < *face; }
+                        ^
+./ns3/ndn-fib-entry.h:93:28: error: template argument 1 is invalid
+   operator< (const Ptr<Face> &face) const { return *m_face < *face; }
+                            ^
+./ns3/ndn-fib-entry.h:98:7: error: ‘Face’ was not declared in this scope
+   Ptr<Face>
+       ^
+./ns3/ndn-fib-entry.h:98:11: error: template argument 1 is invalid
+   Ptr<Face>
+           ^
+./ns3/ndn-fib-entry.h:194:7: error: ‘Face’ was not declared in this scope
+   Ptr<Face> m_face; ///< Face
+       ^
+./ns3/ndn-fib-entry.h:194:11: error: template argument 1 is invalid
+   Ptr<Face> m_face; ///< Face
+           ^
+./ns3/ndn-fib-entry.h: In member function ‘bool ns3::ndn::fib::FaceMetric::operator<(const ns3::ndn::fib::FaceMetric&) const’:
+./ns3/ndn-fib-entry.h:87:52: error: invalid type argument of unary ‘*’ (have ‘int’)
+   operator< (const FaceMetric &fm) const { return *m_face < *fm.m_face; } // return identity of the face
+                                                    ^
+./ns3/ndn-fib-entry.h:87:65: error: invalid type argument of unary ‘*’ (have ‘int’)
+   operator< (const FaceMetric &fm) const { return *m_face < *fm.m_face; } // return identity of the face
+                                                                 ^
+./ns3/ndn-fib-entry.h: In member function ‘bool ns3::ndn::fib::FaceMetric::operator<(const int&) const’:
+./ns3/ndn-fib-entry.h:93:53: error: invalid type argument of unary ‘*’ (have ‘int’)
+   operator< (const Ptr<Face> &face) const { return *m_face < *face; }
+                                                     ^
+./ns3/ndn-fib-entry.h:93:63: error: invalid type argument of unary ‘*’ (have ‘int’)
+   operator< (const Ptr<Face> &face) const { return *m_face < *face; }
+                                                               ^
+In file included from ./ns3/ndn-fib.h:27:0,
+                 from ./ns3/ndn-pit-entry.h:27,
+                 from ./ns3/ndn-delayed-interest.h:8,
+                 from ./ns3/ndn-face.h:32,
+                 from ./ns3/ndn-api-face.h:29,
+                 from ./ns3/ndnSIM-module.h:18,
+                 from ../src/ndnSIM/examples/ndn-simple-wifi.cc:28:
+./ns3/ndn-fib-entry.h: At global scope:
+./ns3/ndn-fib-entry.h:235:58: error: ‘Face’ was not declared in this scope
+         boost::multi_index::const_mem_fun<FaceMetric,Ptr<Face>,&FaceMetric::GetFace>
+                                                          ^
+./ns3/ndn-fib-entry.h:235:62: error: template argument 1 is invalid
+         boost::multi_index::const_mem_fun<FaceMetric,Ptr<Face>,&FaceMetric::GetFace>
+                                                              ^
+./ns3/ndn-fib-entry.h:235:84: error: template argument 2 is invalid
+         boost::multi_index::const_mem_fun<FaceMetric,Ptr<Face>,&FaceMetric::GetFace>
+                                                                                    ^
+./ns3/ndn-fib-entry.h:235:84: note: invalid template non-type parameter
+./ns3/ndn-fib-entry.h:236:7: error: template argument 2 is invalid
+       >,
+       ^
+./ns3/ndn-fib-entry.h:252:5: error: template argument 1 is invalid
+     >
+     ^
+./ns3/ndn-fib-entry.h:253:4: error: template argument 2 is invalid
+    > type;
+    ^
+./ns3/ndn-fib-entry.h:285:26: error: ‘Face’ was not declared in this scope
+   void UpdateStatus (Ptr<Face> face, FaceMetric::Status status);
+                          ^
+./ns3/ndn-fib-entry.h:285:30: error: template argument 1 is invalid
+   void UpdateStatus (Ptr<Face> face, FaceMetric::Status status);
+                              ^
+./ns3/ndn-fib-entry.h:292:38: error: ‘Face’ was not declared in this scope
+   void AddOrUpdateRoutingMetric (Ptr<Face> face, int32_t metric);
+                                      ^
+./ns3/ndn-fib-entry.h:292:42: error: template argument 1 is invalid
+   void AddOrUpdateRoutingMetric (Ptr<Face> face, int32_t metric);
+                                          ^
+./ns3/ndn-fib-entry.h:298:31: error: ‘Face’ was not declared in this scope
+   SetRealDelayToProducer (Ptr<Face> face, Time delay);
+                               ^
+./ns3/ndn-fib-entry.h:298:35: error: template argument 1 is invalid
+   SetRealDelayToProducer (Ptr<Face> face, Time delay);
+                                   ^
+./ns3/ndn-fib-entry.h:312:22: error: ‘Face’ was not declared in this scope
+   UpdateFaceRtt (Ptr<Face> face, const Time &sample);
+                      ^
+./ns3/ndn-fib-entry.h:312:26: error: template argument 1 is invalid
+   UpdateFaceRtt (Ptr<Face> face, const Time &sample);
+                          ^
+./ns3/ndn-fib-entry.h:332:25: error: ‘Face’ was not declared in this scope
+   RemoveFace (const Ptr<Face> &face)
+                         ^
+./ns3/ndn-fib-entry.h:332:29: error: template argument 1 is invalid
+   RemoveFace (const Ptr<Face> &face)
+                             ^
+./ns3/ndn-fib-entry.h: In member function ‘void ns3::ndn::fib::Entry::RemoveFace(const int&)’:
+./ns3/ndn-fib-entry.h:334:13: error: request for member ‘erase’ in ‘((ns3::ndn::fib::Entry*)this)->ns3::ndn::fib::Entry::m_faces’, which is of non-class type ‘ns3::ndn::fib::FaceMetricContainer::type {aka int}’
+     m_faces.erase (face);
+             ^
+In file included from ./ns3/ndn-pit-entry.h:27:0,
+                 from ./ns3/ndn-delayed-interest.h:8,
+                 from ./ns3/ndn-face.h:32,
+                 from ./ns3/ndn-api-face.h:29,
+                 from ./ns3/ndnSIM-module.h:18,
+                 from ../src/ndnSIM/examples/ndn-simple-wifi.cc:28:
+./ns3/ndn-fib.h: At global scope:
+./ns3/ndn-fib.h:93:32: error: ‘Face’ was not declared in this scope
+   Add (const Name &prefix, Ptr<Face> face, int32_t metric) = 0;
+                                ^
+./ns3/ndn-fib.h:93:36: error: template argument 1 is invalid
+   Add (const Name &prefix, Ptr<Face> face, int32_t metric) = 0;
+                                    ^
+./ns3/ndn-fib.h:105:43: error: ‘Face’ was not declared in this scope
+   Add (const Ptr<const Name> &prefix, Ptr<Face> face, int32_t metric) = 0;
+                                           ^
+./ns3/ndn-fib.h:105:47: error: template argument 1 is invalid
+   Add (const Ptr<const Name> &prefix, Ptr<Face> face, int32_t metric) = 0;
+                                               ^
+./ns3/ndn-fib.h:129:22: error: ‘Face’ was not declared in this scope
+   RemoveFromAll (Ptr<Face> face) = 0;
+                      ^
+./ns3/ndn-fib.h:129:26: error: template argument 1 is invalid
+   RemoveFromAll (Ptr<Face> face) = 0;
+                          ^
+In file included from ./ns3/ndn-pit-entry.h:29:0,
+                 from ./ns3/ndn-delayed-interest.h:8,
+                 from ./ns3/ndn-face.h:32,
+                 from ./ns3/ndn-api-face.h:29,
+                 from ./ns3/ndnSIM-module.h:18,
+                 from ../src/ndnSIM/examples/ndn-simple-wifi.cc:28:
+./ns3/ndn-pit-entry-incoming-face.h:39:8: error: ‘Face’ was not declared in this scope
+   Ptr< Face > m_face; ///< \brief face of the incoming Interest
+        ^
+./ns3/ndn-pit-entry-incoming-face.h:39:13: error: template argument 1 is invalid
+   Ptr< Face > m_face; ///< \brief face of the incoming Interest
+             ^
+./ns3/ndn-pit-entry-incoming-face.h:48:21: error: ‘Face’ was not declared in this scope
+   IncomingFace (Ptr<Face> face);
+                     ^
+./ns3/ndn-pit-entry-incoming-face.h:48:25: error: template argument 1 is invalid
+   IncomingFace (Ptr<Face> face);
+                         ^
+./ns3/ndn-pit-entry-incoming-face.h:68:24: error: ‘Face’ was not declared in this scope
+   bool operator== (Ptr<Face> face) const { return *m_face==*face; }
+                        ^
+./ns3/ndn-pit-entry-incoming-face.h:68:28: error: template argument 1 is invalid
+   bool operator== (Ptr<Face> face) const { return *m_face==*face; }
+                            ^
+./ns3/ndn-pit-entry-incoming-face.h: In member function ‘bool ns3::ndn::pit::IncomingFace::operator==(const ns3::ndn::pit::IncomingFace&) const’:
+./ns3/ndn-pit-entry-incoming-face.h:63:61: error: invalid type argument of unary ‘*’ (have ‘int’)
+   bool operator== (const IncomingFace &dst) const { return *m_face==*(dst.m_face); }
+                                                             ^
+./ns3/ndn-pit-entry-incoming-face.h:63:81: error: invalid type argument of unary ‘*’ (have ‘int’)
+   bool operator== (const IncomingFace &dst) const { return *m_face==*(dst.m_face); }
+                                                                                 ^
+./ns3/ndn-pit-entry-incoming-face.h: In member function ‘bool ns3::ndn::pit::IncomingFace::operator==(int) const’:
+./ns3/ndn-pit-entry-incoming-face.h:68:52: error: invalid type argument of unary ‘*’ (have ‘int’)
+   bool operator== (Ptr<Face> face) const { return *m_face==*face; }
+                                                    ^
+./ns3/ndn-pit-entry-incoming-face.h:68:61: error: invalid type argument of unary ‘*’ (have ‘int’)
+   bool operator== (Ptr<Face> face) const { return *m_face==*face; }
+                                                             ^
+./ns3/ndn-pit-entry-incoming-face.h: In member function ‘bool ns3::ndn::pit::IncomingFace::operator<(const ns3::ndn::pit::IncomingFace&) const’:
+./ns3/ndn-pit-entry-incoming-face.h:74:53: error: invalid type argument of unary ‘*’ (have ‘int’)
+   operator< (const IncomingFace &m) const { return *m_face < *(m.m_face); } // return identity of the face
+                                                     ^
+./ns3/ndn-pit-entry-incoming-face.h:74:72: error: invalid type argument of unary ‘*’ (have ‘int’)
+   operator< (const IncomingFace &m) const { return *m_face < *(m.m_face); } // return identity of the face
+                                                                        ^
+In file included from ./ns3/ndn-pit-entry.h:30:0,
+                 from ./ns3/ndn-delayed-interest.h:8,
+                 from ./ns3/ndn-face.h:32,
+                 from ./ns3/ndn-api-face.h:29,
+                 from ./ns3/ndnSIM-module.h:18,
+                 from ../src/ndnSIM/examples/ndn-simple-wifi.cc:28:
+./ns3/ndn-pit-entry-outgoing-face.h: At global scope:
+./ns3/ndn-pit-entry-outgoing-face.h:39:7: error: ‘Face’ was not declared in this scope
+   Ptr<Face> m_face;     ///< \brief face of the outgoing Interest
+       ^
+./ns3/ndn-pit-entry-outgoing-face.h:39:11: error: template argument 1 is invalid
+   Ptr<Face> m_face;     ///< \brief face of the outgoing Interest
+           ^
+In file included from ./ns3/ndn-pit-entry.h:30:0,
+                 from ./ns3/ndn-delayed-interest.h:8,
+                 from ./ns3/ndn-face.h:32,
+                 from ./ns3/ndn-api-face.h:29,
+                 from ./ns3/ndnSIM-module.h:18,
+                 from ../src/ndnSIM/examples/ndn-simple-wifi.cc:28:
+./ns3/ndn-pit-entry-outgoing-face.h:51:21: error: ‘Face’ was not declared in this scope
+   OutgoingFace (Ptr<Face> face);
+                     ^
+./ns3/ndn-pit-entry-outgoing-face.h:51:25: error: template argument 1 is invalid
+   OutgoingFace (Ptr<Face> face);
+                         ^
+./ns3/ndn-pit-entry-outgoing-face.h:78:24: error: ‘Face’ was not declared in this scope
+   bool operator== (Ptr<Face> face) { return *m_face==*face; }
+                        ^
+./ns3/ndn-pit-entry-outgoing-face.h:78:28: error: template argument 1 is invalid
+   bool operator== (Ptr<Face> face) { return *m_face==*face; }
+                            ^
+./ns3/ndn-pit-entry-outgoing-face.h: In member function ‘bool ns3::ndn::pit::OutgoingFace::operator==(const ns3::ndn::pit::OutgoingFace&)’:
+./ns3/ndn-pit-entry-outgoing-face.h:73:55: error: invalid type argument of unary ‘*’ (have ‘int’)
+   bool operator== (const OutgoingFace &dst) { return *m_face==*dst.m_face; }
+                                                       ^
+./ns3/ndn-pit-entry-outgoing-face.h:73:68: error: invalid type argument of unary ‘*’ (have ‘int’)
+   bool operator== (const OutgoingFace &dst) { return *m_face==*dst.m_face; }
+                                                                    ^
+./ns3/ndn-pit-entry-outgoing-face.h: In member function ‘bool ns3::ndn::pit::OutgoingFace::operator==(int)’:
+./ns3/ndn-pit-entry-outgoing-face.h:78:46: error: invalid type argument of unary ‘*’ (have ‘int’)
+   bool operator== (Ptr<Face> face) { return *m_face==*face; }
+                                              ^
+./ns3/ndn-pit-entry-outgoing-face.h:78:55: error: invalid type argument of unary ‘*’ (have ‘int’)
+   bool operator== (Ptr<Face> face) { return *m_face==*face; }
+                                                       ^
+./ns3/ndn-pit-entry-outgoing-face.h: In member function ‘bool ns3::ndn::pit::OutgoingFace::operator<(const ns3::ndn::pit::OutgoingFace&) const’:
+./ns3/ndn-pit-entry-outgoing-face.h:84:53: error: invalid type argument of unary ‘*’ (have ‘int’)
+   operator< (const OutgoingFace &m) const { return *m_face < *(m.m_face); } // return identity of the face
+                                                     ^
+./ns3/ndn-pit-entry-outgoing-face.h:84:72: error: invalid type argument of unary ‘*’ (have ‘int’)
+   operator< (const OutgoingFace &m) const { return *m_face < *(m.m_face); } // return identity of the face
+                                                                        ^
+In file included from ./ns3/ndn-delayed-interest.h:8:0,
+                 from ./ns3/ndn-face.h:32,
+                 from ./ns3/ndn-api-face.h:29,
+                 from ./ns3/ndnSIM-module.h:18,
+                 from ../src/ndnSIM/examples/ndn-simple-wifi.cc:28:
+./ns3/ndn-pit-entry.h: At global scope:
+./ns3/ndn-pit-entry.h:142:20: error: ‘Face’ was not declared in this scope
+   AddIncoming (Ptr<Face> face);
+                    ^
+./ns3/ndn-pit-entry.h:142:24: error: template argument 1 is invalid
+   AddIncoming (Ptr<Face> face);
+                        ^
+./ns3/ndn-pit-entry.h:148:23: error: ‘Face’ was not declared in this scope
+   RemoveIncoming (Ptr<Face> face);
+                       ^
+./ns3/ndn-pit-entry.h:148:27: error: template argument 1 is invalid
+   RemoveIncoming (Ptr<Face> face);
+                           ^
+./ns3/ndn-pit-entry.h:163:20: error: ‘Face’ was not declared in this scope
+   AddOutgoing (Ptr<Face> face);
+                    ^
+./ns3/ndn-pit-entry.h:163:24: error: template argument 1 is invalid
+   AddOutgoing (Ptr<Face> face);
+                        ^
+./ns3/ndn-pit-entry.h:178:34: error: ‘Face’ was not declared in this scope
+   RemoveAllReferencesToFace (Ptr<Face> face);
+                                  ^
+./ns3/ndn-pit-entry.h:178:38: error: template argument 1 is invalid
+   RemoveAllReferencesToFace (Ptr<Face> face);
+                                      ^
+./ns3/ndn-pit-entry.h:186:25: error: ‘Face’ was not declared in this scope
+   SetWaitingInVain (Ptr<Face> face);
+                         ^
+./ns3/ndn-pit-entry.h:186:29: error: template argument 1 is invalid
+   SetWaitingInVain (Ptr<Face> face);
+                             ^
+./ns3/ndn-pit-entry.h:199:45: error: ‘Face’ was not declared in this scope
+   AreTherePromisingOutgoingFacesExcept (Ptr<Face> face) const;
+                                             ^
+./ns3/ndn-pit-entry.h:199:49: error: template argument 1 is invalid
+   AreTherePromisingOutgoingFacesExcept (Ptr<Face> face) const;
+                                                 ^
+In file included from ./ns3/ndn-face.h:32:0,
+                 from ./ns3/ndn-api-face.h:29,
+                 from ./ns3/ndnSIM-module.h:18,
+                 from ../src/ndnSIM/examples/ndn-simple-wifi.cc:28:
+./ns3/ndn-delayed-interest.h:15:14: warning: declaration ‘class ns3::ndn::pit::Entry’ does not declare anything [enabled by default]
+   class pit::Entry;
+              ^
+Waf: Leaving directory `/home/nakazato/ndnSIM/ns-3/build'
+Build failed
+ -> task in 'rocketfuel-maps-cch-to-annotaded' failed (exit status 1): 
+	{task 139741176567248: cxx rocketfuel-maps-cch-to-annotaded.cc -> rocketfuel-maps-cch-to-annotaded.cc.1.o}
+['/usr/bin/g++', '-O0', '-ggdb', '-g3', '-Wall', '-Wno-error=deprecated-declarations', '-fstrict-aliasing', '-Wstrict-aliasing', '-pthread', '-fno-strict-aliasing', '-fwrapv', '-fstack-protector', '-fno-strict-aliasing', '-I.', '-I..', '-I/usr/include', '-I/usr/include/python2.7', '-I/usr/include/x86_64-linux-gnu/python2.7', '-DNS3_ASSERT_ENABLE', '-DNS3_LOG_ENABLE', '-DHAVE_SYS_IOCTL_H=1', '-DHAVE_IF_NETS_H=1', '-DHAVE_NET_ETHERNET_H=1', '-DHAVE_PACKET_H=1', '-DHAVE_SQLITE3=1', '-DHAVE_IF_TUN_H=1', '-DNDEBUG', '-D_FORTIFY_SOURCE=2', '../src/ndnSIM/tools/rocketfuel-maps-cch-to-annotaded.cc', '-c', '-o', 'src/ndnSIM/tools/rocketfuel-maps-cch-to-annotaded.cc.1.o']
+ -> task in 'ndn-simple-wifi' failed (exit status 1): 
+	{task 139741176545232: cxx ndn-simple-wifi.cc -> ndn-simple-wifi.cc.39.o}
+['/usr/bin/g++', '-O0', '-ggdb', '-g3', '-Wall', '-Wno-error=deprecated-declarations', '-fstrict-aliasing', '-Wstrict-aliasing', '-pthread', '-fno-strict-aliasing', '-fwrapv', '-fstack-protector', '-fno-strict-aliasing', '-I.', '-I..', '-I/usr/include/libxml2', '-I/usr/include', '-I/usr/include/python2.7', '-I/usr/include/x86_64-linux-gnu/python2.7', '-DNS3_ASSERT_ENABLE', '-DNS3_LOG_ENABLE', '-DHAVE_SYS_IOCTL_H=1', '-DHAVE_IF_NETS_H=1', '-DHAVE_NET_ETHERNET_H=1', '-DHAVE_PACKET_H=1', '-DHAVE_SQLITE3=1', '-DHAVE_IF_TUN_H=1', '-DNDEBUG', '-D_FORTIFY_SOURCE=2', '../src/ndnSIM/examples/ndn-simple-wifi.cc', '-c', '-o', 'src/ndnSIM/examples/ndn-simple-wifi.cc.39.o']

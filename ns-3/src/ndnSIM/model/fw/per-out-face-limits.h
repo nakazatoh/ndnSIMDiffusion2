@@ -31,7 +31,7 @@
 
 #include "ns3/ndn-forwarding-strategy.h"
 
-#include "ns3/ndn-limits.h"
+#include "ns3/ndn-limits-rate.h"
 
 namespace ns3 {
 namespace ndn {
@@ -76,7 +76,9 @@ public:
   AddFace (Ptr<Face> face)
   {
     ObjectFactory factory (m_limitType);
-    Ptr<Limits> limits = factory.template Create<Limits> ();
+    Ptr<LimitsRate> limits = factory.template Create<LimitsRate> ();
+    limits->SetFace(face);
+    limits->RegisterAvailableSlotCallback(MakeCallback(&ForwardingStrategy::RetrySendOutInterest, this));
     face->AggregateObject (limits);
 
     super::AddFace (face);

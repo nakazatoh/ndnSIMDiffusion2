@@ -3,6 +3,7 @@
 #ifndef NDN_DELAYED_INTEREST_H
 #define NDN_DELAYED_INTEREST_H
 
+#include "ns3/simple-ref-count.h"
 //#include "ns3/ptr.h"
 //#include "ns3/ndn-face.h"
 //#include "ns3/ndn-pit-entry.h"
@@ -17,12 +18,15 @@ namespace pit {
   class Entry;
 }
 
-  struct DelayedInterest
+  class DelayedInterest : public SimpleRefCount<DelayedInterest>
   {
-    Ptr<Face> inFace;
-    Ptr<Face> outFace;
-    Ptr<Interest> interest;
-    Ptr<pit::Entry> pitEntry;
+    public:
+      DelayedInterest();
+      ~DelayedInterest();
+      Ptr<Face> inFace;
+      Ptr<Face> outFace;
+      Ptr<Interest> interest;
+      Ptr<pit::Entry> pitEntry;
   };
 }
 }

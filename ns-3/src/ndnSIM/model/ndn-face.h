@@ -23,6 +23,7 @@
 
 #include <ostream>
 #include <algorithm>
+#include <queue>
 
 #include "ns3/ptr.h"
 #include "ns3/object.h"
@@ -34,7 +35,6 @@
 
 namespace ns3 {
 
-//class Queue;
 class Packet;
 class Node;
 
@@ -168,7 +168,14 @@ public:
   inline void
   SetUp (bool up = true);
 
-  /**
+  /**if (!CanSendOutInterest (inFace, outFace, interest, pitEntry))
+    {
+      Ptr<DelayedInterest> di = Create<DelayedInterest>();
+      di->inFace = inFace;
+      di->outFace = outFace;
+      di->interest = interest;
+      di->pitEntry = pitEntry;
+    
    * \brief Returns true if this face is enabled, false otherwise.
    */
   inline bool
@@ -258,6 +265,15 @@ public:
 
   double
   GetBW() const;
+
+  void
+  Enqueue(Ptr<DelayedInterest>);
+
+  Ptr<DelayedInterest>
+  Dequeue();
+
+  bool
+  IsQueueEmpty();
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -321,7 +337,7 @@ private:
   double m_b_pitsize;
   double m_arrival_time[5];
   int m_a_t_index;
-  //Queue<DelayedInterest>
+  std::queue<Ptr<DelayedInterest> > m_interest_queue;
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 };
@@ -380,7 +396,7 @@ Face::GetId () const
   }
 
   inline double
-  GetQueueLength()
+  Face::GetQueueLength()
   {
     return 0.0;
   }
@@ -408,6 +424,7 @@ Face::GetFPitsize() const
 {
   return m_f_pitsize;
 }
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 inline bool

@@ -103,6 +103,22 @@ public:
     return m_bucketLeak;
   }
 
+  void
+  SetFace (Ptr<Face> face)
+  {
+    m_face = face;
+  }
+
+  /**
+   * @brief Set callback which will be called when exhausted limit gets a new slot
+   */
+  void
+  RegisterAvailableSlotCallback (Callback<void, Ptr<Face> > handler);
+
+protected:
+  void
+  FireAvailableSlotCallback ();
+
 protected:
   // from Node
   void
@@ -125,6 +141,9 @@ private:
   double m_bucket;      ///< \brief Value representing current size of the Interest allowance for this face (current size of token bucket)
 
   Time m_leakRandomizationInteral;
+
+  Callback<void, Ptr<Face> > m_rate_handler;
+  Ptr<Face> m_face;
 };
 
 
