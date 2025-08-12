@@ -237,7 +237,7 @@ ForwardingStrategy::OnInterest (Ptr<Face> inFace,
                 WillSatisfyPendingInterest (0, pitEntry);
 
                 // Actually satisfy pending interest
-                SatisfyPendingInterestDTCC (0, contentObject, pitEntry);
+                SatisfyPendingInterestQSF (0, contentObject, pitEntry);
                 return;
         }
 
@@ -324,7 +324,7 @@ Ptr<Node> node = inFace -> GetNode();
 
                 // if (feedbackPitsizeTag.GetPitSize() >= 0)
                 //{      
-      	                SatisfyPendingInterestDTCC (inFace, data, pitEntry);
+      	                SatisfyPendingInterestQSF (inFace, data, pitEntry);
                 //}
                 //else
                 //{
@@ -494,8 +494,11 @@ ForwardingStrategy::SatisfyPendingInterestDTCC (Ptr<Face> inFace,
     Ptr<Packet> payloadCopy = data->GetPayload()->Copy();
 
     uint32_t seq = data->GetName ().get (-1).toSeqNum ();
-    NS_LOG_LOGIC("Node: " << nodeID << " Interest-in-face: " << outFace_data 
-      << " Cache HIT! seq#: " << seq << " pitsize_in: " << inPitsize);
+    NS_LOG_DEBUG("Node: " << nodeID << " Interest-in-face: " << outFace_data 
+      << " Interest-out-face: Cache" << " b_pitsize: " << incoming->m_face->GetBPitsize()
+      << " pitsize_in: " << inPitsize << " pitsize_out: 1" 
+      << " f_pitsize: 1" << " f_pitsize_portion: 1" << " rateLimit: NA" 
+      << " seq#: " << seq << " f_rate: NA");
 
     if (pitsizeTagPresent)
     {
@@ -518,7 +521,7 @@ ForwardingStrategy::SatisfyPendingInterestDTCC (Ptr<Face> inFace,
     if (!ok)
     {
       m_dropData (data, incoming->m_face);
-      NS_LOG_DEBUG ("Cannot satisfy data to " << *incoming->m_face);
+      NS_LOG_INFO ("Cannot satisfy data to " << *incoming->m_face);
     }
   }
   else
@@ -679,7 +682,7 @@ ForwardingStrategy::SatisfyPendingInterestDTCC (Ptr<Face> inFace,
       if (!ok)
       {
         m_dropData (data, incoming.m_face);
-        NS_LOG_DEBUG ("Cannot satisfy data to " << *incoming.m_face);
+        NS_LOG_INFO ("Cannot satisfy data to " << *incoming.m_face);
       }
    
     } //if (inFace != 0) close
@@ -734,7 +737,10 @@ ForwardingStrategy::SatisfyPendingInterestQSF (Ptr<Face> inFace,
 
     uint32_t seq = data->GetName().get(-1).toSeqNum();
     NS_LOG_DEBUG("Node: " << nodeID << " Interest-in-face: " << outFace_data 
-      << " Cache HIT! seq#: " << seq << " pitsize_in: " << inPitsize);
+      << " Interest-out-face: Cache" << " b_pitsize: " << incoming->m_face->GetBPitsize()
+      << " pitsize_in: " << inPitsize << " pitsize_out: 1" 
+      << " f_pitsize: 1" << " f_pitsize_portion: 1" << " rateLimit: NA" 
+      << " seq#: " << seq << " f_rate: NA");
 
     if (pitsizeTagPresent)
     {
@@ -757,7 +763,7 @@ ForwardingStrategy::SatisfyPendingInterestQSF (Ptr<Face> inFace,
     if (!ok)
     {
         m_dropData (data, incoming->m_face);
-        NS_LOG_DEBUG ("Cannot satisfy data to " << *incoming->m_face);
+        NS_LOG_INFO ("Cannot satisfy data to " << *incoming->m_face);
     }
   }
   else
@@ -847,10 +853,14 @@ ForwardingStrategy::SatisfyPendingInterestQSF (Ptr<Face> inFace,
       {
         rate = (incoming.m_face->GetObject<Limits>())->GetCurrentLimit();
         newRate = rate;
+        uint32_t seq = data->GetName().get(-1).toSeqNum();
+        double bw = inFace->GetBW();
         NS_LOG_DEBUG("Node: " << nodeID << " Interest-in-face: " << outFace_data 
           << " Interest-out-face: " << infaceId << " b_pitsize: " << b_pitsize 
           << " pitsize_in: " << pitsize_in << " pitsize_out: " << pitsize_out
-          << " f_pitsize: " << f_pitsize << " rateLimit: " << rate);
+          << " f_pitsize: " << f_pitsize << " f_pitsize_portion: " << f_pitsize_portion
+          << " rateLimit: " << rate << " seq#: " << seq
+          << " f_rate: " << f_rate << " bandwidth: " << bw);
         m_interestRateTable[outFace_data][infaceId] = rate;
       }  
       else               
@@ -880,7 +890,8 @@ ForwardingStrategy::SatisfyPendingInterestQSF (Ptr<Face> inFace,
           << " Interest-out-face: " << infaceId << " b_pitsize: " << b_pitsize 
           << " pitsize_in: " << pitsize_in << " pitsize_out: " << pitsize_out
           << " f_pitsize: " << f_pitsize << " f_pitsize_portion: " << f_pitsize_portion 
-          << " rateLimit: " << rate << " seq#: " << seq<< " bandwidth: " << bw);
+          << " rateLimit: " << rate << " seq#: " << seq
+          << " f_rate: " << f_rate << " bandwidth: " << bw);
          
         m_interestRateTable[outFace_data][infaceId] = rate;
 
@@ -913,7 +924,7 @@ ForwardingStrategy::SatisfyPendingInterestQSF (Ptr<Face> inFace,
       if (!ok)
       {
         m_dropData (data, incoming.m_face);
-        NS_LOG_DEBUG ("Cannot satisfy data to " << *incoming.m_face);
+        NS_LOG_INFO ("Cannot satisfy data to " << *incoming.m_face);
       }
    
     } //if (inFace != 0) close
