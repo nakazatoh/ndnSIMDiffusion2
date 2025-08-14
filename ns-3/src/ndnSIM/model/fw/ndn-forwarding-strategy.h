@@ -275,7 +275,7 @@ protected:
    */
   virtual void
   SatisfyPendingInterest (Ptr<Face> inFace, // 0 allowed (from cache)
-                          Ptr<const Data> data,
+                          Ptr<Data> data,
                           Ptr<pit::Entry> pitEntry);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -461,6 +461,7 @@ protected:
   double ad;
   bool m_consumerNeighbour;
   std::vector<std::vector<double> > m_interestRateTable;
+  uint32_t m_selectSatPI;
 ////////////////////////
 
   bool m_cacheUnsolicitedDataFromApps;

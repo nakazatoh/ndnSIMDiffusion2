@@ -176,10 +176,10 @@ main (int argc, char *argv[])
   s << std::setw(2) << std::setfill('0') << localTime->tm_min;
   s << std::setw(2) << std::setfill('0') << localTime->tm_sec;
 
-  std::string drop_trace("drop-trace-simple-dumbell-8nodes-1bottleneck.txt");
-  std::string rate_trace("rate-trace-simple-dumbell-8nodes-1bottleneck.txt");
-  std::string aggregate_trace("aggregate-trace-simple-dumbell-8nodes-1bottleneck.txt");
-  std::string app_delay_trace("app-delays-trace-simple-dumbell-8nodes-1bottleneck.txt");
+  std::string drop_trace("drop-trace-simple-dumbbell-8nodes-1bottleneck.txt");
+  std::string rate_trace("rate-trace-simple-dumbbell-8nodes-1bottleneck.txt");
+  std::string aggregate_trace("aggregate-trace-simple-dumbbell-8nodes-1bottleneck.txt");
+  std::string app_delay_trace("app-delays-trace-simple-dumbbell-8nodes-1bottleneck.txt");
 
   // L2RateTracer::InstallAll ("20220621-3_drop-trace-5src-1213.txt", Seconds (0.1));
   L2RateTracer::InstallAll (s.str() + drop_trace, Seconds (0.1));

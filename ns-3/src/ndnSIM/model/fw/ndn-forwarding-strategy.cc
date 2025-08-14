@@ -111,6 +111,11 @@ TypeId ForwardingStrategy::GetTypeId (void)
                    BooleanValue (true),
                    MakeBooleanAccessor (&ForwardingStrategy::m_detectRetransmissions),
                    MakeBooleanChecker ())
+
+    .AddAttribute ("SelectSatPI", "Select SatisfyPendingInterestXXXX, 0:original 1:DTCC 2:QSF",
+                   UintegerValue(0),
+                   MakeUintegerAccessor(&ForwardingStrategy::m_selectSatPI),
+                   MakeUintegerChecker<uint32_t>(0, 2))
     ;
   return tid;
 }
@@ -237,7 +242,21 @@ ForwardingStrategy::OnInterest (Ptr<Face> inFace,
                 WillSatisfyPendingInterest (0, pitEntry);
 
                 // Actually satisfy pending interest
-                SatisfyPendingInterestQSF (0, contentObject, pitEntry);
+                // SatisfyPendingInterestQSF (0, contentObject, pitEntry);
+                switch (m_selectSatPI)
+                {
+                  case 0:
+                    SatisfyPendingInterest(0, contentObject, pitEntry);
+                    break;
+                  case 1:
+                    SatisfyPendingInterestDTCC(0, contentObject, pitEntry);
+                    break;
+                  case 2:
+                    SatisfyPendingInterestQSF(0, contentObject, pitEntry);
+                    break;
+                  default:
+                    throw std::out_of_range("m_selectSatPI out of range");
+                }
                 return;
         }
 
@@ -324,7 +343,21 @@ Ptr<Node> node = inFace -> GetNode();
 
                 // if (feedbackPitsizeTag.GetPitSize() >= 0)
                 //{      
-      	                SatisfyPendingInterestQSF (inFace, data, pitEntry);
+      	                // SatisfyPendingInterestQSF (inFace, data, pitEntry);
+                switch (m_selectSatPI)
+                {
+                  case 0:
+                    SatisfyPendingInterest(inFace, data, pitEntry);
+                    break;
+                  case 1:
+                    SatisfyPendingInterestDTCC(inFace, data, pitEntry);
+                    break;
+                  case 2:
+                    SatisfyPendingInterestQSF(inFace, data, pitEntry);
+                    break;
+                  default:
+                    throw std::out_of_range("m_selectSatPI out of range");
+                }
                 //}
                 //else
                 //{
@@ -423,35 +456,227 @@ ForwardingStrategy::DetectRetransmittedInterest (Ptr<Face> inFace,
 
 void
 ForwardingStrategy::SatisfyPendingInterest (Ptr<Face> inFace,
-                                            Ptr<const Data> data,
+                                            Ptr<Data> data,
                                             Ptr<pit::Entry> pitEntry)
 {
-        if (inFace != 0)
-                pitEntry->RemoveIncoming (inFace);
+  if (inFace == 0)
+  {
+    const pit::Entry::in_iterator incoming = pitEntry->GetIncoming ().begin();
+    uint32_t outFace_data = incoming->m_face->GetId();
+    uint32_t nodeID = incoming->m_face->GetNode()->GetId();
+    uint32_t inPitsize=0;
 
-                //satisfy all pending incoming Interests
-                BOOST_FOREACH (const pit::IncomingFace &incoming, pitEntry->GetIncoming ())
+    Ptr<pit::Entry> pitEntry2 = m_pit -> Begin(); //PITエントリの最初
+    while(pitEntry2) //PITエントリを全部見る
+    {
+      std::set<ndn::pit::IncomingFace> incoming_face  = pitEntry2 -> GetIncoming(); //incomingFaceをみる（インタレストが入ってきたFace）
+      for(std::set<ndn::pit::IncomingFace>::iterator in_itr = incoming_face.begin(); in_itr != incoming_face.end(); ++in_itr)
+      {
+        uint32_t tmpInfaceId;
+        tmpInfaceId = in_itr -> m_face -> GetId();
+        if(tmpInfaceId == outFace_data) // このデータが出て行くFaceに関するPITサイズの計算
         {
-                bool ok = incoming.m_face->SendData (data);
+          inPitsize++;
+        }
+      }
+      pitEntry2 = m_pit -> Next(pitEntry2);
+    }  //while() close//
 
-                DidSendOutData (inFace, incoming.m_face, data, pitEntry);
-                NS_LOG_DEBUG ("Satisfy " << *incoming.m_face);
+    FwFeedbackPitsizeTag feedbackPitsizeTag;
+    FwFeedbackRateTag feedbackRateTag;
 
-                if (!ok)
-                {
-                        m_dropData (data, incoming.m_face);
-                        NS_LOG_DEBUG ("Cannot satisfy data to " << *incoming.m_face);
-                }
+    bool pitsizeTagPresent = data->GetPayload()->PeekPacketTag(feedbackPitsizeTag);
+    bool rateTagPresent = data->GetPayload()->PeekPacketTag(feedbackRateTag);
+
+    Ptr<Packet> payloadCopy = data->GetPayload()->Copy();
+
+    uint32_t seq = data->GetName().get(-1).toSeqNum();
+    NS_LOG_DEBUG("Node: " << nodeID << " Interest-in-face: " << outFace_data 
+      << " Interest-out-face: Cache" << " b_pitsize: " << incoming->m_face->GetBPitsize()
+      << " pitsize_in: " << inPitsize << " pitsize_out: 1" 
+      << " f_pitsize: 1" << " f_pitsize_portion: 1" << " rateLimit: NA" 
+      << " seq#: " << seq << " f_rate: NA");
+
+    if (pitsizeTagPresent)
+    {
+      payloadCopy->RemovePacketTag(feedbackPitsizeTag);
+      payloadCopy->RemovePacketTag(feedbackRateTag);
+    }
+      
+    feedbackPitsizeTag.SetPitSize(inPitsize);
+    payloadCopy -> AddPacketTag(feedbackPitsizeTag);
+    double rate = incoming->m_face->GetObject<Limits>()->GetCurrentLimit();
+    feedbackRateTag.SetRate(rate);
+    payloadCopy -> AddPacketTag(feedbackRateTag);
+
+    data->SetPayload (payloadCopy);
+
+
+    bool ok = incoming->m_face->SendData (data);
+
+    DidSendOutData (inFace, incoming->m_face, data, pitEntry);
+    // NS_LOG_DEBUG ("Satisfy " << *incoming->m_face);
+
+    if (!ok)
+    {
+      m_dropData (data, incoming->m_face);
+      NS_LOG_DEBUG ("Cannot satisfy data to " << *incoming->m_face);
+    }
+  }
+  else
+  {
+    pitEntry->RemoveIncoming (inFace);
+	  	
+    Ptr<Node> node = inFace -> GetNode();
+    uint32_t nodeID = node -> GetId();
+    uint32_t infaceId = inFace -> GetId(); //データが入ってきたFaceのID
+
+    //satisfy all pending incoming Interests
+    BOOST_FOREACH (const pit::IncomingFace &incoming, pitEntry->GetIncoming ())
+    {
+    ///2018/1/4/////////making feedback////////////////
+      const int max_number_of_face = 5; //ノードのとりうるFaceの最大数  
+
+      uint32_t outFace_data = incoming.m_face -> GetId(); // このデータが出て行くfaceID 
+      uint32_t inPitsize=0; //このデータが出て行くFaceのピットのサイズ。重み付けの分母。
+      uint32_t outPitsize = 0;
+      uint32_t totalOutPitsize = 0;
+
+      bool ExistOutFace_data=false; //このデータが出て行くFaceに関連するPITエントリかどうかを調べるフラグ。
+          //std::cout << infaceId << ",";
+
+      Ptr<pit::Entry> pitEntry2 = m_pit -> Begin(); //PITエントリの最初
+
+      while(pitEntry2) //PITエントリを全部見る
+      {
+        std::set<ndn::pit::IncomingFace> incoming_face  = pitEntry2 -> GetIncoming(); //incomingFaceをみる（インタレストが入ってきたFace）
+        for(std::set<ndn::pit::IncomingFace>::iterator in_itr = incoming_face.begin(); in_itr != incoming_face.end(); ++in_itr)
+        {
+          uint32_t tmpInfaceId;
+          tmpInfaceId = in_itr -> m_face -> GetId();
+          if(tmpInfaceId == outFace_data) // このデータが出て行くFaceに関するPITサイズの計算
+          {
+            inPitsize++;
+            ExistOutFace_data = true;
+          }
         }
 
-        // All incoming interests are satisfied. Remove them
-        pitEntry->ClearIncoming ();
+        std::set<ndn::pit::OutgoingFace> outgoing_face  = pitEntry2 -> GetOutgoing(); //outgoingFaceをみる（インタレストが出て行ったFace）
+        for(std::set<ndn::pit::OutgoingFace>::iterator out_itr = outgoing_face.begin(); out_itr != outgoing_face.end(); ++out_itr)
+        {
+          uint32_t tmpOutfaceId;
+          tmpOutfaceId = out_itr -> m_face -> GetId();
+          if(tmpOutfaceId ==infaceId) //今回のデータが出て行くFaceに関するフィードバック情報を計算する
+          {		
+            if(ExistOutFace_data)
+            {
+              outPitsize++;
+            }
+            totalOutPitsize++;
+          }
+        }
 
-        // Remove all outgoing faces
-        pitEntry->ClearOutgoing ();
+        pitEntry2 = m_pit -> Next(pitEntry2);
+        ExistOutFace_data =false;
+      }  //while() close//
 
-        // Set pruning timout on PIT entry (instead of deleting the record)
-        m_pit->MarkErased (pitEntry);
+      double pitsize_in = inPitsize;
+      double pitsize_out = outPitsize;
+
+      /* create a new FeedbackTag */ 
+      FwFeedbackPitsizeTag feedbackPitsizeTag;
+      FwFeedbackRateTag feedbackRateTag;
+
+      bool pitsizeTagPresent = data -> GetPayload() ->  PeekPacketTag(feedbackPitsizeTag);
+      bool rateTagPresent = data -> GetPayload() ->  PeekPacketTag(feedbackRateTag);
+
+      double f_pitsize = feedbackPitsizeTag.GetPitSize();
+      double f_rate = feedbackRateTag.GetRate();
+
+      inFace->SetFPitsize(f_pitsize);
+      //double f_pitsizedif = pitsize_out - f_pitsize;
+      double f_pitsize_portion = f_pitsize * pitsize_out / totalOutPitsize;
+      double f_pitsizedif = pitsize_out - f_pitsize_portion;
+      double b_pitsize = incoming.m_face->GetBPitsize();
+      double b_pitsizedif = b_pitsize - pitsize_in;
+      double rate;
+      double newRate;
+
+      double tm = Simulator::Now ().ToDouble (Time::S);
+      Ptr<Packet> payloadOriginal = data->GetPayload()->Copy();
+      Ptr<Packet> payloadCopy = payloadOriginal->Copy();           
+
+      if (!pitsizeTagPresent) //for ndn-qsf.cc
+      {
+        rate = (incoming.m_face->GetObject<Limits>())->GetCurrentLimit();
+        newRate = rate;
+        uint32_t seq = data->GetName().get(-1).toSeqNum();
+
+        NS_LOG_DEBUG("Node: " << nodeID << " Interest-in-face: " << outFace_data 
+          << " Interest-out-face: " << infaceId << " b_pitsize: " << b_pitsize 
+          << " pitsize_in: " << pitsize_in << " pitsize_out: " << pitsize_out
+          << " f_pitsize: " << f_pitsize << " f_pitsize_portion: " << f_pitsize_portion
+          << " rateLimit: " << rate << " seq#: " << seq
+          << " f_rate: " << f_rate);
+        m_interestRateTable[outFace_data][infaceId] = rate;
+      }  
+      else               
+      {
+        Ptr<Limits> faceLimits = inFace -> GetObject<Limits>();
+        rate = faceLimits -> GetCurrentLimit();
+        uint32_t seq = data->GetName().get(-1).toSeqNum();
+        NS_LOG_DEBUG("Node: " << nodeID << " Interest-in-face: " << outFace_data 
+          << " Interest-out-face: " << infaceId << " b_pitsize: " << b_pitsize 
+          << " pitsize_in: " << pitsize_in << " pitsize_out: " << pitsize_out
+          << " f_pitsize: " << f_pitsize << " f_pitsize_portion: " << f_pitsize_portion
+          << " rateLimit: " << rate << " seq#: " << seq
+          << " f_rate: " << f_rate);
+         
+        m_interestRateTable[outFace_data][infaceId] = rate;
+
+        payloadCopy->RemovePacketTag(feedbackPitsizeTag);
+        payloadCopy->RemovePacketTag(feedbackRateTag);
+
+      } //if(nodeID != 19  && nodeID != 20) close
+
+      /* set pitsize on feedback */
+      feedbackPitsizeTag.SetPitSize(inPitsize);
+      payloadCopy -> AddPacketTag(feedbackPitsizeTag);
+
+      /* set rate on feedback */
+      double rate_sum = 0.0;
+      for (std::vector<double>::iterator v = m_interestRateTable[outFace_data].begin(); v != m_interestRateTable[outFace_data].end(); v++) 
+      {
+        rate_sum += *v;
+      }
+      feedbackRateTag.SetRate(rate_sum);
+      payloadCopy -> AddPacketTag(feedbackRateTag);
+
+      data->SetPayload (payloadCopy);
+
+      bool ok = incoming.m_face->SendData (data);
+
+      DidSendOutData (inFace, incoming.m_face, data, pitEntry);
+
+      data->SetPayload(payloadOriginal);
+
+      // NS_LOG_DEBUG ("Satisfy " << *incoming.m_face);
+
+      if (!ok)
+      {
+        m_dropData (data, incoming.m_face);
+        NS_LOG_DEBUG ("Cannot satisfy data to " << *incoming.m_face);
+      }
+    }
+  }
+  // All incoming interests are satisfied. Remove them
+  pitEntry->ClearIncoming ();
+
+  // Remove all outgoing faces
+  pitEntry->ClearOutgoing ();
+
+  // Set pruning timout on PIT entry (instead of deleting the record)
+  m_pit->MarkErased (pitEntry);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

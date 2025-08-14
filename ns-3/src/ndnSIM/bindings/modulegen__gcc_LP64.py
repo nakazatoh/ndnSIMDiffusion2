@@ -6107,7 +6107,7 @@ def register_Ns3NdnForwardingStrategy_methods(root_module, cls):
     ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::SatisfyPendingInterest(ns3::Ptr<ns3::ndn::Face> inFace, ns3::Ptr<ns3::ndn::Data const> data, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
     cls.add_method('SatisfyPendingInterest', 
                    'void', 
-                   [param('ns3::Ptr< ns3::ndn::Face >', 'inFace'), param('ns3::Ptr< ns3::ndn::Data const >', 'data'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
+                   [param('ns3::Ptr< ns3::ndn::Face >', 'inFace'), param('ns3::Ptr< ns3::ndn::Data >', 'data'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
                    visibility='protected', is_virtual=True)
     ## ndn-forwarding-strategy.h (module 'ndnSIM'): bool ns3::ndn::ForwardingStrategy::ShouldSuppressIncomingInterest(ns3::Ptr<ns3::ndn::Face> inFace, ns3::Ptr<ns3::ndn::Interest const> interest, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
     cls.add_method('ShouldSuppressIncomingInterest', 
