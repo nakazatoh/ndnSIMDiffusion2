@@ -842,7 +842,7 @@ ForwardingStrategy::SatisfyPendingInterestDTCC (Ptr<Face> inFace,
           << " Interest-out-face: " << infaceId << " b_pitsize: " << b_pitsize 
           << " pitsize_in: " << pitsize_in << " pitsize_out: " << pitsize_out
           << " f_pitsize: " << f_pitsize << " f_pitsize_portion: " << f_pitsize_portion
-          << " rateLimit: " << rate << " seq#: " << seq);
+          << " rateLimit: " << rate << " seq#: " << seq << " f_rate: NA");
       } 
       else
       {
@@ -891,7 +891,8 @@ ForwardingStrategy::SatisfyPendingInterestDTCC (Ptr<Face> inFace,
       {
         rate_sum += *v;
       }
-      feedbackRateTag.SetRate(rate_sum);
+      // feedbackRateTag.SetRate(rate_sum);
+      feedbackRateTag.SetRate(rate);
       payloadCopy -> AddPacketTag(feedbackRateTag);
 
       data->SetPayload (payloadCopy);

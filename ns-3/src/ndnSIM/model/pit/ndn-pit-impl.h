@@ -258,12 +258,37 @@ PitImpl<Policy>::RescheduleCleaning ()
       return;
     }
 
+/*  if (!i_time.empty())
+    for (typename time_index::iterator entry = i_time.begin(); entry != i_time.end(); entry++)
+    {
+      // Ptr<pit::Entry> pitEntry = entry->to_iterator ()->payload ();
+      if (!entry->to_iterator())
+      {
+        // NS_LOG_DEBUG("Expire time: " << entry->GetExpireTime() << " iterator: NULL");
+        continue;
+      }
+      else
+      {
+        // NS_LOG_DEBUG("Expire time: " << entry->GetExpireTime() << " pitEntry ptr: " << entry->to_iterator()->payload());
+        if (! entry->to_iterator()->payload())
+          NS_LOG_DEBUG("!!!pitEntry zero!!!");
+      }
+    } */
   Time nextEvent = i_time.begin ()->GetExpireTime () - Simulator::Now ();
   if (nextEvent <= 0) nextEvent = Seconds (0);
 
   NS_LOG_DEBUG ("Schedule next cleaning in " <<
                 nextEvent.ToDouble (Time::S) << "s (at " <<
                 i_time.begin ()->GetExpireTime () << "s abs time");
+  if (i_time.begin()->to_iterator())
+  {
+    NS_LOG_DEBUG("pitEntry ptr: " << i_time.begin()->to_iterator()->payload() );
+  }
+  else
+  {
+    NS_LOG_DEBUG("!!! iterator is zero !!!");
+  }
+  
 
   m_cleanEvent = Simulator::Schedule (nextEvent,
                                       &PitImpl<Policy>::CleanExpired, this);
@@ -275,6 +300,22 @@ PitImpl<Policy>::CleanExpired ()
 {
   NS_LOG_LOGIC ("Cleaning PIT. Total: " << i_time.size ());
   Time now = Simulator::Now ();
+/*  if (!i_time.empty())
+    for (typename time_index::iterator entry = i_time.begin(); entry != i_time.end(); entry++)
+    {
+      // Ptr<pit::Entry> pitEntry = entry->to_iterator ()->payload ();
+      if (!entry->to_iterator())
+      {
+        NS_LOG_DEBUG("Expire time: " << entry->GetExpireTime() << " iterator: NULL");
+        continue;
+      }
+      else
+      {
+        NS_LOG_DEBUG("Expire time: " << entry->GetExpireTime() << " iterator: " << entry->to_iterator() << " pitEntry ptr: " << entry->to_iterator()->payload());
+        if (! entry->to_iterator()->payload())
+          NS_LOG_DEBUG("!!!pitEntry zero!!!");
+      }
+    } */
 
   // uint32_t count = 0;
   while (!i_time.empty ())
@@ -282,6 +323,8 @@ PitImpl<Policy>::CleanExpired ()
       typename time_index::iterator entry = i_time.begin ();
       if (entry->GetExpireTime () <= now) // is the record stale?
         {
+          if (!entry->to_iterator()->payload())
+            NS_LOG_DEBUG("!!! payload zero !!! iterator: " << entry->to_iterator());
           m_forwardingStrategy->WillEraseTimedOutPendingInterest (entry->to_iterator ()->payload ());
           super::erase (entry->to_iterator ());
           // count ++;

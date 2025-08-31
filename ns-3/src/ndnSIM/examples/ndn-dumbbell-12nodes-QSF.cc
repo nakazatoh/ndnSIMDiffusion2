@@ -48,22 +48,6 @@ PeriodicStatsPrinter (Ptr<Node> node, Time next)
   int pitsize;  
   pitsize = pit -> GetSize();
 
-  //if(node -> GetId() == 16 || node -> GetId() == 17 || node -> GetId() == 18 || node -> GetId() == 19 || node -> GetId() == 20) F_pitsize = 0;
-  
-  //int pitsizedif;
-  //pitsizedif = pitsize - F_pitsize;
-  //F_pitsize = pitsize;
-
-  /*
-  std::cout << Simulator::Now ().ToDouble (Time::S) << "\t"
-            << node->GetId () << "\t"
-            << Names::FindName (node) << "\t"      << std::endl;
-            << pitsize << "\t"
-            << pitsizedif <<"\n";
-  */
-
-  //191015 LEE write PITsize to file
-  //std::fstream file;
   //file.open("210331_pitsize-congestion-topo-liner-dfcc-2src-ver2.txt",std::ios::out|std::ios::app);
   std::cout << Simulator::Now ().ToDouble (Time::S) << "\t"
        << node->GetId () << "\t"
@@ -73,11 +57,10 @@ PeriodicStatsPrinter (Ptr<Node> node, Time next)
   //file.close();
   //
 
-
   Simulator::Schedule (next, PeriodicStatsPrinter, node, next);
 }
 
-NS_LOG_COMPONENT_DEFINE("ndn-congestion-topo-plugin-5src");
+NS_LOG_COMPONENT_DEFINE("ndn-dumbbell-12nodes");
 
 int
 main (int argc, char *argv[])
@@ -98,7 +81,7 @@ main (int argc, char *argv[])
 
   // Install NDN stack on all nodes
   ndn::StackHelper ndnHelper;
-  ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute::PerOutFaceLimits","Limit","ns3::ndn::Limits::Rate");
+  ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute::PerOutFaceLimits","Limit","ns3::ndn::Limits::Rate","SelectSatPI","2");
   ndnHelper.EnableLimits(true, Seconds(0.2),1250,40);
   ndnHelper.SetContentStore ("ns3::ndn::cs::Lru", "MaxSize", "0");
   ndnHelper.SetPit ("ns3::ndn::pit::SerializedSize", "MaxSize", "0");
@@ -207,10 +190,10 @@ main (int argc, char *argv[])
   s << std::setw(2) << std::setfill('0') << localTime->tm_min;
   s << std::setw(2) << std::setfill('0') << localTime->tm_sec;
 
-  std::string drop_trace("drop-trace-dumbbell-12nodes-1213.txt");
-  std::string rate_trace("rate-trace-dumbbell-12nodes.txt");
-  std::string aggregate_trace("aggregate-trace-dumbbell-12nodes.txt");
-  std::string app_delay_trace("app-delays-trace-dumbbell-12nodes.txt");
+  std::string drop_trace("drop-trace-dumbbell-12nodes-QSF.txt");
+  std::string rate_trace("rate-trace-dumbbell-12nodes-QSF.txt");
+  std::string aggregate_trace("aggregate-trace-dumbbell-12nodes-QSF.txt");
+  std::string app_delay_trace("app-delays-trace-dumbbell-12nodes-QSF.txt");
 
   // L2RateTracer::InstallAll ("20220621-3_drop-trace-5src-1213.txt", Seconds (0.1));
   L2RateTracer::InstallAll (s.str() + drop_trace, Seconds (0.1));

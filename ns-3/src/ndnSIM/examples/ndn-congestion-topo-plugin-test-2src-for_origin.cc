@@ -54,12 +54,12 @@ PeriodicStatsPrinter (Ptr<Node> node, Time next)
 {
   Ptr<ndn::Pit> pit = node->GetObject<ndn::Pit> ();
 
-  if(node -> GetId() == 17) F_pitsize = 0;
+  // if(node -> GetId() == 17) F_pitsize = 0;
 
-  int pitsize,pitsizedif;
+  int pitsize; //,pitsizedif;
   pitsize = pit -> GetSize();
-  pitsizedif = pitsize - F_pitsize;
-  F_pitsize = pitsize;
+  // pitsizedif = pitsize - F_pitsize;
+  // F_pitsize = pitsize;
 
   /*
   std::cout << Simulator::Now ().ToDouble (Time::S) << "\t"

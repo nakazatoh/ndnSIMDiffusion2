@@ -54,17 +54,9 @@ PeriodicStatsPrinter (Ptr<Node> node, Time next)
 
   if(node -> GetId() == 17) F_pitsize = 0;
 
-  int pitsize,pitsizedif;
+  int pitsize;
   pitsize = pit -> GetSize();
-  pitsizedif = pitsize - F_pitsize;
-  F_pitsize = pitsize;
-/*
-  std::cout << Simulator::Now ().ToDouble (Time::S) << "\t"
-            << node->GetId () << "\t"
-            << Names::FindName (node) << "\t"
-            << pitsize << "\t"
-            << pitsizedif <<"\n";
-*/
+
   file.open("200204_pitsize-congestion-topo-liner-dfcc.txt",std::ios::out|std::ios::app);
   file << Simulator::Now ().ToDouble (Time::S) << "\t"
        << node->GetId () << "\t"
