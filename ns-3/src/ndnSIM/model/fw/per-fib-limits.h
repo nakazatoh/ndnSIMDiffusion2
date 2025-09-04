@@ -99,7 +99,7 @@ protected:
   virtual bool
   CanSendOutInterest (Ptr<Face> inFace,
                       Ptr<Face> outFace,
-                      Ptr<const Interest> interest,
+                      Ptr<Interest> interest,
                       Ptr<pit::Entry> pitEntry);
 
   /// \copydoc ForwardingStrategy::WillSatisfyPendingInterest
@@ -140,7 +140,7 @@ template<class Parent>
 bool
 PerFibLimits<Parent>::CanSendOutInterest (Ptr<Face> inFace,
                                           Ptr<Face> outFace,
-                                          Ptr<const Interest> interest,
+                                          Ptr<Interest> interest,
                                           Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());

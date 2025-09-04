@@ -61,7 +61,36 @@ Limits::FireAvailableSlotCallback ()
   if (!m_handler.IsNull ())
     m_handler ();
 }
-
-
+  void
+  Limits::Enqueue (Ptr<DelayedInterest> di)
+  {
+    m_iq.Enqueue(di);
+    NS_LOG_DEBUG("queue size: " << m_iq.GetNInterest());
+  }
+  
+  Ptr<DelayedInterest>
+  Limits::Dequeue ()
+  {
+    Ptr<DelayedInterest> di = m_iq.Dequeue();
+    if (di != 0)
+      NS_LOG_DEBUG("queue size: " << m_iq.GetNInterest());
+    else
+      NS_LOG_DEBUG("queue size: 0");
+    
+    return di;
+  }
+  
+  Ptr<const DelayedInterest>
+  Limits::Peek ()
+  {
+    Ptr<const DelayedInterest> di = m_iq.Peek();
+    if (di != 0)
+      NS_LOG_DEBUG("queue size: " << m_iq.GetNInterest());
+    else
+      NS_LOG_DEBUG("queue size: 0");
+    
+    return di;
+  }
+  
 } // namespace ndn
 } // namespace ns3

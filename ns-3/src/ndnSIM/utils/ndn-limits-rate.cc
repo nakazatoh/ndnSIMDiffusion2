@@ -24,7 +24,10 @@
 #include "ns3/simulator.h"
 #include "ns3/random-variable.h"
 #include "ns3/ndn-face.h"
+#include "ns3/ndn-interest.h"
 #include "ns3/node.h"
+#include "ns3/ndn-forwarding-strategy.h"
+#include "ns3/ndn-pit-entry.h"
 
 NS_LOG_COMPONENT_DEFINE ("ndn.Limits.Rate");
 
@@ -157,7 +160,7 @@ LimitsRate::LeakBucket (double interval)
 }
 
 void
-LimitsRate::RegisterAvailableSlotCallback (Callback<void, Ptr<Face> > handler)
+LimitsRate::RegisterAvailableSlotCallback (Callback<void> handler)
 {
   m_rate_handler = handler;
 }
@@ -166,7 +169,26 @@ void
 LimitsRate::FireAvailableSlotCallback ()
 {
   if (!m_rate_handler.IsNull ())
-    m_rate_handler (m_face);
+    m_rate_handler ();
+}
+
+void
+LimitsRate::RetrySendOutInterest ()
+{
+  Ptr<const DelayedInterest> di;
+  while ((di = m_iq.Peek()) != 0)
+  {
+    Ptr<ForwardingStrategy> forwardingStrategy = di->m_fs;
+    // Ptr<Limits> faceLimits = di->m_outFace->template GetObject<Limits> ();
+    if (!IsBelowLimit ())
+      return;
+    if (forwardingStrategy->CanSendOutInterestFromQ (this))
+    {
+      // m_iq.Dequeue();
+      // BorrowLimit ();
+      // forwardingStrategy->RetrySendOutInterest(di->m_inFace, di->m_outFace, di->m_interest, di->m_pitEntry);
+    }
+  }
 }
 
 } // namespace ndn
