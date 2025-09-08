@@ -20,6 +20,7 @@
 
 #include "ndn-limits-rate.h"
 
+#include "ns3/abort.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
 #include "ns3/random-variable.h"
@@ -89,6 +90,10 @@ LimitsRate::SetLimits (double rate, double delay)
 
   // maximum allowed burst
   m_bucketMax = GetMaxRate () * GetMaxDelay ();
+  if (m_bucketMax < 1.0)
+  {
+    m_bucketMax = 1.0;
+  }
 
   // amount of packets allowed every second (leak rate)
   m_bucketLeak = GetMaxRate ();
@@ -175,6 +180,7 @@ LimitsRate::FireAvailableSlotCallback ()
 void
 LimitsRate::RetrySendOutInterest ()
 {
+  NS_LOG_FUNCTION(this);
   Ptr<const DelayedInterest> di;
   while ((di = m_iq.Peek()) != 0)
   {
@@ -182,12 +188,7 @@ LimitsRate::RetrySendOutInterest ()
     // Ptr<Limits> faceLimits = di->m_outFace->template GetObject<Limits> ();
     if (!IsBelowLimit ())
       return;
-    if (forwardingStrategy->CanSendOutInterestFromQ (this))
-    {
-      // m_iq.Dequeue();
-      // BorrowLimit ();
-      // forwardingStrategy->RetrySendOutInterest(di->m_inFace, di->m_outFace, di->m_interest, di->m_pitEntry);
-    }
+    forwardingStrategy->SendOutInterestFromQ (this);
   }
 }
 

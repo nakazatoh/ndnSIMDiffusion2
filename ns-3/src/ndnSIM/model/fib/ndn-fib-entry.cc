@@ -187,6 +187,19 @@ Entry::GetFib ()
   return m_fib;
 }
 
+void
+Entry::AddArrivalTime(double arrivalTime)
+{
+  m_arrivalTime[m_arrivalTimeIndex] = arrivalTime;
+  ++m_arrivalTimeIndex %= 5;
+}
+
+double
+Entry::GetBandwidth ()
+{
+  double duration = m_arrivalTime[(m_arrivalTimeIndex + 4) % 5] - m_arrivalTime[m_arrivalTimeIndex %5];
+  return 4.0 / duration;
+}
 
 std::ostream& operator<< (std::ostream& os, const Entry &entry)
 {

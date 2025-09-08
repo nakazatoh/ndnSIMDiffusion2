@@ -49,6 +49,7 @@ class Face;
 
 class Interest;
 class Data;
+class DelayedInterest;
 
 class Pit;
 namespace pit { class Entry; }
@@ -388,8 +389,8 @@ protected:
    *
    * @see DetectRetransmittedInterest
    */
-  virtual bool
-  CanSendOutInterestFromQ (Ptr<Limits> limits);
+  virtual void
+  SendOutInterestFromQ (Ptr<Limits> limits);
 
   /**
    * @brief Method implementing actual interest forwarding, taking into account CanSendOutInterest decision
@@ -425,6 +426,23 @@ protected:
                       Ptr<Face> outFace,
                       Ptr<Interest> interest,
                       Ptr<pit::Entry> pitEntry);
+
+  /**
+   * @brief Enqueu an interest to the InterestQueue at the appropriate level of Limits
+   * @param di  a DelayedInterest instance to be queued
+   */
+  virtual void
+  InterestEnqueue(Ptr<DelayedInterest> di);
+
+  /**
+   * @brief Dequeue an interest from the InterestQueue at the appropriate level of Limits
+   * @param outFace    proposed outgoing face of the Interest
+   * @param pitEntry   reference to PIT entry (reference to corresponding FIB entry inside)
+   */
+
+  virtual Ptr<DelayedInterest>
+  InterestDequeue(Ptr<Face> outFace,
+                  Ptr<pit::Entry> pitEntry);
 
   /**
    * @brief Event fired just after forwarding the Interest

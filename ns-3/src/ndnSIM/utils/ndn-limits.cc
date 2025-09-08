@@ -91,6 +91,12 @@ Limits::FireAvailableSlotCallback ()
     
     return di;
   }
+
+  uint32_t
+  Limits::GetQueueLength()
+  {
+    return m_iq.GetNInterest();
+  }
   
 } // namespace ndn
 } // namespace ns3

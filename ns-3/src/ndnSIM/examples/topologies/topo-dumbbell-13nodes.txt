@@ -21,15 +21,15 @@ Rtr5   NA        3       6
 link
 
 # srcNode   dstNode     bandwidth   metric  delay   queue
-Src1        Rtr1        1Mbps      1        1ms    100
-Src2        Rtr1        1Mbps      1        1ms    100
-Src3        Rtr1        1Mbps      1        1ms    100
-Src4        Rtr2        1Mbps      1        1ms    100
-Rtr1        Rtr2        1Mbps       1        1ms    100
-Rtr2        Rtr5        1Mbps      1        1ms    100
-Rtr5        Rtr3        1Mbps      1        1ms    100
-Rtr3        Rtr4        1Mbps       1        1ms    100
-Rtr3        Dst3        0.5Mbps     1        1ms    100
-Rtr3        Dst4        0.5Mbps     1        1ms    100
-Rtr4        Dst1        1Mbps       1        1ms    100
-Rtr4        Dst2        0.1Mbps     1        1ms    100
+Src1        Rtr1        1Mbps      1        4ms    100
+Src2        Rtr1        1Mbps      1        4ms    100
+Src3        Rtr1        1Mbps      1        4ms    100
+Src4        Rtr2        1Mbps      1        4ms    100
+Rtr1        Rtr2        1Mbps      1        4ms    100
+Rtr2        Rtr5        1Mbps      1        4ms    100
+Rtr5        Rtr3        1Mbps      1        4ms    100
+Rtr3        Rtr4        1Mbps      1        4ms    100
+Rtr3        Dst3        0.5Mbps    1        4ms    100
+Rtr3        Dst4        0.5Mbps    1        4ms    100
+Rtr4        Dst1        1Mbps      1        4ms    100
+Rtr4        Dst2        0.1Mbps    1        4ms    100
