@@ -115,6 +115,12 @@ public:
   void 
   RetrySendOutInterest ();
 
+  void
+  SetNodeId (uint32_t nodeId);
+
+  uint32_t
+  GetNodeId ();
+
 protected:
   void
   FireAvailableSlotCallback ();

@@ -368,6 +368,7 @@ protected:
    * @param outFace    proposed outgoing face of the Interest
    * @param interest   Interest packet
    * @param pitEntry   reference to PIT entry (reference to corresponding FIB entry inside)
+   * @return 0: drop interest, 1: send interest, 2: interest is queued
    *
    * @see DetectRetransmittedInterest
    */

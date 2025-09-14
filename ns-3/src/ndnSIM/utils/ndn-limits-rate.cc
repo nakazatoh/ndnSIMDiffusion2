@@ -61,25 +61,27 @@ LimitsRate::NotifyNewAggregate ()
 
   if (!m_isLeakScheduled)
     {
-      if (GetObject<Face> () != 0)
-        {
-          NS_ASSERT_MSG (GetObject<Face> ()->GetNode () != 0, "Node object should exist on the face");
+      // if (GetObject<Face> () != 0)
+        // {
+          // NS_ASSERT_MSG (GetObject<Face> ()->GetNode () != 0, "Node object should exist on the face");
 
           m_isLeakScheduled = true;
 
           if (!m_leakRandomizationInteral.IsZero ())
             {
               UniformVariable r (0.0, m_leakRandomizationInteral.ToDouble (Time::S));
-              Simulator::ScheduleWithContext (GetObject<Face> ()->GetNode ()->GetId (),
-                                              Seconds (r.GetValue ()), &LimitsRate::LeakBucket, this, 0.0);
+              // Simulator::ScheduleWithContext (GetObject<Face> ()->GetNode ()->GetId (),
+              //                                Seconds (r.GetValue ()), &LimitsRate::LeakBucket, this, 0.0);
+              Simulator::ScheduleWithContext (m_nodeId, Seconds (r.GetValue ()), &LimitsRate::LeakBucket, this, 0.0);
             }
           else
             {
-              Simulator::ScheduleWithContext (GetObject<Face> ()->GetNode ()->GetId (),
-                                              Seconds (0), &LimitsRate::LeakBucket, this, 0.0);
+              // Simulator::ScheduleWithContext (GetObject<Face> ()->GetNode ()->GetId (),
+              //                                 Seconds (0), &LimitsRate::LeakBucket, this, 0.0);
+              Simulator::ScheduleWithContext (m_nodeId, Seconds (0), &LimitsRate::LeakBucket, this, 0.0);
             }
 
-        }
+        // }
     }
 }
 
@@ -90,10 +92,7 @@ LimitsRate::SetLimits (double rate, double delay)
 
   // maximum allowed burst
   m_bucketMax = GetMaxRate () * GetMaxDelay ();
-  if (m_bucketMax < 1.0)
-  {
-    m_bucketMax = 1.0;
-  }
+  NS_ASSERT_MSG (m_bucketMax >= 1.0, "Bandwidth-delay product is too low."); 
 
   // amount of packets allowed every second (leak rate)
   m_bucketLeak = GetMaxRate ();
@@ -112,6 +111,7 @@ LimitsRate::UpdateCurrentLimit (double limit)
 bool
 LimitsRate::IsBelowLimit ()
 {
+  NS_LOG_FUNCTION(this << "m_bucketMax" << m_bucketMax << "m_bucket" << m_bucket);
   if (!IsEnabled ()) return true;
 
   return (m_bucketMax - m_bucket >= 1.0);
@@ -135,6 +135,7 @@ LimitsRate::ReturnLimit ()
 void
 LimitsRate::LeakBucket (double interval)
 {
+  NS_LOG_FUNCTION(this << "interval: " << interval);
   const double leak = m_bucketLeak * interval;
 
 #ifdef NS3_LOG_ENABLE
@@ -190,6 +191,18 @@ LimitsRate::RetrySendOutInterest ()
       return;
     forwardingStrategy->SendOutInterestFromQ (this);
   }
+}
+
+void
+LimitsRate::SetNodeId (uint32_t nodeId)
+{
+  super::SetNodeId (nodeId);
+}
+
+uint32_t
+LimitsRate::GetNodeId ()
+{
+  return super::GetNodeId ();
 }
 
 } // namespace ndn

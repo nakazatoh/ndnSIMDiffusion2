@@ -205,6 +205,7 @@ ForwardingStrategy::OnInterest (Ptr<Face> inFace,
         {
                 similarInterest = false;
                 pitEntry = m_pit->Create (interest);
+                NS_LOG_INFO("pitEntry: " << pitEntry);
                 if (pitEntry != 0)
                 {
                         DidCreatePitEntry (inFace, interest, pitEntry);
@@ -817,13 +818,11 @@ ForwardingStrategy::SatisfyPendingInterestDTCC (Ptr<Face> inFace,
       bool pitsizeTagPresent = data -> GetPayload() ->  PeekPacketTag(feedbackPitsizeTag);
       bool rateTagPresent = data -> GetPayload() ->  PeekPacketTag(feedbackRateTag);
 
-      double f_pitsize = feedbackPitsizeTag.GetPitSize();
-      double f_rate = feedbackRateTag.GetRate();
+      double f_pitsize;
+      double f_rate;
 
-      inFace->SetFPitsize(f_pitsize);
-      //double f_pitsizedif = pitsize_out - f_pitsize;
-      double f_pitsize_portion = f_pitsize * pitsize_out / totalOutPitsize;
-      double f_pitsizedif = pitsize_out - f_pitsize_portion;
+      double f_pitsize_portion;
+      double f_pitsizedif;
       double b_pitsize = incoming.m_face->GetBPitsize();
       double b_pitsizedif = b_pitsize - pitsize_in;
       double rate;
@@ -842,11 +841,18 @@ ForwardingStrategy::SatisfyPendingInterestDTCC (Ptr<Face> inFace,
         NS_LOG_DEBUG("Node: " << nodeID << " Interest-in-face: " << outFace_data 
           << " Interest-out-face: " << infaceId << " b_pitsize: " << b_pitsize 
           << " pitsize_in: " << pitsize_in << " pitsize_out: " << pitsize_out
-          << " f_pitsize: " << f_pitsize << " f_pitsize_portion: " << f_pitsize_portion
+          << " f_pitsize: 0" << " f_pitsize_portion: 0"
           << " rateLimit: " << rate << " seq#: " << seq << " f_rate: NA");
       } 
       else
       {
+        f_pitsize = feedbackPitsizeTag.GetPitSize();
+        f_rate = feedbackRateTag.GetRate();
+        inFace->SetFPitsize(f_pitsize);
+        f_pitsize_portion = f_pitsize * pitsize_out / totalOutPitsize;
+        //double f_pitsizedif = pitsize_out - f_pitsize;
+        f_pitsizedif = pitsize_out - f_pitsize_portion;
+
         Ptr<Limits> faceLimits = inFace -> GetObject<Limits>();
         rate = faceLimits -> GetCurrentLimit();
                                 
@@ -931,6 +937,7 @@ ForwardingStrategy::SatisfyPendingInterestQSF (Ptr<Face> inFace,
                                                 Ptr<Data> data,
                                                 Ptr<pit::Entry> pitEntry)
 {
+  NS_LOG_FUNCTION(this << "Name: " << data->GetName());
   if (inFace == 0)
   {
     const pit::Entry::in_iterator incoming = pitEntry->GetIncoming ().begin();

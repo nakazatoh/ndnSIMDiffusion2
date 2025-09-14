@@ -82,6 +82,7 @@ public:
     ObjectFactory factory (m_limitType);
     Ptr<LimitsRate> limits = factory.template Create<LimitsRate> ();
     limits->RegisterAvailableSlotCallback(MakeCallback(&LimitsRate::RetrySendOutInterest, limits));
+    limits->SetNodeId(face->GetNode()->GetId());
     face->AggregateObject (limits);
 
     super::AddFace (face);
@@ -91,6 +92,12 @@ protected:
   /// \copydoc ForwardingStrategy::CanSendOutInterest
   virtual bool
   CanSendOutInterest (Ptr<Face> inFace,
+                      Ptr<Face> outFace,
+                      Ptr<Interest> interest,
+                      Ptr<pit::Entry> pitEntry);
+
+  virtual bool
+  CanSendOutInterestFromFib (Ptr<Face> inFace,
                       Ptr<Face> outFace,
                       Ptr<Interest> interest,
                       Ptr<pit::Entry> pitEntry);
@@ -163,6 +170,18 @@ PerOutFaceLimits<Parent>::CanSendOutInterest (Ptr<Face> inFace,
     }
   NS_LOG_DEBUG("Limit exceeded");
   return false;
+}
+
+template<class Parent>
+bool
+PerOutFaceLimits<Parent>::CanSendOutInterestFromFib (Ptr<Face> inFace,
+                                              Ptr<Face> outFace,
+                                              Ptr<Interest> interest,
+                                              Ptr<pit::Entry> pitEntry)
+{
+  NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
+  
+  return super::CanSendOutInterest (inFace, outFace, interest, pitEntry);
 }
 
 template<class Parent>

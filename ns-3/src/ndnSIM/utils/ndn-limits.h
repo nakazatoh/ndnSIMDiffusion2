@@ -199,6 +199,18 @@ public:
    */
   uint32_t
   GetQueueLength();
+
+  /**
+   * @brief Set m_nodeId of this Limits instance
+   */
+  virtual void
+  SetNodeId(uint32_t nodeId);
+
+  /**
+   * @brief Get m_nodeId of this Limits instance
+   */
+  virtual uint32_t
+  GetNodeId();
   
   ////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
@@ -215,7 +227,8 @@ protected:
   FireAvailableSlotCallback ();
 
   InterestQueue m_iq;
-  
+  uint32_t m_nodeId;
+ 
 private:
   double m_maxRate;
   double m_maxDelay;

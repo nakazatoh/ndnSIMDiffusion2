@@ -97,6 +97,18 @@ Limits::FireAvailableSlotCallback ()
   {
     return m_iq.GetNInterest();
   }
-  
+
+  void
+  Limits::SetNodeId(uint32_t nodeId)
+  {
+    m_nodeId = nodeId;
+  }
+
+  uint32_t
+  Limits::GetNodeId()
+  {
+    return m_nodeId;
+  }
+    
 } // namespace ndn
 } // namespace ns3
