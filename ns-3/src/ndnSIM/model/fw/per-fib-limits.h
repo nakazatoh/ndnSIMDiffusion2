@@ -159,6 +159,14 @@ PerFibLimits<Parent>::CanSendOutInterest (Ptr<Face> inFace,
 {
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
 
+  Ptr<Fib> fib = outFace->GetNode()->GetObject<Fib>();
+  Ptr<fib::Entry> fibEntry;
+  uint32_t totalLength;
+  for (fibEntry = fib->Begin(); fibEntry = fib->Next(fibEntry); fibEntry != fib->End())
+  {
+    totalLength += fibEntry->GetQueueLength();
+  }
+  NS_LOG_DEBUG("IQLength " << totalLength);
   Ptr<Limits> fibLimits = pitEntry->GetFibEntry ()->template GetObject<Limits> ();
   // no checks for the limit here. the check should be somewhere elese
   if (fibLimits->IsBelowLimit ())
