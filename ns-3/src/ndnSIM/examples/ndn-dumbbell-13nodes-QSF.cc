@@ -175,10 +175,12 @@ main (int argc, char *argv[])
   // Calculate and install FIBs
   ndn::GlobalRoutingHelper::CalculateRoutes ();
 
-  app2.Start(Seconds(5.0));
-  app2.Stop(Seconds(8.0));
-  app4.Start(Seconds(2.0));
-  app4.Stop(Seconds(5.0));
+  app2.Start(Seconds(3.0));
+  app2.Stop(Seconds(6.0));
+  app3.Start(Seconds(1.0));
+  app3.Stop(Seconds(5.0));
+  app4.Start(Seconds(7.0));
+  app4.Stop(Seconds(9.0));
 
   Simulator::Stop (Seconds (10.0));
 
@@ -192,10 +194,10 @@ main (int argc, char *argv[])
   s << std::setw(2) << std::setfill('0') << localTime->tm_min;
   s << std::setw(2) << std::setfill('0') << localTime->tm_sec;
 
-  std::string drop_trace("drop-trace-dumbbell-13nodes-DTCC.txt");
-  std::string rate_trace("rate-trace-dumbbell-13nodes-DTCC.txt");
-  std::string aggregate_trace("aggregate-trace-dumbbell-13nodes-DTCC.txt");
-  std::string app_delay_trace("app-delays-trace-dumbbell-13nodes-DTCC.txt");
+  std::string drop_trace("drop-trace-dumbbell-13nodes-QSF.txt");
+  std::string rate_trace("rate-trace-dumbbell-13nodes-QSF.txt");
+  std::string aggregate_trace("aggregate-trace-dumbbell-13nodes-QSF.txt");
+  std::string app_delay_trace("app-delays-trace-dumbbell-13nodes-QSF.txt");
 
   // L2RateTracer::InstallAll ("20220621-3_drop-trace-5src-1213.txt", Seconds (0.1));
   L2RateTracer::InstallAll (s.str() + drop_trace, Seconds (0.1));

@@ -157,14 +157,14 @@ PerFibLimits<Parent>::CanSendOutInterest (Ptr<Face> inFace,
                                           Ptr<Interest> interest,
                                           Ptr<pit::Entry> pitEntry)
 {
-  NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
+  NS_LOG_FUNCTION (this << pitEntry->GetPrefix () << " seq#: " << pitEntry->GetPrefix().get(-1).toSeqNum());
 
   Ptr<Fib> fib = outFace->GetNode()->GetObject<Fib>();
   Ptr<fib::Entry> fibEntry;
-  uint32_t totalLength;
+  uint32_t totalLength = 0;
   for (fibEntry = fib->Begin(); fibEntry = fib->Next(fibEntry); fibEntry != fib->End())
   {
-    totalLength += fibEntry->GetQueueLength();
+    totalLength += fibEntry->template GetObject<Limits>()->GetQueueLength();
   }
   NS_LOG_DEBUG("IQLength " << totalLength);
   Ptr<Limits> fibLimits = pitEntry->GetFibEntry ()->template GetObject<Limits> ();
@@ -177,7 +177,7 @@ PerFibLimits<Parent>::CanSendOutInterest (Ptr<Face> inFace,
           return true;
         }
     }
-  NS_LOG_DEBUG("Limit exceeded");
+  NS_LOG_INFO("Limit exceeded");
   return false;
 }
 
@@ -223,18 +223,21 @@ template<class Parent>
 void
 PerFibLimits<Parent>::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
 {
-  NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
+  NS_LOG_FUNCTION (this << pitEntry->GetPrefix () << "seq#:" << pitEntry->GetPrefix().get(-1).toSeqNum());
 
   Ptr<Limits> fibLimits = pitEntry->GetFibEntry ()->template GetObject<Limits> ();
-  NS_LOG_INFO (this << "InterestQueue lenght: " << fibLimits->GetQueueLength());
+  NS_LOG_INFO (this << " InterestQueue lenght: " << fibLimits->GetQueueLength());
 
-  for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
+  if (pitEntry->GetOutgoingCount() != 0)
+  {
+    for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
        face != pitEntry->GetOutgoing ().end ();
-       face ++)
+         face ++)
     {
       for (uint32_t i = 0; i <= face->m_retxCount; i++)
         fibLimits->ReturnLimit ();
     }
+  }
 
   super::WillEraseTimedOutPendingInterest (pitEntry);
 }

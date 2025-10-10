@@ -105,7 +105,7 @@ LimitsRate::UpdateCurrentLimit (double limit)
   NS_ASSERT_MSG (limit >= 0.0, "Limit should be greater or equal to zero");
 
   m_bucketLeak = std::min (limit, GetMaxRate ());
-  m_bucketMax  = m_bucketLeak * GetMaxDelay ();
+  m_bucketMax  = m_bucketLeak * GetMaxDelay () + 1.0;
 }
 
 bool

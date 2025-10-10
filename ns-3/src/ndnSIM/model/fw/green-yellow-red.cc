@@ -108,13 +108,16 @@ GreenYellowRed::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_DEBUG ("WillEraseTimedOutPendingInterest for " << pitEntry->GetPrefix ());
 
-  for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
-       face != pitEntry->GetOutgoing ().end ();
-       face ++)
+  if (pitEntry->GetOutgoingCount() != 0)
+  {
+    for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
+      face != pitEntry->GetOutgoing ().end ();
+      face ++)
     {
       // NS_LOG_DEBUG ("Face: " << face->m_face);
       pitEntry->GetFibEntry ()->UpdateStatus (face->m_face, fib::FaceMetric::NDN_FIB_YELLOW);
     }
+  }
 
   super::WillEraseTimedOutPendingInterest (pitEntry);
 }

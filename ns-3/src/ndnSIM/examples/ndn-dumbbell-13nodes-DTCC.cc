@@ -175,10 +175,12 @@ main (int argc, char *argv[])
   // Calculate and install FIBs
   ndn::GlobalRoutingHelper::CalculateRoutes ();
 
-  app2.Start(Seconds(5.0));
-  app2.Stop(Seconds(8.0));
-  app4.Start(Seconds(2.0));
-  app4.Stop(Seconds(5.0));
+  app2.Start(Seconds(3.0));
+  app2.Stop(Seconds(6.0));
+  app3.Start(Seconds(1.0));
+  app3.Stop(Seconds(5.0));
+  app4.Start(Seconds(7.0));
+  app4.Stop(Seconds(9.0));
 
   Simulator::Stop (Seconds (10.0));
 

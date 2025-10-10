@@ -160,7 +160,7 @@ PerOutFaceLimits<Parent>::CanSendOutInterest (Ptr<Face> inFace,
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
   
   Ptr<Limits> faceLimits = outFace->template GetObject<Limits> ();
-  NS_LOG_DEBUG("IQLenght " << faceLimits->GetQueueLength);
+  NS_LOG_DEBUG("IQLenght " << faceLimits->GetQueueLength());
   if (faceLimits->IsBelowLimit ())
     {
       if (super::CanSendOutInterest (inFace, outFace, interest, pitEntry))
@@ -169,7 +169,7 @@ PerOutFaceLimits<Parent>::CanSendOutInterest (Ptr<Face> inFace,
           return true;
         }
     }
-  NS_LOG_DEBUG("Limit exceeded");
+  NS_LOG_INFO("Limit exceeded");
   return false;
 }
 
@@ -230,14 +230,17 @@ PerOutFaceLimits<Parent>::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitE
 {
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
 
-  for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
-       face != pitEntry->GetOutgoing ().end ();
-       face ++)
+  if (pitEntry->GetOutgoingCount() != 0)
+  {
+    for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
+      face != pitEntry->GetOutgoing ().end ();
+      face ++)
     {
       Ptr<Limits> faceLimits = face->m_face->GetObject<Limits> ();
       for (uint32_t i = 0; i <= face->m_retxCount; i++)
         faceLimits->ReturnLimit ();
     }
+  }
 
   super::WillEraseTimedOutPendingInterest (pitEntry);
 }

@@ -275,7 +275,12 @@ public:
   : m_fib (fib)
   , m_prefix (prefix)
   , m_needsProbing (false)
+  , m_arrivalTimeIndex (0)
   {
+    for (int i = 0; i < 5; i++)
+    {
+      m_arrivalTime[i] = 0.0;
+    }  
   }
 
   /**
