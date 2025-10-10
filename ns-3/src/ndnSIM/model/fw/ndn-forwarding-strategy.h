@@ -35,6 +35,8 @@ namespace ndn {
  * @defgroup ndn-fw NDN forwarding strategies
  */
 
+class Limits;
+class LimitsRate;
 
 /**
  * @ingroup ndn-fw
@@ -47,6 +49,7 @@ class Face;
 
 class Interest;
 class Data;
+class DelayedInterest;
 
 class Pit;
 namespace pit { class Entry; }
@@ -62,6 +65,8 @@ class ContentStore;
 class ForwardingStrategy :
     public Object
 {
+  friend Limits;
+  friend LimitsRate;
 public:
   static TypeId GetTypeId ();
 
@@ -363,14 +368,30 @@ protected:
    * @param outFace    proposed outgoing face of the Interest
    * @param interest   Interest packet
    * @param pitEntry   reference to PIT entry (reference to corresponding FIB entry inside)
+   * @return 0: drop interest, 1: send interest, 2: interest is queued
    *
    * @see DetectRetransmittedInterest
    */
   virtual bool
   CanSendOutInterest (Ptr<Face> inFace,
                       Ptr<Face> outFace,
-                      Ptr<const Interest> interest,
+                      Ptr<Interest> interest,
                       Ptr<pit::Entry> pitEntry);
+
+  /**
+   * @brief Method to check whether a queued Interest can be send at the particular limits or not
+   *
+   * In the base class, this method perfoms two checks:
+   * 1. If inFace is equal to outFace (when equal, Interest forwarding is prohibited)
+   * 2. Whether Interest should be suppressed (list of outgoing faces include outFace),
+   * considering (if enabled) retransmission logic
+   *
+   * @param limits     limits where a queued interest is to be transmitted
+   *
+   * @see DetectRetransmittedInterest
+   */
+  virtual void
+  SendOutInterestFromQ (Ptr<Limits> limits);
 
   /**
    * @brief Method implementing actual interest forwarding, taking into account CanSendOutInterest decision
@@ -390,8 +411,39 @@ protected:
                       Ptr<Interest> interest,
                       Ptr<pit::Entry> pitEntry);
 
+  /**
+   * @brief Retry interest forwarding after queueing
+   *
+   * If event returns false, then there is some kind of a problem exists
+   *
+   * @param inFace     incoming face of the Interest
+   * @param outFace    proposed outgoing face of the Interest
+   * @param interest Interest packet
+   * @param pitEntry   reference to PIT entry (reference to corresponding FIB entry inside)
+   *
+   */
+  virtual bool
+  RetrySendOutInterest (Ptr<Face> inFace,
+                      Ptr<Face> outFace,
+                      Ptr<Interest> interest,
+                      Ptr<pit::Entry> pitEntry);
+
+  /**
+   * @brief Enqueu an interest to the InterestQueue at the appropriate level of Limits
+   * @param di  a DelayedInterest instance to be queued
+   */
   virtual void
-  RetrySendOutInterest (Ptr<Face> face);
+  InterestEnqueue(Ptr<DelayedInterest> di);
+
+  /**
+   * @brief Dequeue an interest from the InterestQueue at the appropriate level of Limits
+   * @param outFace    proposed outgoing face of the Interest
+   * @param pitEntry   reference to PIT entry (reference to corresponding FIB entry inside)
+   */
+
+  virtual Ptr<DelayedInterest>
+  InterestDequeue(Ptr<Face> outFace,
+                  Ptr<pit::Entry> pitEntry);
 
   /**
    * @brief Event fired just after forwarding the Interest
@@ -446,6 +498,17 @@ protected:
   DoPropagateInterest (Ptr<Face> inFace,
                        Ptr<Interest> interest,
                        Ptr<pit::Entry> pitEntry) = 0;
+
+  /**
+   * @brief Count the number of PIT entries associated with the face given by the paramenter
+   * as its outgoing face
+   * 
+   * @param outFace the face registered as the outgoing face in PIT of this node to be counted
+   * 
+   * @return the number of pit entries with the given face as outgoing
+   */
+  uint32_t
+  NPitEntryWithOutgoingFace (Ptr<Face> outFace);
 
 protected:
   // inherited from Object class

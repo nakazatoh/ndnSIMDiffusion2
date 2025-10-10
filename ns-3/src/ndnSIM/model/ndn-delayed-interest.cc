@@ -9,6 +9,19 @@ NS_LOG_COMPONENT_DEFINE ("ndn.DelayedInterest");
 
 namespace ns3 {
 namespace ndn {
+  DelayedInterest::DelayedInterest(Ptr<Face> inFace, 
+                                   Ptr<Face> outFace,
+                                   Ptr<Interest> interest, 
+                                   Ptr<pit::Entry> pitEntry)
+                                   :
+    m_inFace (inFace),
+    m_outFace (outFace),
+    m_interest (interest),
+    m_pitEntry (pitEntry)
+  {
+    NS_LOG_DEBUG("Created with parameters");
+  }
+
   DelayedInterest::DelayedInterest()
   {
     NS_LOG_DEBUG("Created");

@@ -284,32 +284,6 @@ Face::GetBW () const
   return 4.0 / duration;
 }
 
-void
-Face::Enqueue(Ptr<DelayedInterest> di)
-{
-  m_interest_queue.push(di);
-  NS_LOG_DEBUG("queue size: " << m_interest_queue.size());
-}
-
-Ptr<DelayedInterest>
-Face::Dequeue()
-{
-  NS_LOG_DEBUG("queue size: " << m_interest_queue.size());
-  if (!m_interest_queue.empty())
-  {
-    Ptr<DelayedInterest> di = m_interest_queue.front();
-    m_interest_queue.pop();
-    return di;
-  }
-  return 0;
-}
-
-bool
-Face::IsQueueEmpty()
-{
-  NS_LOG_DEBUG("queue size: " << m_interest_queue.size());
-  return m_interest_queue.empty();
-}
 bool
 Face::operator== (const Face &face) const
 {

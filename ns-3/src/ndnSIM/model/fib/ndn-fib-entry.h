@@ -275,7 +275,12 @@ public:
   : m_fib (fib)
   , m_prefix (prefix)
   , m_needsProbing (false)
+  , m_arrivalTimeIndex (0)
   {
+    for (int i = 0; i < 5; i++)
+    {
+      m_arrivalTime[i] = 0.0;
+    }  
   }
 
   /**
@@ -339,6 +344,18 @@ public:
    */
   Ptr<Fib>
   GetFib ();
+
+  /**
+   * @brief add an arrival time of data for bandwidth estimation
+   */
+  void
+  AddArrivalTime(double arrivalTime);
+
+  /**
+   * @brief Estimate the data arrival rate for this fib entry
+   */
+  double
+  GetBandwidth();
   
 private:
   friend std::ostream& operator<< (std::ostream& os, const Entry &entry);
@@ -350,6 +367,8 @@ public:
   FaceMetricContainer::type m_faces; ///< \brief Indexed list of faces
 
   bool m_needsProbing;      ///< \brief flag indicating that probing should be performed
+  double m_arrivalTime[5];
+  int m_arrivalTimeIndex;
 };
 
 std::ostream& operator<< (std::ostream& os, const Entry &entry);

@@ -25,6 +25,7 @@
 #include "ns3/object.h"
 #include "ns3/traced-value.h"
 #include "ns3/ndn-face.h"
+#include "ns3/ndn-interest-queue.h"
 
 namespace ns3 {
 namespace ndn {
@@ -171,6 +172,45 @@ public:
   {
     return m_linkDelay;
   }
+
+  /**
+   * @brief Enqueue to the interest queue
+   * @param di a pointer to a DelayedInterest
+   */
+  void
+  Enqueue (Ptr<DelayedInterest> di);
+
+  /**
+   * @brief Dequeue from the interest queue
+   * @return the first element in the queue
+   */
+  Ptr<DelayedInterest>
+  Dequeue ();
+
+  /**
+   * @brief Read the front of the interest queue
+   * @return the first element in the queue
+   */
+  Ptr<const DelayedInterest>
+  Peek ();
+
+  /**
+   * @brief Get current queue length
+   */
+  uint32_t
+  GetQueueLength();
+
+  /**
+   * @brief Set m_nodeId of this Limits instance
+   */
+  virtual void
+  SetNodeId(uint32_t nodeId);
+
+  /**
+   * @brief Get m_nodeId of this Limits instance
+   */
+  virtual uint32_t
+  GetNodeId();
   
   ////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
@@ -185,7 +225,10 @@ public:
 protected:
   void
   FireAvailableSlotCallback ();
-  
+
+  InterestQueue m_iq;
+  uint32_t m_nodeId;
+ 
 private:
   double m_maxRate;
   double m_maxDelay;
@@ -194,7 +237,6 @@ private:
 
   double m_linkDelay;
 };
-  
 
 } // namespace ndn
 } // namespace ns3

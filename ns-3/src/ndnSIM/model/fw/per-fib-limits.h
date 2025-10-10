@@ -22,6 +22,7 @@
 #ifndef NDNSIM_PER_FIB_LIMITS_H
 #define NDNSIM_PER_FIB_LIMITS_H
 
+#include "ns3/abort.h"
 #include "ns3/event-id.h"
 #include "ns3/log.h"
 #include "ns3/ndn-pit.h"
@@ -32,6 +33,8 @@
 #include "ns3/ndn-forwarding-strategy.h"
 
 #include "ns3/ndn-limits.h"
+#include "ns3/ndn-limits-rate.h"
+#include "ns3/ndn-interest-queue.h"
 
 namespace ns3 {
 namespace ndn {
@@ -88,7 +91,9 @@ public:
     ObjectFactory factory;
     factory.SetTypeId (fibEntry->m_faces.begin ()->GetFace ()->GetObject<Limits> ()->GetInstanceTypeId ());
 
-    Ptr<Limits> limits = factory.template Create<Limits> ();
+    Ptr<LimitsRate> limits = factory.template Create<LimitsRate> ();
+    limits->RegisterAvailableSlotCallback(MakeCallback(&LimitsRate::RetrySendOutInterest, limits));
+    limits->SetNodeId(fibEntry->m_faces.begin()->GetFace()->GetNode()->GetId());
     fibEntry->AggregateObject (limits);
 
     super::DidAddFibEntry (fibEntry);
@@ -99,8 +104,17 @@ protected:
   virtual bool
   CanSendOutInterest (Ptr<Face> inFace,
                       Ptr<Face> outFace,
-                      Ptr<const Interest> interest,
+                      Ptr<Interest> interest,
                       Ptr<pit::Entry> pitEntry);
+  
+  virtual void
+  SendOutInterestFromQ (Ptr<Limits> limits);
+
+  virtual void
+  InterestEnqueue (Ptr<DelayedInterest> di);
+
+  virtual Ptr<DelayedInterest>
+  InterestDequeue (Ptr<Face> outFace, Ptr<pit::Entry> pitEntry);
 
   /// \copydoc ForwardingStrategy::WillSatisfyPendingInterest
   virtual void
@@ -140,41 +154,90 @@ template<class Parent>
 bool
 PerFibLimits<Parent>::CanSendOutInterest (Ptr<Face> inFace,
                                           Ptr<Face> outFace,
-                                          Ptr<const Interest> interest,
+                                          Ptr<Interest> interest,
                                           Ptr<pit::Entry> pitEntry)
 {
-  NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
+  NS_LOG_FUNCTION (this << pitEntry->GetPrefix () << " seq#: " << pitEntry->GetPrefix().get(-1).toSeqNum());
 
+  Ptr<Fib> fib = outFace->GetNode()->GetObject<Fib>();
+  Ptr<fib::Entry> fibEntry;
+  uint32_t totalLength = 0;
+  for (fibEntry = fib->Begin(); fibEntry = fib->Next(fibEntry); fibEntry != fib->End())
+  {
+    totalLength += fibEntry->template GetObject<Limits>()->GetQueueLength();
+  }
+  NS_LOG_DEBUG("IQLength " << totalLength);
   Ptr<Limits> fibLimits = pitEntry->GetFibEntry ()->template GetObject<Limits> ();
   // no checks for the limit here. the check should be somewhere elese
-
   if (fibLimits->IsBelowLimit ())
     {
-      if (super::CanSendOutInterest (inFace, outFace, interest, pitEntry))
+      if (super::CanSendOutInterestFromFib (inFace, outFace, interest, pitEntry))
         {
           fibLimits->BorrowLimit ();
           return true;
         }
     }
-
+  NS_LOG_INFO("Limit exceeded");
   return false;
+}
+
+template<class Parent>
+void
+PerFibLimits<Parent>::SendOutInterestFromQ (Ptr<Limits> fibLimits)
+{
+  NS_LOG_FUNCTION (this);
+
+  Ptr<const DelayedInterest> di = fibLimits->Peek();
+  if (fibLimits->IsBelowLimit ())
+    {
+      if (super::CanSendOutInterest (di->m_inFace, di->m_outFace, di->m_interest, di->m_pitEntry))
+        {
+          Ptr<DelayedInterest> di = fibLimits->Dequeue();
+          fibLimits->BorrowLimit ();
+          ForwardingStrategy::RetrySendOutInterest(di->m_inFace, di->m_outFace, di->m_interest, di->m_pitEntry);
+          return;
+        }
+    }
+  NS_ABORT_MSG("Should not be possible.");
+}
+
+template<class Parent>
+void
+PerFibLimits<Parent>::InterestEnqueue(Ptr<DelayedInterest> di)
+{
+  NS_LOG_FUNCTION(this);
+  Ptr<Limits> fibLimits = di->m_pitEntry->GetFibEntry()->template GetObject<Limits>();
+  fibLimits->Enqueue(di);
+}
+
+template<class Parent>
+Ptr<DelayedInterest>
+PerFibLimits<Parent>::InterestDequeue(Ptr<Face> outFace, Ptr<pit::Entry> pitEntry)
+{
+  NS_LOG_FUNCTION(this);
+  Ptr<Limits> fibLimits = pitEntry->GetFibEntry()->template GetObject<Limits>();
+  return fibLimits->Dequeue();
 }
 
 template<class Parent>
 void
 PerFibLimits<Parent>::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
 {
-  NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
+  NS_LOG_FUNCTION (this << pitEntry->GetPrefix () << "seq#:" << pitEntry->GetPrefix().get(-1).toSeqNum());
 
   Ptr<Limits> fibLimits = pitEntry->GetFibEntry ()->template GetObject<Limits> ();
+  NS_LOG_INFO (this << " InterestQueue lenght: " << fibLimits->GetQueueLength());
 
-  for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
+  if (pitEntry->GetOutgoingCount() != 0)
+  {
+    for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
        face != pitEntry->GetOutgoing ().end ();
-       face ++)
+         face ++)
     {
       for (uint32_t i = 0; i <= face->m_retxCount; i++)
         fibLimits->ReturnLimit ();
     }
+  }
 
   super::WillEraseTimedOutPendingInterest (pitEntry);
 }

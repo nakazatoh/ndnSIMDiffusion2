@@ -22,6 +22,7 @@
 #ifndef NDNSIM_PER_OUT_FACE_LIMITS_H
 #define NDNSIM_PER_OUT_FACE_LIMITS_H
 
+#include "ns3/abort.h"
 #include "ns3/event-id.h"
 #include "ns3/log.h"
 #include "ns3/ndn-pit.h"
@@ -32,6 +33,9 @@
 #include "ns3/ndn-forwarding-strategy.h"
 
 #include "ns3/ndn-limits-rate.h"
+#include "ns3/ndn-interest-queue.h"
+#include "ns3/ndnSIM/utils/ndn-fw-feedback-pitsize-tag.h"
+#include "ns3/ndnSIM/utils/ndn-fw-feedback-rate-tag.h"
 
 namespace ns3 {
 namespace ndn {
@@ -77,8 +81,8 @@ public:
   {
     ObjectFactory factory (m_limitType);
     Ptr<LimitsRate> limits = factory.template Create<LimitsRate> ();
-    limits->SetFace(face);
-    limits->RegisterAvailableSlotCallback(MakeCallback(&ForwardingStrategy::RetrySendOutInterest, this));
+    limits->RegisterAvailableSlotCallback(MakeCallback(&LimitsRate::RetrySendOutInterest, limits));
+    limits->SetNodeId(face->GetNode()->GetId());
     face->AggregateObject (limits);
 
     super::AddFace (face);
@@ -89,9 +93,24 @@ protected:
   virtual bool
   CanSendOutInterest (Ptr<Face> inFace,
                       Ptr<Face> outFace,
-                      Ptr<const Interest> interest,
+                      Ptr<Interest> interest,
+                      Ptr<pit::Entry> pitEntry);
+
+  virtual bool
+  CanSendOutInterestFromFib (Ptr<Face> inFace,
+                      Ptr<Face> outFace,
+                      Ptr<Interest> interest,
                       Ptr<pit::Entry> pitEntry);
   
+  virtual void
+  SendOutInterestFromQ (Ptr<Limits> facelimits);
+
+  virtual void
+  InterestEnqueue (Ptr<DelayedInterest> di);
+
+  virtual Ptr<DelayedInterest>
+  InterestDequeue (Ptr<Face> outFace, Ptr<pit::Entry> pitEntry);
+
   /// \copydoc ForwardingStrategy::WillSatisfyPendingInterest
   virtual void
   WillSatisfyPendingInterest (Ptr<Face> inFace,
@@ -135,12 +154,13 @@ template<class Parent>
 bool
 PerOutFaceLimits<Parent>::CanSendOutInterest (Ptr<Face> inFace,
                                               Ptr<Face> outFace,
-                                              Ptr<const Interest> interest,
+                                              Ptr<Interest> interest,
                                               Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
   
   Ptr<Limits> faceLimits = outFace->template GetObject<Limits> ();
+  NS_LOG_DEBUG("IQLenght " << faceLimits->GetQueueLength());
   if (faceLimits->IsBelowLimit ())
     {
       if (super::CanSendOutInterest (inFace, outFace, interest, pitEntry))
@@ -149,8 +169,59 @@ PerOutFaceLimits<Parent>::CanSendOutInterest (Ptr<Face> inFace,
           return true;
         }
     }
-  
+  NS_LOG_INFO("Limit exceeded");
   return false;
+}
+
+template<class Parent>
+bool
+PerOutFaceLimits<Parent>::CanSendOutInterestFromFib (Ptr<Face> inFace,
+                                              Ptr<Face> outFace,
+                                              Ptr<Interest> interest,
+                                              Ptr<pit::Entry> pitEntry)
+{
+  NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
+  
+  return super::CanSendOutInterest (inFace, outFace, interest, pitEntry);
+}
+
+template<class Parent>
+void
+PerOutFaceLimits<Parent>::SendOutInterestFromQ (Ptr<Limits> faceLimits)
+{
+  NS_LOG_FUNCTION (this);
+  
+  // Ptr<Limits> faceLimits = outFace->template GetObject<Limits> ();
+  Ptr<const DelayedInterest> di = faceLimits->Peek();
+  if (faceLimits->IsBelowLimit ())
+    {
+      if (super::CanSendOutInterest (di->m_inFace, di->m_outFace, di->m_interest, di->m_pitEntry))
+        {
+          Ptr<DelayedInterest> di = faceLimits->Dequeue();
+          faceLimits->BorrowLimit ();
+          ForwardingStrategy::RetrySendOutInterest(di->m_inFace, di->m_outFace, di->m_interest, di->m_pitEntry);
+          return;
+        }
+    }
+  NS_ABORT_MSG("Should not be posssible.");
+}
+
+template<class Parent>
+void
+PerOutFaceLimits<Parent>::InterestEnqueue(Ptr<DelayedInterest> di)
+{
+  NS_LOG_FUNCTION(this);
+  Ptr<Limits> faceLimits = di->m_outFace->template GetObject<Limits>();
+  faceLimits->Enqueue(di);
+}
+
+template<class Parent>
+Ptr<DelayedInterest>
+PerOutFaceLimits<Parent>::InterestDequeue(Ptr<Face> outFace, Ptr<pit::Entry> pitEntry)
+{
+  NS_LOG_FUNCTION(this);
+  Ptr<Limits> faceLimits = outFace->template GetObject<Limits>();
+  return faceLimits->Dequeue();
 }
 
 template<class Parent>
@@ -159,14 +230,17 @@ PerOutFaceLimits<Parent>::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitE
 {
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
 
-  for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
-       face != pitEntry->GetOutgoing ().end ();
-       face ++)
+  if (pitEntry->GetOutgoingCount() != 0)
+  {
+    for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
+      face != pitEntry->GetOutgoing ().end ();
+      face ++)
     {
       Ptr<Limits> faceLimits = face->m_face->GetObject<Limits> ();
       for (uint32_t i = 0; i <= face->m_retxCount; i++)
         faceLimits->ReturnLimit ();
     }
+  }
 
   super::WillEraseTimedOutPendingInterest (pitEntry);
 }

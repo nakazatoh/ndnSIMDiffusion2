@@ -20,11 +20,15 @@
 
 #include "ndn-limits-rate.h"
 
+#include "ns3/abort.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
 #include "ns3/random-variable.h"
 #include "ns3/ndn-face.h"
+#include "ns3/ndn-interest.h"
 #include "ns3/node.h"
+#include "ns3/ndn-forwarding-strategy.h"
+#include "ns3/ndn-pit-entry.h"
 
 NS_LOG_COMPONENT_DEFINE ("ndn.Limits.Rate");
 
@@ -57,25 +61,27 @@ LimitsRate::NotifyNewAggregate ()
 
   if (!m_isLeakScheduled)
     {
-      if (GetObject<Face> () != 0)
-        {
-          NS_ASSERT_MSG (GetObject<Face> ()->GetNode () != 0, "Node object should exist on the face");
+      // if (GetObject<Face> () != 0)
+        // {
+          // NS_ASSERT_MSG (GetObject<Face> ()->GetNode () != 0, "Node object should exist on the face");
 
           m_isLeakScheduled = true;
 
           if (!m_leakRandomizationInteral.IsZero ())
             {
               UniformVariable r (0.0, m_leakRandomizationInteral.ToDouble (Time::S));
-              Simulator::ScheduleWithContext (GetObject<Face> ()->GetNode ()->GetId (),
-                                              Seconds (r.GetValue ()), &LimitsRate::LeakBucket, this, 0.0);
+              // Simulator::ScheduleWithContext (GetObject<Face> ()->GetNode ()->GetId (),
+              //                                Seconds (r.GetValue ()), &LimitsRate::LeakBucket, this, 0.0);
+              Simulator::ScheduleWithContext (m_nodeId, Seconds (r.GetValue ()), &LimitsRate::LeakBucket, this, 0.0);
             }
           else
             {
-              Simulator::ScheduleWithContext (GetObject<Face> ()->GetNode ()->GetId (),
-                                              Seconds (0), &LimitsRate::LeakBucket, this, 0.0);
+              // Simulator::ScheduleWithContext (GetObject<Face> ()->GetNode ()->GetId (),
+              //                                 Seconds (0), &LimitsRate::LeakBucket, this, 0.0);
+              Simulator::ScheduleWithContext (m_nodeId, Seconds (0), &LimitsRate::LeakBucket, this, 0.0);
             }
 
-        }
+        // }
     }
 }
 
@@ -86,6 +92,7 @@ LimitsRate::SetLimits (double rate, double delay)
 
   // maximum allowed burst
   m_bucketMax = GetMaxRate () * GetMaxDelay ();
+  NS_ASSERT_MSG (m_bucketMax >= 1.0, "Bandwidth-delay product is too low."); 
 
   // amount of packets allowed every second (leak rate)
   m_bucketLeak = GetMaxRate ();
@@ -98,12 +105,13 @@ LimitsRate::UpdateCurrentLimit (double limit)
   NS_ASSERT_MSG (limit >= 0.0, "Limit should be greater or equal to zero");
 
   m_bucketLeak = std::min (limit, GetMaxRate ());
-  m_bucketMax  = m_bucketLeak * GetMaxDelay ();
+  m_bucketMax  = m_bucketLeak * GetMaxDelay () + 1.0;
 }
 
 bool
 LimitsRate::IsBelowLimit ()
 {
+  NS_LOG_FUNCTION(this << "m_bucketMax" << m_bucketMax << "m_bucket" << m_bucket);
   if (!IsEnabled ()) return true;
 
   return (m_bucketMax - m_bucket >= 1.0);
@@ -127,6 +135,7 @@ LimitsRate::ReturnLimit ()
 void
 LimitsRate::LeakBucket (double interval)
 {
+  NS_LOG_FUNCTION(this << "interval: " << interval);
   const double leak = m_bucketLeak * interval;
 
 #ifdef NS3_LOG_ENABLE
@@ -157,7 +166,7 @@ LimitsRate::LeakBucket (double interval)
 }
 
 void
-LimitsRate::RegisterAvailableSlotCallback (Callback<void, Ptr<Face> > handler)
+LimitsRate::RegisterAvailableSlotCallback (Callback<void> handler)
 {
   m_rate_handler = handler;
 }
@@ -166,7 +175,34 @@ void
 LimitsRate::FireAvailableSlotCallback ()
 {
   if (!m_rate_handler.IsNull ())
-    m_rate_handler (m_face);
+    m_rate_handler ();
+}
+
+void
+LimitsRate::RetrySendOutInterest ()
+{
+  NS_LOG_FUNCTION(this);
+  Ptr<const DelayedInterest> di;
+  while ((di = m_iq.Peek()) != 0)
+  {
+    Ptr<ForwardingStrategy> forwardingStrategy = di->m_fs;
+    // Ptr<Limits> faceLimits = di->m_outFace->template GetObject<Limits> ();
+    if (!IsBelowLimit ())
+      return;
+    forwardingStrategy->SendOutInterestFromQ (this);
+  }
+}
+
+void
+LimitsRate::SetNodeId (uint32_t nodeId)
+{
+  super::SetNodeId (nodeId);
+}
+
+uint32_t
+LimitsRate::GetNodeId ()
+{
+  return super::GetNodeId ();
 }
 
 } // namespace ndn

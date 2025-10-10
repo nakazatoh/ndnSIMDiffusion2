@@ -187,6 +187,35 @@ Entry::GetFib ()
   return m_fib;
 }
 
+void
+Entry::AddArrivalTime(double arrivalTime)
+{
+  m_arrivalTime[m_arrivalTimeIndex] = arrivalTime;
+  ++m_arrivalTimeIndex %= 5;
+}
+
+double
+Entry::GetBandwidth ()
+{
+  double duration;
+  if (m_arrivalTime[m_arrivalTimeIndex] == 0)
+  {
+    if (m_arrivalTimeIndex == 1)
+    {
+      return 10000.0;
+    }
+    else
+    {
+      duration = m_arrivalTime[(m_arrivalTimeIndex + 4) % 5] - m_arrivalTime[0];
+      return (m_arrivalTimeIndex - 1) / duration;
+    }
+  } 
+  else
+  {
+    duration = m_arrivalTime[(m_arrivalTimeIndex + 4) % 5] - m_arrivalTime[m_arrivalTimeIndex];
+    return 4.0 / duration;
+  }
+}
 
 std::ostream& operator<< (std::ostream& os, const Entry &entry)
 {

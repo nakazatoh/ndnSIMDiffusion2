@@ -30,7 +30,6 @@
 #include "ns3/nstime.h"
 #include "ns3/type-id.h"
 #include "ns3/traced-callback.h"
-#include "ndn-delayed-interest.h"
 #include "ns3/ndn-name.h"
 
 namespace ns3 {
@@ -265,15 +264,6 @@ public:
 
   double
   GetBW() const;
-
-  void
-  Enqueue(Ptr<DelayedInterest>);
-
-  Ptr<DelayedInterest>
-  Dequeue();
-
-  bool
-  IsQueueEmpty();
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -337,7 +327,6 @@ private:
   double m_b_pitsize;
   double m_arrival_time[5];
   int m_a_t_index;
-  std::queue<Ptr<DelayedInterest> > m_interest_queue;
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 };

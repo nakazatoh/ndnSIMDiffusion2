@@ -5,42 +5,8 @@
     "version": "0.2.0",
     "configurations": [
         {
-            // Pipe Launch calls waf with appropriate arguments
-            "name": "(gdb) Pipe Launch",
-            "type": "cppdbg",
-            "request": "launch",
-                      // my build folder is ${workspaceFolder}/build, substitute yours
-            //"program": "${workspaceFolder}/build/utils/ns3-dev-test-runner-debug", //ここに実行したいプログラムを設定する
-            "program": "${workspaceFolder}/build/src/ndnSIM/examples/ns3-dev-ndn-congestion-topo-plugin-5src-debug",
-            "args": [],
-            "stopAtEntry": true,
-            "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": false,
-            "pipeTransport": {
-                "debuggerPath": "",  // leave blank
-                "pipeProgram": "${workspaceFolder}/waf",
-                // pipeArgs is essentially the entire waf command line arguments
-                "pipeArgs": [
-                    "--command-template", "'",  // opening quote for command template
-                    "/usr/bin/gdb", "--interpreter=mi",  // --interpreter lets vscode talk to gdb
-                    "--args", "%s",
-                    "'",  // closing quote for command template
-                    "--run", "ndn-congestion-topo-plugin-5src"], //実行するプログラムの指定？
-                "pipeCwd": ""
-            },
-            "MIMode": "gdb",
-            "setupCommands": [
-                {
-                    "description": "Enable pretty-printing for gdb",
-                    "text": "-enable-pretty-printing",
-                    "ignoreFailures": true
-                }
-            ]
-        },
-        {
             // Launch config emulates waf environment, calls gdb directly
-            "name": "(gdb) Launch",
+            "name": "(gdb) Launch-DTCC",
             "type": "cppdbg",
             "request": "launch",
             // my build folder is ${workspaceFolder}/build, substitute yours
@@ -54,10 +20,55 @@
             "environment": [
             //    {"Name": "NS_LOG", "Value": "*=level_debug|prefix_func|prefix_time|prefix_node"},
             //    {"Name": "NS_LOG", "Value": "ndn.pit.SerializedSize=level_all|prefix_func|prefix_time|prefix_node:ndn.ForwardingStrategy=level_all|prefix_func|prefix_time|prefix_node"},
+            //    {"Name": "NS_LOG", "Value": "ndn.fw.BestRoute=level_all|prefix_func|prefix_time|prefix_node:ndn.Limits.Rate=level_all|prefix_func|prefix_time|prefix_node:ndn.Limits=level_debug|prefix_func|prefix_time|prefix_node:ndn.fw.BestRoute.PerOutFaceLimits=level_all|prefix_func|prefix_time|prefix_node:ndn.ForwardingStrategy=level_all|prefix_func|prefix_time|prefix_node"},
             //    {"Name": "NS_LOG", "Value": "ndn.StackHelper=level_info|prefix_func|prefix_time|prefix_node"},
             //    {"Name": "NS_LOG", "Value": "DropTailQueue=level_all|prefix_func|prefix_time|prefix_node:ndn.ForwardingStrategy=level_debug|prefix_func|prefix_time|prefix_node"},
-                {"Name": "NS_LOG", "Value": "ndn.Face=level_debug|prefix_func|prefix_time|prefix_node:ndn.DelayedInterest=level_debug|prefix_func|prefix_time|prefix_node:ndn.pit.SerializedSize=level_all|prefix_func|prefix_node|prefix_time:ndn.Producer=level_debug|prefix_func|prefix_time|prefix_node:ndn.Consumer=level_debug|prefix_func|prefix_time|prefix_node:DropTailQueue=level_debug|prefix_func|prefix_time|prefix_node:PointToPointNetDevice=level_debug|prefix_func|prefix_time|prefix_node:ndn.ForwardingStrategy=level_all|prefix_func|prefix_time|prefix_node"},
+            //    {"Name": "NS_LOG", "Value": "ndn.Face=level_debug|prefix_func|prefix_time|prefix_node:ndn.DelayedInterest=level_debug|prefix_func|prefix_time|prefix_node:ndn.pit.SerializedSize=level_all|prefix_func|prefix_node|prefix_time:ndn.Producer=level_debug|prefix_func|prefix_time|prefix_node:ndn.Consumer=level_debug|prefix_func|prefix_time|prefix_node:DropTailQueue=level_debug|prefix_func|prefix_time|prefix_node:PointToPointNetDevice=level_debug|prefix_func|prefix_time|prefix_node:ndn.ForwardingStrategy=level_debug|prefix_func|prefix_time|prefix_node"},
             //    {"Name": "NS_LOG", "Value": "DropTailQueue=level_debug|prefix_func|prefix_time|prefix_node:PointToPointNetDevice=level_debug|prefix_func|prefix_time|prefix_node:ndn.ForwardingStrategy=debug|prefix_func|prefix_time|prefix_node"},
+                {"Name": "NS_LOG", "Value": "ndn.fw.BestRoute.PerOutFaceLimits=debug|prefix_func|prefix_time|prefix_node:PointToPointNetDevice=level_debug|prefix_func|prefix_time|prefix_node:ndn.ForwardingStrategy=debug|prefix_func|prefix_time|prefix_node"},
+                {"Name": "PYTHONPATH", "Value": "/home/nakazato/ndnSIM/ns-3/build/bindings/python:/home/nakazato/ndnSIM/ns-3/src/visualizer:/home/nakazato/ndnSIM/pybindgen"}, 
+                {"Name": "LD_LIBRARY_PATH", "Value": "/usr/lib/gcc/x86_64-linux-gnu/4.8:/home/nakazato/ndnSIM/ns-3/build"},
+                {"Name": "NS3_MODULE_PATH", "Value": "/usr/lib/gcc/x86_64-linux-gnu/4.8:/home/nakazato/ndnSIM/ns-3/build"},
+                {"Name": "NS3_EXECUTABLE_PATH", "Value": "/home/nakazato/ndnSIM/ns-3/build/src/emu:/home/nakazato/ndnSIM/ns-3/build/src/fd-net-device:/home/nakazato/ndnSIM/ns-3/build/src/tap-bridge"},
+                {"Name": "PATH", "Value": "/home/nakazato/ndnSIM/ns-3/build/src/emu:/home/nakazato/ndnSIM/ns-3/build/src/fd-net-device:/home/nakazato/ndnSIM/ns-3/build/src/tap-bridge:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"}
+            ],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "logging": {
+                "engineLogging" :true,
+                "trace": true
+            }
+        },
+        {
+            // Launch config emulates waf environment, calls gdb directly
+            "name": "(gdb) Launch-QSF",
+            "type": "cppdbg",
+            "request": "launch",
+            // my build folder is ${workspaceFolder}/build, substitute yours
+            // "program": "${workspaceFolder}/build/src/ndnSIM/examples/ns3-dev-ndn-simple-dumbbell-8nodes-1bottleneck-debug", //ここに実行したいプログラムを設定する
+            "program": "${workspaceFolder}/build/src/ndnSIM/examples/ns3-dev-ndn-dumbbell-13nodes-DTCC-debug",
+            "stopAtEntry": true,
+            "cwd": "${workspaceFolder}",
+            // replace the values below with those found from running
+            // $ waf shell
+            // $ env
+            "environment": [
+                {"Name": "NS_LOG", "Value": "ndn.pit.SerializedSize=level_all|prefix_func|prefix_time|prefix_node:ndn.Limits.Rate=all|prefix_func|prefix_time|prefix_node:ndn.Limits=all|prefix_func|prefix_time|prefix_node:ndn.ForwardingStrategy=level_function|prefix_func|prefix_time|prefix_node:ndn.fw.BestRoute.PerOutFaceLimits.PerFibLimits=level_all|prefix_func|prefix_time|prefix_node"},
+            //    {"Name": "NS_LOG", "Value": "*=level_debug|prefix_func|prefix_time|prefix_node"},
+            //    {"Name": "NS_LOG", "Value": "ndn.pit.SerializedSize=level_all|prefix_func|prefix_time|prefix_node:ndn.ForwardingStrategy=level_all|prefix_func|prefix_time|prefix_node"},
+            //    {"Name": "NS_LOG", "Value": "ndn.StackHelper=level_info|prefix_func|prefix_time|prefix_node"},
+            //    {"Name": "NS_LOG", "Value": "DropTailQueue=level_all|prefix_func|prefix_time|prefix_node:ndn.ForwardingStrategy=level_debug|prefix_func|prefix_time|prefix_node"},
+            //    {"Name": "NS_LOG", "Value": "ndn.Face=level_debug|prefix_func|prefix_time|prefix_node:ndn.DelayedInterest=level_debug|prefix_func|prefix_time|prefix_node:ndn.pit.SerializedSize=level_all|prefix_func|prefix_node|prefix_time:ndn.Producer=level_debug|prefix_func|prefix_time|prefix_node:ndn.Consumer=level_debug|prefix_func|prefix_time|prefix_node:DropTailQueue=level_debug|prefix_func|prefix_time|prefix_node:PointToPointNetDevice=level_debug|prefix_func|prefix_time|prefix_node:ndn.ForwardingStrategy=level_all|prefix_func|prefix_time|prefix_node"},
+            //    {"Name": "NS_LOG", "Value": "DropTailQueue=level_debug|prefix_func|prefix_time|prefix_node:PointToPointNetDevice=level_debug|prefix_func|prefix_time|prefix_node:ndn.ForwardingStrategy=debug|prefix_func|prefix_time|prefix_node"},
+            //    {"Name": "NS_LOG", "Value": "ndn.fw.BestRoute.PerOutFaceLimits.PerFibLimits=debug|prefix_func|prefix_time|prefix_node:PointToPointNetDevice=level_debug|prefix_func|prefix_time|prefix_node:ndn.ForwardingStrategy=debug|prefix_func|prefix_time|prefix_node"},
                 {"Name": "PYTHONPATH", "Value": "/home/nakazato/ndnSIM/ns-3/build/bindings/python:/home/nakazato/ndnSIM/ns-3/src/visualizer:/home/nakazato/ndnSIM/pybindgen"}, 
                 {"Name": "LD_LIBRARY_PATH", "Value": "/usr/lib/gcc/x86_64-linux-gnu/4.8:/home/nakazato/ndnSIM/ns-3/build"},
                 {"Name": "NS3_MODULE_PATH", "Value": "/usr/lib/gcc/x86_64-linux-gnu/4.8:/home/nakazato/ndnSIM/ns-3/build"},
