@@ -54,7 +54,7 @@
             "request": "launch",
             // my build folder is ${workspaceFolder}/build, substitute yours
             // "program": "${workspaceFolder}/build/src/ndnSIM/examples/ns3-dev-ndn-simple-dumbbell-8nodes-1bottleneck-debug", //ここに実行したいプログラムを設定する
-            "program": "${workspaceFolder}/build/src/ndnSIM/examples/ns3-dev-ndn-dumbbell-13nodes-QSF-debug",
+            "program": "${workspaceFolder}/build/src/ndnSIM/examples/ns3-dev-ndn-dumbbell-13nodes-DTCC-debug",
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",
             // replace the values below with those found from running
@@ -64,10 +64,9 @@
                 {"Name": "NS_LOG", "Value": "ndn.pit.SerializedSize=level_all|prefix_func|prefix_time|prefix_node:ndn.Limits.Rate=all|prefix_func|prefix_time|prefix_node:ndn.Limits=all|prefix_func|prefix_time|prefix_node:ndn.ForwardingStrategy=level_function|prefix_func|prefix_time|prefix_node:ndn.fw.BestRoute.PerOutFaceLimits.PerFibLimits=level_all|prefix_func|prefix_time|prefix_node"},
             //    {"Name": "NS_LOG", "Value": "*=level_debug|prefix_func|prefix_time|prefix_node"},
             //    {"Name": "NS_LOG", "Value": "ndn.pit.SerializedSize=level_all|prefix_func|prefix_time|prefix_node:ndn.ForwardingStrategy=level_all|prefix_func|prefix_time|prefix_node"},
-            //    {"Name": "NS_LOG", "Value": "ndn.Limits.Rate=all|prefix_func|prefix_time|prefix_node:ndn.GlobalRoutingHelper=level_all|prefix_func|prefix_time|prefix_node:ndn.StackHelper=level_all|prefix_func|prefix_time|prefix_node:ndn.fw.BestRoute=level_all|prefix_func|prefix_time|prefix_node:ndn.Limits=level_debug|prefix_func|prefix_time|prefix_node:ndn.fw.BestRoute.PerOutFaceLimits.PerFibLimits=level_all|prefix_func|prefix_time|prefix_node:ndn.ForwardingStrategy=level_all|prefix_func|prefix_time|prefix_node"},
             //    {"Name": "NS_LOG", "Value": "ndn.StackHelper=level_info|prefix_func|prefix_time|prefix_node"},
             //    {"Name": "NS_LOG", "Value": "DropTailQueue=level_all|prefix_func|prefix_time|prefix_node:ndn.ForwardingStrategy=level_debug|prefix_func|prefix_time|prefix_node"},
-            //    {"Name": "NS_LOG", "Value": "ndn.Face=level_debug|prefix_func|prefix_time|prefix_node:ndn.DelayedInterest=level_debug|prefix_func|prefix_time|prefix_node:ndn.pit.SerializedSize=level_all|prefix_func|prefix_node|prefix_time:ndn.Producer=level_debug|prefix_func|prefix_time|prefix_node:ndn.Consumer=level_debug|prefix_func|prefix_time|prefix_node:DropTailQueue=level_debug|prefix_func|prefix_time|prefix_node:PointToPointNetDevice=level_debug|prefix_func|prefix_time|prefix_node:ndn.ForwardingStrategy=level_debug|prefix_func|prefix_time|prefix_node"},
+            //    {"Name": "NS_LOG", "Value": "ndn.Face=level_debug|prefix_func|prefix_time|prefix_node:ndn.DelayedInterest=level_debug|prefix_func|prefix_time|prefix_node:ndn.pit.SerializedSize=level_all|prefix_func|prefix_node|prefix_time:ndn.Producer=level_debug|prefix_func|prefix_time|prefix_node:ndn.Consumer=level_debug|prefix_func|prefix_time|prefix_node:DropTailQueue=level_debug|prefix_func|prefix_time|prefix_node:PointToPointNetDevice=level_debug|prefix_func|prefix_time|prefix_node:ndn.ForwardingStrategy=level_all|prefix_func|prefix_time|prefix_node"},
             //    {"Name": "NS_LOG", "Value": "DropTailQueue=level_debug|prefix_func|prefix_time|prefix_node:PointToPointNetDevice=level_debug|prefix_func|prefix_time|prefix_node:ndn.ForwardingStrategy=debug|prefix_func|prefix_time|prefix_node"},
             //    {"Name": "NS_LOG", "Value": "ndn.fw.BestRoute.PerOutFaceLimits.PerFibLimits=debug|prefix_func|prefix_time|prefix_node:PointToPointNetDevice=level_debug|prefix_func|prefix_time|prefix_node:ndn.ForwardingStrategy=debug|prefix_func|prefix_time|prefix_node"},
                 {"Name": "PYTHONPATH", "Value": "/home/nakazato/ndnSIM/ns-3/build/bindings/python:/home/nakazato/ndnSIM/ns-3/src/visualizer:/home/nakazato/ndnSIM/pybindgen"}, 
