@@ -81,7 +81,7 @@ public:
   {
     ObjectFactory factory (m_limitType);
     Ptr<LimitsRate> limits = factory.template Create<LimitsRate> ();
-    limits->RegisterAvailableSlotCallback(MakeCallback(&LimitsRate::RetrySendOutInterest, limits));
+//    limits->RegisterAvailableSlotCallback(MakeCallback(&LimitsRate::RetrySendOutInterest, limits));
     limits->SetNodeId(face->GetNode()->GetId());
     face->AggregateObject (limits);
 
@@ -160,7 +160,7 @@ PerOutFaceLimits<Parent>::CanSendOutInterest (Ptr<Face> inFace,
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
   
   Ptr<Limits> faceLimits = outFace->template GetObject<Limits> ();
-  NS_LOG_DEBUG("IQLenght " << faceLimits->GetQueueLength());
+//  NS_LOG_DEBUG("IQLenght " << faceLimits->GetQueueLength());
   if (faceLimits->IsBelowLimit ())
     {
       if (super::CanSendOutInterest (inFace, outFace, interest, pitEntry))

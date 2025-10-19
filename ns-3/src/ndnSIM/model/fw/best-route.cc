@@ -86,13 +86,11 @@ BestRoute::DoPropagateInterest (Ptr<Face> inFace,
       if (metricFace.GetStatus () == fib::FaceMetric::NDN_FIB_RED) // all non-read faces are in front
         break;
         
-      TrySendOutInterest(inFace, metricFace.GetFace (), interest, pitEntry);
-/*
       if (!TrySendOutInterest (inFace, metricFace.GetFace (), interest, pitEntry))
         {
           continue;
         }
-*/
+
       propagatedCount++;
       break; // do only once
     }

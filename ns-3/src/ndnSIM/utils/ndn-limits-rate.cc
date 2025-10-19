@@ -57,13 +57,14 @@ LimitsRate::GetTypeId ()
 void
 LimitsRate::NotifyNewAggregate ()
 {
+  NS_LOG_FUNCTION(this);
   super::NotifyNewAggregate ();
 
   if (!m_isLeakScheduled)
     {
       // if (GetObject<Face> () != 0)
         // {
-          // NS_ASSERT_MSG (GetObject<Face> ()->GetNode () != 0, "Node object should exist on the face");
+          //NS_ASSERT_MSG (GetObject<Face> ()->GetNode () != 0, "Node object should exist on the face");
 
           m_isLeakScheduled = true;
 
@@ -81,7 +82,7 @@ LimitsRate::NotifyNewAggregate ()
               Simulator::ScheduleWithContext (m_nodeId, Seconds (0), &LimitsRate::LeakBucket, this, 0.0);
             }
 
-        // }
+        //}
     }
 }
 

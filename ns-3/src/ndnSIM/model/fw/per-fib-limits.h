@@ -92,7 +92,7 @@ public:
     factory.SetTypeId (fibEntry->m_faces.begin ()->GetFace ()->GetObject<Limits> ()->GetInstanceTypeId ());
 
     Ptr<LimitsRate> limits = factory.template Create<LimitsRate> ();
-    limits->RegisterAvailableSlotCallback(MakeCallback(&LimitsRate::RetrySendOutInterest, limits));
+//    limits->RegisterAvailableSlotCallback(MakeCallback(&LimitsRate::RetrySendOutInterest, limits));
     limits->SetNodeId(fibEntry->m_faces.begin()->GetFace()->GetNode()->GetId());
     fibEntry->AggregateObject (limits);
 
@@ -158,7 +158,7 @@ PerFibLimits<Parent>::CanSendOutInterest (Ptr<Face> inFace,
                                           Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix () << " seq#: " << pitEntry->GetPrefix().get(-1).toSeqNum());
-
+/*
   Ptr<Fib> fib = outFace->GetNode()->GetObject<Fib>();
   Ptr<fib::Entry> fibEntry;
   uint32_t totalLength = 0;
@@ -167,6 +167,7 @@ PerFibLimits<Parent>::CanSendOutInterest (Ptr<Face> inFace,
     totalLength += fibEntry->template GetObject<Limits>()->GetQueueLength();
   }
   NS_LOG_DEBUG("IQLength " << totalLength);
+*/
   Ptr<Limits> fibLimits = pitEntry->GetFibEntry ()->template GetObject<Limits> ();
   // no checks for the limit here. the check should be somewhere elese
   if (fibLimits->IsBelowLimit ())
@@ -226,10 +227,10 @@ PerFibLimits<Parent>::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix () << "seq#:" << pitEntry->GetPrefix().get(-1).toSeqNum());
 
   Ptr<Limits> fibLimits = pitEntry->GetFibEntry ()->template GetObject<Limits> ();
-  NS_LOG_INFO (this << " InterestQueue lenght: " << fibLimits->GetQueueLength());
+//  NS_LOG_INFO (this << " InterestQueue lenght: " << fibLimits->GetQueueLength());
 
-  if (pitEntry->GetOutgoingCount() != 0)
-  {
+//  if (pitEntry->GetOutgoingCount() != 0)
+//  {
     for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
        face != pitEntry->GetOutgoing ().end ();
          face ++)
@@ -237,7 +238,7 @@ PerFibLimits<Parent>::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry
       for (uint32_t i = 0; i <= face->m_retxCount; i++)
         fibLimits->ReturnLimit ();
     }
-  }
+//  }
 
   super::WillEraseTimedOutPendingInterest (pitEntry);
 }

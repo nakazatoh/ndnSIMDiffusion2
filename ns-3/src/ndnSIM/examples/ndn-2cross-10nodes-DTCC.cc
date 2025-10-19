@@ -60,7 +60,7 @@ PeriodicStatsPrinter (Ptr<Node> node, Time next)
   Simulator::Schedule (next, PeriodicStatsPrinter, node, next);
 }
 
-NS_LOG_COMPONENT_DEFINE("ndn-dumbbell-13nodes-QSF");
+NS_LOG_COMPONENT_DEFINE("ndn-dumbbell-13nodes-DTCC");
 
 int
 main (int argc, char *argv[])
@@ -81,8 +81,8 @@ main (int argc, char *argv[])
 
   // Install NDN stack on all nodes
   ndn::StackHelper ndnHelper;
-  ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute::PerOutFaceLimits::PerFibLimits","Limit","ns3::ndn::Limits::Rate","SelectSatPI","2");
-  ndnHelper.EnableLimits(true, Seconds(1),1250,40);
+  ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute::PerOutFaceLimits","Limit","ns3::ndn::Limits::Rate","SelectSatPI","1");
+  ndnHelper.EnableLimits(true, Seconds(0.2),1250,40);
   ndnHelper.SetContentStore ("ns3::ndn::cs::Lru", "MaxSize", "0");
   ndnHelper.SetPit ("ns3::ndn::pit::SerializedSize", "MaxSize", "0");
   ndnHelper.SetPit ("ns3::ndn::pit::SerializedSize", "MaxPitEntryLifetime", "0");
@@ -97,12 +97,10 @@ main (int argc, char *argv[])
   Ptr<Node> consumer1 = Names::Find<Node> ("Src1");
   Ptr<Node> consumer2 = Names::Find<Node> ("Src2");
   Ptr<Node> consumer3 = Names::Find<Node> ("Src3");
-  Ptr<Node> consumer4 = Names::Find<Node> ("Src4");
   
   Ptr<Node> producer1 = Names::Find<Node> ("Dst1");
   Ptr<Node> producer2 = Names::Find<Node> ("Dst2");
   Ptr<Node> producer3 = Names::Find<Node> ("Dst3");
-  Ptr<Node> producer4 = Names::Find<Node> ("Dst4");
 
   ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerCbr");
   consumerHelper.SetAttribute ("Frequency", StringValue ("70")); // 200 interests a second
@@ -120,20 +118,15 @@ main (int argc, char *argv[])
   // that will express interests in /dst2 namespace
 
   //lee2005
-  consumerHelper.SetAttribute ("Frequency", StringValue ("10")); // 10 interests a second
+  consumerHelper.SetAttribute ("Frequency", StringValue ("40")); // 10 interests a second
   //
   consumerHelper.SetPrefix ("/dst2");
   ApplicationContainer app2 = consumerHelper.Install (consumer2);
 
-  consumerHelper.SetAttribute ("Frequency", StringValue ("30")); 
+  consumerHelper.SetAttribute ("Frequency", StringValue ("40")); 
   // consumerHelper.SetAttribute("Randomize", StringValue("exponential"));
   consumerHelper.SetPrefix ("/dst3");
   ApplicationContainer app3 = consumerHelper.Install (consumer3);
-
-  consumerHelper.SetAttribute ("Frequency", StringValue ("50")); // 50 interests a second
-  // consumerHelper.SetAttribute("Randomize", StringValue("none"));
-  consumerHelper.SetPrefix ("/dst4");
-  ApplicationContainer app4 = consumerHelper.Install (consumer4);
 
   // std::cout << "Number of Applications:" << consumer3->GetNApplications() << std::endl;
   // consumer3->GetApplication(0)->SetStopTime(Seconds(2.0));
@@ -168,19 +161,13 @@ main (int argc, char *argv[])
   producerHelper.SetPrefix ("/dst3");
   producerHelper.Install (producer3);
 
-  ndnGlobalRoutingHelper.AddOrigins ("/dst4", producer4);
-  producerHelper.SetPrefix ("/dst4");
-  producerHelper.Install (producer4);
-
   // Calculate and install FIBs
   ndn::GlobalRoutingHelper::CalculateRoutes ();
 
-  app2.Start(Seconds(3.0));
-  app2.Stop(Seconds(6.0));
-  app3.Start(Seconds(1.0));
-  app3.Stop(Seconds(5.0));
-  app4.Start(Seconds(7.0));
-  app4.Stop(Seconds(9.0));
+  app2.Start(Seconds(1.0));
+  app2.Stop(Seconds(9.0));
+  app3.Start(Seconds(4.0));
+  app3.Stop(Seconds(7.0));
 
   Simulator::Stop (Seconds (10.0));
 
@@ -194,10 +181,10 @@ main (int argc, char *argv[])
   s << std::setw(2) << std::setfill('0') << localTime->tm_min;
   s << std::setw(2) << std::setfill('0') << localTime->tm_sec;
 
-  std::string drop_trace("drop-trace-dumbbell-13nodes-QSF.txt");
-  std::string rate_trace("rate-trace-dumbbell-13nodes-QSF.txt");
-  std::string aggregate_trace("aggregate-trace-dumbbell-13nodes-QSF.txt");
-  std::string app_delay_trace("app-delays-trace-dumbbell-13nodes-QSF.txt");
+  std::string drop_trace("drop-trace-2cross-10nodes-DTCC.txt");
+  std::string rate_trace("rate-trace-2cross-10nodes-DTCC.txt");
+  std::string aggregate_trace("aggregate-trace-2cross-10nodes-DTCC.txt");
+  std::string app_delay_trace("app-delays-trace-2cross-10nodes-DTCC.txt");
 
   // L2RateTracer::InstallAll ("20220621-3_drop-trace-5src-1213.txt", Seconds (0.1));
   L2RateTracer::InstallAll (s.str() + drop_trace, Seconds (0.1));

@@ -1348,31 +1348,11 @@ ForwardingStrategy::TrySendOutInterest (Ptr<Face> inFace,
   uint32_t nodeID = inFace->GetNode() -> GetId();
   uint32_t seq = interest->GetName ().get (-1).toSeqNum ();
 
-  Ptr<DelayedInterest> di = Create<DelayedInterest>();
-  di->m_inFace = inFace;
-  di->m_outFace = outFace;
-  di->m_interest = interest;
-  di->m_pitEntry = pitEntry;
-  di->m_fs = this;
-  InterestEnqueue(di);
-
   if (!CanSendOutInterest (inFace, outFace, interest, pitEntry))
     {
-      return true;
+      return false;
     }
-  di = InterestDequeue(outFace, pitEntry);
-  inFace = di->m_inFace;
-  outFace = di->m_outFace;
-  interest = di->m_interest;
-  pitEntry = di->m_pitEntry;
-  nodeID = inFace->GetNode() -> GetId();
-  seq = interest->GetName ().get (-1).toSeqNum ();
-  NS_LOG_LOGIC("Dequeue: Node: " << nodeID 
-               << " interfaceID: " << inFace -> GetId() 
-               << " seq#: " << seq);
 
-  Ptr<Node> node = inFace -> GetNode();
-  //uint32_t nodeID = node -> GetId();
   Ptr<Limits> faceLimits = outFace -> GetObject<Limits>();
   double rate = faceLimits -> GetCurrentLimit();
   uint32_t faceid = outFace->GetId();
@@ -1381,7 +1361,7 @@ ForwardingStrategy::TrySendOutInterest (Ptr<Face> inFace,
 
   Ptr<pit::Entry> pe = m_pit->Begin();
   double pc = 0;
-  while(pe)
+  while(pe != m_pit->End())
   {
     std::set<ndn::pit::OutgoingFace> outgoing_face = pe->GetOutgoing();
     for(std::set<ndn::pit::OutgoingFace>::iterator out_itr = outgoing_face.begin();
