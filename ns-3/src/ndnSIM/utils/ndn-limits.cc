@@ -45,6 +45,8 @@ Limits::Limits ()
   , m_maxDelay (1.0)
   , m_handler (MakeNullCallback<void> ())
   , m_linkDelay (0)
+  , m_f_qSize (0.0)
+  , m_rtt (0.1)
 {
 }
 
@@ -98,6 +100,12 @@ Limits::FireAvailableSlotCallback ()
     return m_iq.GetNInterest();
   }
 
+  bool
+  Limits::RemoveInterest(Ptr<const Interest> interest)
+  {
+    return m_iq.RemoveInterest(interest);
+  }
+
   void
   Limits::SetNodeId(uint32_t nodeId)
   {
@@ -108,6 +116,32 @@ Limits::FireAvailableSlotCallback ()
   Limits::GetNodeId()
   {
     return m_nodeId;
+  }
+
+  void
+  Limits::SetFQSize(double f_qSize)
+  {
+    NS_LOG_FUNCTION(this << "f_qSize:" << f_qSize);
+    m_f_qSize = f_qSize;
+  }
+
+  double
+  Limits::GetFQSize()
+  {
+    return m_f_qSize;
+  }
+
+  void
+  Limits::AddRTT(double rtt)
+  {
+    NS_LOG_FUNCTION(this << "rtt:" << rtt);
+    m_rtt = m_rtt * 0.8 + rtt * 0.2;
+  }
+
+  double
+  Limits::GetRTT()
+  {
+    return m_rtt;
   }
     
 } // namespace ndn

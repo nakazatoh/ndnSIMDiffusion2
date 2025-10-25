@@ -48,6 +48,7 @@ Entry::Entry (Pit &container,
   , m_fibEntry (fibEntry)
   , m_maxRetxCount (0)
   , m_creationTime (Simulator::Now ())
+  , m_iQLimits (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -270,6 +271,18 @@ Ptr<const Interest>
 Entry::GetInterest () const
 {
   return m_interest;
+}
+
+void
+Entry::SetInterestQueueLimits (Ptr<Limits> iQLimits)
+{
+  m_iQLimits = iQLimits;
+}
+
+Ptr<Limits>
+Entry::GetInterestQueueLimits ()
+{
+  return m_iQLimits;
 }
 
 std::ostream& operator<< (std::ostream& os, const Entry &entry)

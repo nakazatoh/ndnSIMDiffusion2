@@ -43,7 +43,7 @@ TypeId InterestQueue::GetTypeId (void)
 }
 
 InterestQueue::InterestQueue () :
-  m_nInterests (0),
+  // m_nInterests (0),
   m_nTotalReceivedInterests (0)
 {
   NS_LOG_FUNCTION (this);
@@ -61,11 +61,11 @@ InterestQueue::Enqueue (Ptr<DelayedInterest> di)
 
   m_traceEnqueue(di);
 
-  m_nInterests++;
+  // m_nInterests++;
   m_nTotalReceivedInterests++;
-  m_delayed_interests.push (di);
+  m_delayed_interests.push_back (di);
 
-  NS_LOG_LOGIC ("Number Interests " << m_nInterests);
+  NS_LOG_LOGIC ("Number Interests " << m_delayed_interests.size());
 
   return true;
 }
@@ -82,9 +82,9 @@ InterestQueue::Dequeue (void)
     }
 
   Ptr<DelayedInterest> di = m_delayed_interests.front ();
-  m_delayed_interests.pop ();
+  m_delayed_interests.pop_front ();
 
-  m_nInterests--;
+  // m_nInterests--;
   NS_LOG_LOGIC ("Popped " << di);
   m_traceDequeue (di);
   NS_LOG_LOGIC ("Number Interests " << m_delayed_interests.size ());
@@ -124,16 +124,16 @@ bool
 InterestQueue::IsEmpty (void) const
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_LOGIC ("returns " << (m_nInterests == 0));
-  return m_nInterests == 0;
+  NS_LOG_LOGIC ("returns " << (m_delayed_interests.size() == 0));
+  return m_delayed_interests.size() == 0; //m_nInterests == 0;
 }
 
 uint32_t
 InterestQueue::GetNInterest (void) const
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_LOGIC ("returns " << m_nInterests);
-  return m_nInterests;
+  NS_LOG_LOGIC ("returns " << m_delayed_interests.size());
+  return m_delayed_interests.size(); // m_nInterests;
 }
 
 uint32_t
@@ -148,9 +148,26 @@ void
 InterestQueue::ResetStatistics (void)
 {
   NS_LOG_FUNCTION (this);
-  m_nInterests = 0;
+  // m_nInterests = 0;
   m_nTotalReceivedInterests = 0;
 }
+
+bool 
+InterestQueue::RemoveInterest(Ptr<const Interest> interest)
+{
+  NS_LOG_FUNCTION (this << "interest:" << interest->GetName());
+  for (std::list<Ptr<DelayedInterest> >::iterator dii = m_delayed_interests.begin(); 
+    dii != m_delayed_interests.end(); dii++)
+    {
+      if ((*dii)->m_interest == interest)
+      {
+        m_delayed_interests.erase(dii);
+        return true;
+      }
+    }
+  return false;
+}
+
 
 } // namespace ndn
 } // namespace ns3

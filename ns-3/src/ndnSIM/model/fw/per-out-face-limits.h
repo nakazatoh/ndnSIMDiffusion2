@@ -30,8 +30,6 @@
 #include "ns3/simulator.h"
 #include "ns3/string.h"
 
-#include "ns3/ndn-forwarding-strategy.h"
-
 #include "ns3/ndn-limits-rate.h"
 #include "ns3/ndn-interest-queue.h"
 #include "ns3/ndnSIM/utils/ndn-fw-feedback-pitsize-tag.h"
@@ -212,6 +210,7 @@ PerOutFaceLimits<Parent>::InterestEnqueue(Ptr<DelayedInterest> di)
 {
   NS_LOG_FUNCTION(this);
   Ptr<Limits> faceLimits = di->m_outFace->template GetObject<Limits>();
+  di->m_pitEntry->SetInterestQueueLimits(faceLimits);
   faceLimits->Enqueue(di);
 }
 
@@ -221,7 +220,9 @@ PerOutFaceLimits<Parent>::InterestDequeue(Ptr<Face> outFace, Ptr<pit::Entry> pit
 {
   NS_LOG_FUNCTION(this);
   Ptr<Limits> faceLimits = outFace->template GetObject<Limits>();
-  return faceLimits->Dequeue();
+  Ptr<DelayedInterest> di = faceLimits->Dequeue();
+  di->m_pitEntry->SetInterestQueueLimits (0);
+  return di;
 }
 
 template<class Parent>
@@ -237,9 +238,19 @@ PerOutFaceLimits<Parent>::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitE
       face ++)
     {
       Ptr<Limits> faceLimits = face->m_face->GetObject<Limits> ();
+      // bool result = faceLimits->RemoveInterest(pitEntry->GetInterest());
       for (uint32_t i = 0; i <= face->m_retxCount; i++)
         faceLimits->ReturnLimit ();
     }
+  }
+  else 
+  {
+    // const fib::FaceMetric &metricFace = (pitEntry->GetFibEntry()->m_faces).get<fib::i_metric>();
+    // Ptr<Face> face = metricFace.GetFace();
+    // Ptr<Limits> faceLimits = face->GetObject<Limits>();
+    Ptr<Limits> faceLimits = pitEntry->GetInterestQueueLimits();
+    bool result = faceLimits->RemoveInterest(pitEntry->GetInterest());
+    NS_LOG_INFO (this << " InterestQueue length: " << faceLimits->GetQueueLength() << " result: " << result);
   }
 
   super::WillEraseTimedOutPendingInterest (pitEntry);

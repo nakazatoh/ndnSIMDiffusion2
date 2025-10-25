@@ -1017,6 +1017,8 @@ ForwardingStrategy::SatisfyPendingInterestQSF (Ptr<Face> inFace,
     Ptr<fib::Entry> fibEntry = pitEntry->GetFibEntry();
     Ptr<Limits> fibLimits = fibEntry->template GetObject<Limits>();
     fibEntry->AddArrivalTime(tm);
+    double interestArrivalTime = pitEntry->GetOutgoing().begin()->m_sendTime.ToDouble(Time::S);
+    fibLimits->AddRTT(tm - interestArrivalTime);
 
     //satisfy all pending incoming Interests
     BOOST_FOREACH (const pit::IncomingFace &incoming, pitEntry->GetIncoming ())
@@ -1096,6 +1098,7 @@ ForwardingStrategy::SatisfyPendingInterestQSF (Ptr<Face> inFace,
       {
         inFace->SetFPitsize(0);
         f_qSize = f_dataQSize = pitsize_out;
+        fibLimits->SetFQSize(f_qSize);
         f_pitsize = 0.0;
         f_pitsize_portion = 0.0;
         f_pitsizedif = pitsize_out - f_pitsize_portion;
@@ -1118,12 +1121,14 @@ ForwardingStrategy::SatisfyPendingInterestQSF (Ptr<Face> inFace,
         f_interestQSize = f_interestQSizeTag.GetRate();
 
         inFace->SetFPitsize(f_pitsize);
-        f_dataQSize = pitsize_out - f_pitsize;
+        f_dataQSize = pitsize_out_fib - f_pitsize;
+        NS_LOG_DEBUG("pitsize_out: " << pitsize_out << " pitsize_out_fib: " << pitsize_out_fib << " f_dataQSize: " << f_dataQSize);
         f_pitsize_portion = f_pitsize * pitsize_out / totalOutPitsize;
         f_pitsizedif = pitsize_out - f_pitsize_portion;
         b_pitsize = incoming.m_face->GetBPitsize();
         b_pitsizedif = b_pitsize - pitsize_in;
         f_qSize = std::max(f_interestQSize, f_dataQSize);
+        fibLimits->SetFQSize(f_qSize);
 
         rate = fibLimits -> GetCurrentLimit();
 

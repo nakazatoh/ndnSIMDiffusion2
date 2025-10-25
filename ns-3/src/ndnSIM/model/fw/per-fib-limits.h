@@ -93,9 +93,11 @@ public:
 
     Ptr<LimitsRate> limits = factory.template Create<LimitsRate> ();
     limits->RegisterAvailableSlotCallback(MakeCallback(&LimitsRate::RetrySendOutInterest, limits));
-    limits->SetNodeId(fibEntry->m_faces.begin()->GetFace()->GetNode()->GetId());
+    uint32_t nodeId;
+    limits->SetNodeId(nodeId = fibEntry->m_faces.begin()->GetFace()->GetNode()->GetId());
     fibEntry->AggregateObject (limits);
-
+    Simulator::ScheduleWithContext(nodeId, Seconds (limits->GetRTT()), &LimitsRate::RateProbing, limits);
+    NS_LOG_DEBUG(this << " nodeId: " << nodeId);
     super::DidAddFibEntry (fibEntry);
   }
 
@@ -193,6 +195,7 @@ PerFibLimits<Parent>::SendOutInterestFromQ (Ptr<Limits> fibLimits)
       if (super::CanSendOutInterest (di->m_inFace, di->m_outFace, di->m_interest, di->m_pitEntry))
         {
           Ptr<DelayedInterest> di = fibLimits->Dequeue();
+          di->m_pitEntry->SetInterestQueueLimits(0);
           fibLimits->BorrowLimit ();
           ForwardingStrategy::RetrySendOutInterest(di->m_inFace, di->m_outFace, di->m_interest, di->m_pitEntry);
           return;
@@ -207,6 +210,7 @@ PerFibLimits<Parent>::InterestEnqueue(Ptr<DelayedInterest> di)
 {
   NS_LOG_FUNCTION(this);
   Ptr<Limits> fibLimits = di->m_pitEntry->GetFibEntry()->template GetObject<Limits>();
+  di->m_pitEntry->SetInterestQueueLimits(fibLimits);
   fibLimits->Enqueue(di);
 }
 
@@ -216,7 +220,9 @@ PerFibLimits<Parent>::InterestDequeue(Ptr<Face> outFace, Ptr<pit::Entry> pitEntr
 {
   NS_LOG_FUNCTION(this);
   Ptr<Limits> fibLimits = pitEntry->GetFibEntry()->template GetObject<Limits>();
-  return fibLimits->Dequeue();
+  Ptr<DelayedInterest> di = fibLimits->Dequeue();
+  di->m_pitEntry->SetInterestQueueLimits(0);
+  return di;
 }
 
 template<class Parent>
@@ -226,7 +232,8 @@ PerFibLimits<Parent>::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix () << "seq#:" << pitEntry->GetPrefix().get(-1).toSeqNum());
 
   Ptr<Limits> fibLimits = pitEntry->GetFibEntry ()->template GetObject<Limits> ();
-  NS_LOG_INFO (this << " InterestQueue lenght: " << fibLimits->GetQueueLength());
+  bool result = fibLimits->RemoveInterest(pitEntry->GetInterest());
+  NS_LOG_INFO (this << " InterestQueue lenght: " << fibLimits->GetQueueLength() << " result: " << result);
 
   if (pitEntry->GetOutgoingCount() != 0)
   {

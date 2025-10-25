@@ -201,6 +201,14 @@ public:
   GetQueueLength();
 
   /**
+   * @brief Remove the specified interest from the interest queue
+   * @param Interest to be removed
+   * @return true if the interest exists in the queue and removed
+   */
+  bool
+  RemoveInterest(Ptr<const Interest> interest);
+
+  /**
    * @brief Set m_nodeId of this Limits instance
    */
   virtual void
@@ -211,6 +219,30 @@ public:
    */
   virtual uint32_t
   GetNodeId();
+
+  /**
+   * @brief Set m_f_qSize of this Limits instance
+   * @param f_qSize the max of interest queue size and data queue size of upstream node
+   */
+  virtual void SetFQSize(double f_qSize);
+
+  /**
+   * @brief Get m_f_qSize of this Limits instance
+   * @return the value of m_f_qSize
+   */
+  virtual double GetFQSize();
+
+  /**
+   * @brief Incorporate an observed RTT to the average RTT of this Limits instance
+   * @param rtt an observed RTT value
+   */
+  virtual void AddRTT(double rtt);
+
+  /**
+   * @brief Read average RTT of this Limits instance
+   * @return the average RTT value
+   */
+  virtual double GetRTT();
   
   ////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
@@ -228,6 +260,8 @@ protected:
 
   InterestQueue m_iq;
   uint32_t m_nodeId;
+  double m_f_qSize;
+  double m_rtt;
  
 private:
   double m_maxRate;

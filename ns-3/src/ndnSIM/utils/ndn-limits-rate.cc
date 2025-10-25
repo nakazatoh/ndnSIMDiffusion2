@@ -205,5 +205,18 @@ LimitsRate::GetNodeId ()
   return super::GetNodeId ();
 }
 
+void
+LimitsRate::RateProbing()
+{
+  if (GetMaxRate() < 0)
+    return;
+  if (m_f_qSize < 5.0)
+  {
+    UpdateCurrentLimit(GetCurrentLimit() * 1.05);
+  }
+  NS_LOG_DEBUG(this << " f_qSize: " << m_f_qSize << " rtt: " << m_rtt << " m_bucketMax: " << m_bucketMax << " m_bucketLeak: " << m_bucketLeak);
+  Simulator::ScheduleWithContext (m_nodeId, Seconds (m_rtt), &LimitsRate::RateProbing, this);
+}
+
 } // namespace ndn
 } // namespace ns3

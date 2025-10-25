@@ -21,7 +21,7 @@
 
 //#include "ns3/ndn-pit.h"
 //#include "ns3/ndn-pit-entry.h"
-//#include "ns3/ndn-interest.h"
+#include "ns3/ndn-interest.h"
 //#include "ns3/ndn-face.h"
 #include "ns3/ndn-delayed-interest.h"
 #include <queue>
@@ -101,14 +101,21 @@ public:
    */
   void ResetStatistics (void);
 
+  /**
+   * @brief Remove the DelayedInterest instance specified by the specified interest
+   * @param Pointer to the interest to be removed
+   * @return true if successfully remove the DelayedInterest instance
+   */
+  bool RemoveInterest(Ptr<const Interest> interest);
+
 private:
   /// Traced callback: fired when an Interest is enqueued
   TracedCallback<Ptr<const DelayedInterest> > m_traceEnqueue;
   /// Traced callback: fired when an Interest is dequeued
   TracedCallback<Ptr<const DelayedInterest> > m_traceDequeue;
 
-  std::queue<Ptr<DelayedInterest> > m_delayed_interests; //!< the Interests in the queue
-  uint32_t m_nInterests;              //!< Number of Interests in the queue
+  std::list<Ptr<DelayedInterest> > m_delayed_interests; //!< the Interests in the queue
+  // uint32_t m_nInterests;              //!< Number of Interests in the queue
   uint32_t m_nTotalReceivedInterests; //!< Total received Interests
 };
 

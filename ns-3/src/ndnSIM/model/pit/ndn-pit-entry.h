@@ -29,6 +29,8 @@
 #include "ns3/ndn-pit-entry-incoming-face.h"
 #include "ns3/ndn-pit-entry-outgoing-face.h"
 
+#include "ns3/ndn-interest-queue.h"
+
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/tag.hpp>
 #include <boost/multi_index/ordered_index.hpp>
@@ -266,6 +268,22 @@ public:
   virtual Time
   GetCreationTime ();
 
+  /**
+   * @brief Set the pointer to the Limits if the corresponding interest is queued
+   *        Otherwise the pointer is null.
+   * @param iQLimits: the pointer to the Limits.
+   */
+  void
+  SetInterestQueueLimits (Ptr<Limits> iQLimits);
+
+  /**
+   * @brief Get the pointer to the Limits if the pitEntry is in the queue.
+   *        Otherwise null is returned.
+   * @return Pointer to the Limits where the interest queue exists.
+   */
+  Ptr<Limits>
+  GetInterestQueueLimits ();
+
 private:
   friend std::ostream& operator<< (std::ostream& os, const Entry &entry);
 
@@ -286,6 +304,8 @@ protected:
 
   std::list< boost::shared_ptr<fw::Tag> > m_fwTags; ///< @brief Forwarding strategy tags
   Time m_creationTime; // nakazato: Time when PIT entry is created
+
+  Ptr<Limits> m_iQLimits;
 };
 
 /// @cond include_hidden

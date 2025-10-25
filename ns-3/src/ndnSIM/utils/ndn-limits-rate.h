@@ -121,6 +121,11 @@ public:
   uint32_t
   GetNodeId ();
 
+  /**
+   * @brief Try to increase rate for every RTT for QSF algorithm
+   */
+  virtual void RateProbing();
+
 protected:
   void
   FireAvailableSlotCallback ();

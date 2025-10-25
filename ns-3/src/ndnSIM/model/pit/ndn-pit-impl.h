@@ -280,6 +280,18 @@ PitImpl<Policy>::RescheduleCleaning ()
   NS_LOG_DEBUG ("Schedule next cleaning in " <<
                 nextEvent.ToDouble (Time::S) << "s (at " <<
                 i_time.begin ()->GetExpireTime () << "s abs time");
+/*
+  typename super::parent_trie::const_recursive_iterator item (super::getTrie ()), end (0);
+  for (; item != end; item++)
+    {
+      if (item->payload () == 0) 
+      {
+        NS_LOG_DEBUG("payload is zero");
+        continue;
+      }
+      NS_LOG_DEBUG(item->payload ()->GetPrefix () << "\t" << *item->payload ());
+    }
+*/
   if (i_time.begin()->to_iterator())
   {
     NS_LOG_DEBUG("pitEntry ptr: " << i_time.begin()->to_iterator()->payload() );
@@ -300,7 +312,8 @@ PitImpl<Policy>::CleanExpired ()
 {
   NS_LOG_LOGIC ("Cleaning PIT. Total: " << i_time.size ());
   Time now = Simulator::Now ();
-/*  if (!i_time.empty())
+  double tm = now.ToDouble (Time::S);
+  if (!i_time.empty())
     for (typename time_index::iterator entry = i_time.begin(); entry != i_time.end(); entry++)
     {
       // Ptr<pit::Entry> pitEntry = entry->to_iterator ()->payload ();
@@ -315,22 +328,35 @@ PitImpl<Policy>::CleanExpired ()
         if (! entry->to_iterator()->payload())
           NS_LOG_DEBUG("!!!pitEntry zero!!!");
       }
-    } */
+    } 
 
   // uint32_t count = 0;
   while (!i_time.empty ())
     {
+      NS_LOG_DEBUG("i_time size: " << i_time.size());
       typename time_index::iterator entry = i_time.begin ();
       if (entry->GetExpireTime () <= now) // is the record stale?
         {
-          if (!entry->to_iterator()->payload())
+          NS_LOG_DEBUG("erasing iterator: " << entry->to_iterator());
+          if (!entry->to_iterator())
+          {
+            NS_LOG_DEBUG("!!! to_iterator zero !!!");
+          }
+          else if (entry->to_iterator()->payload() == 0)
+          {
             NS_LOG_DEBUG("!!! payload zero !!! iterator: " << entry->to_iterator());
-          m_forwardingStrategy->WillEraseTimedOutPendingInterest (entry->to_iterator ()->payload ());
-          super::erase (entry->to_iterator ());
-          // count ++;
+          }
+          else
+          {
+            NS_LOG_DEBUG("iterator about to be erased: " << entry->to_iterator());
+            m_forwardingStrategy->WillEraseTimedOutPendingInterest (entry->to_iterator ()->payload ());
+            super::erase (entry->to_iterator ());
+            // count ++;
+          }
         }
       else
         break; // nothing else to do. All later records will not be stale
+      NS_LOG_DEBUG("i_time size: " << i_time.size());
     }
 
   if (super::getPolicy ().size ())
@@ -411,6 +437,7 @@ PitImpl<Policy>::Create (Ptr<const Interest> header)
         {
           // should we do anything?
           // update payload? add new payload?
+          NS_LOG_DEBUG("!!! result is failure !!!");
           return result.first->payload ();
         }
     }
