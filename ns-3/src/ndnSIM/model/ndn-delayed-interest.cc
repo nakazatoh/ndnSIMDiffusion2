@@ -4,6 +4,7 @@
 #include "ns3/ndn-pit-entry.h"
 #include "ns3/ndn-interest.h"
 #include "ns3/ndn-delayed-interest.h"
+#include "ns3/ndn-forwarding-strategy.h"
 
 NS_LOG_COMPONENT_DEFINE ("ndn.DelayedInterest");
 

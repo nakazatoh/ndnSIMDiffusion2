@@ -68,6 +68,9 @@ def build(bld):
         obj = bld.create_ns3_program('ndn-dumbbell-13nodes-QSF', all_modules)
         obj.source = 'ndn-dumbbell-13nodes-QSF.cc'
 
+        obj = bld.create_ns3_program('ndn-2cross-10nodes', all_modules)
+        obj.source = 'ndn-2cross-10nodes.cc'
+
         obj = bld.create_ns3_program('ndn-2cross-10nodes-DTCC', all_modules)
         obj.source = 'ndn-2cross-10nodes-DTCC.cc'
 

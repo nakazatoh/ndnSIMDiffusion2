@@ -8,12 +8,13 @@
 //#include "ns3/ndn-face.h"
 //#include "ns3/ndn-pit-entry.h"
 //#include "ns3/ndn-interest.h"
-#include "ns3/ndn-forwarding-strategy.h"
+// #include "ns3/ndn-forwarding-strategy.h"
 
 namespace ns3 {
 namespace ndn {
   class Face;
   class Interest;
+  class ForwardingStrategy;
 
 namespace pit {
   class Entry;

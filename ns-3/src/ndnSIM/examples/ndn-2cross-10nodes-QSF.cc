@@ -60,7 +60,7 @@ PeriodicStatsPrinter (Ptr<Node> node, Time next)
   Simulator::Schedule (next, PeriodicStatsPrinter, node, next);
 }
 
-NS_LOG_COMPONENT_DEFINE("ndn-dumbbell-13nodes-DTCC");
+NS_LOG_COMPONENT_DEFINE("ndn-2cross-10nodes-QSF");
 
 int
 main (int argc, char *argv[])
@@ -76,7 +76,7 @@ main (int argc, char *argv[])
 
   AnnotatedTopologyReader topologyReader ("", 25);
   //topologyReader.SetFileName ("src/ndnSIM/examples/topologies/topo-ring-2src.txt");
-  topologyReader.SetFileName ("src/ndnSIM/examples/topologies/topo-dumbbell-13nodes.txt");  //read topology
+  topologyReader.SetFileName ("src/ndnSIM/examples/topologies/topo-2cross-10nodes.txt");  //read topology
   topologyReader.Read ();
 
   // Install NDN stack on all nodes

@@ -21,6 +21,7 @@
 #ifndef NDN_FORWARDING_STRATEGY_H
 #define NDN_FORWARDING_STRATEGY_H
 
+#include "ns3/ndn-interest-queue.h"
 #include "ns3/packet.h"
 #include "ns3/callback.h"
 #include "ns3/object.h"
@@ -525,6 +526,7 @@ protected:
   bool m_consumerNeighbour;
   std::vector<std::vector<double> > m_interestRateTable;
   uint32_t m_selectSatPI;
+  InterestQueue m_iq;
 ////////////////////////
 
   bool m_cacheUnsolicitedDataFromApps;

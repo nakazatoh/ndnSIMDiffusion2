@@ -31,7 +31,7 @@
 #include "ns3/string.h"
 
 #include "ns3/ndn-limits-rate.h"
-#include "ns3/ndn-interest-queue.h"
+#include "ns3/ndn-forwarding-strategy.h"
 #include "ns3/ndnSIM/utils/ndn-fw-feedback-pitsize-tag.h"
 #include "ns3/ndnSIM/utils/ndn-fw-feedback-rate-tag.h"
 

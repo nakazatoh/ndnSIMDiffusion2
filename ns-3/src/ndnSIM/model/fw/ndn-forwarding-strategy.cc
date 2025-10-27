@@ -295,8 +295,8 @@ ForwardingStrategy::OnData (Ptr<Face> inFace,
 /////////////////////////////
 Ptr<Node> node = inFace -> GetNode();
   uint32_t nodeID = node -> GetId();
-  Ptr<Limits> faceLimits = inFace -> GetObject<Limits>();
-  double rate = faceLimits -> GetCurrentLimit();
+  // Ptr<Limits> faceLimits = inFace -> GetObject<Limits>();
+  // double rate = faceLimits -> GetCurrentLimit();
   
   uint32_t seq = data->GetName ().get (-1).toSeqNum ();
   NS_LOG_LOGIC("Node: " << nodeID 
@@ -508,8 +508,8 @@ ForwardingStrategy::SatisfyPendingInterest (Ptr<Face> inFace,
       
     feedbackPitsizeTag.SetPitSize(inPitsize);
     payloadCopy -> AddPacketTag(feedbackPitsizeTag);
-    double rate = incoming->m_face->GetObject<Limits>()->GetCurrentLimit();
-    feedbackRateTag.SetRate(rate);
+    // double rate = incoming->m_face->GetObject<Limits>()->GetCurrentLimit();
+    feedbackRateTag.SetRate(0.0);
     payloadCopy -> AddPacketTag(feedbackRateTag);
 
     data->SetPayload (payloadCopy);
@@ -602,7 +602,7 @@ ForwardingStrategy::SatisfyPendingInterest (Ptr<Face> inFace,
       double f_pitsizedif = pitsize_out - f_pitsize_portion;
       double b_pitsize = incoming.m_face->GetBPitsize();
       double b_pitsizedif = b_pitsize - pitsize_in;
-      double rate;
+      double rate = 0.0;
       double newRate;
 
       double tm = Simulator::Now ().ToDouble (Time::S);
@@ -611,7 +611,7 @@ ForwardingStrategy::SatisfyPendingInterest (Ptr<Face> inFace,
 
       if (!pitsizeTagPresent) //for ndn-qsf.cc
       {
-        rate = (incoming.m_face->GetObject<Limits>())->GetCurrentLimit();
+        // rate = (incoming.m_face->GetObject<Limits>())->GetCurrentLimit();
         newRate = rate;
         uint32_t seq = data->GetName().get(-1).toSeqNum();
 
@@ -625,8 +625,8 @@ ForwardingStrategy::SatisfyPendingInterest (Ptr<Face> inFace,
       }  
       else               
       {
-        Ptr<Limits> faceLimits = inFace -> GetObject<Limits>();
-        rate = faceLimits -> GetCurrentLimit();
+        // Ptr<Limits> faceLimits = inFace -> GetObject<Limits>();
+        // rate = faceLimits -> GetCurrentLimit();
         uint32_t seq = data->GetName().get(-1).toSeqNum();
         NS_LOG_DEBUG("Node: " << nodeID << " Interest-in-face: " << outFace_data 
           << " Interest-out-face: " << infaceId << " b_pitsize: " << b_pitsize 
@@ -648,10 +648,10 @@ ForwardingStrategy::SatisfyPendingInterest (Ptr<Face> inFace,
 
       /* set rate on feedback */
       double rate_sum = 0.0;
-      for (std::vector<double>::iterator v = m_interestRateTable[outFace_data].begin(); v != m_interestRateTable[outFace_data].end(); v++) 
-      {
-        rate_sum += *v;
-      }
+      //for (std::vector<double>::iterator v = m_interestRateTable[outFace_data].begin(); v != m_interestRateTable[outFace_data].end(); v++) 
+      //{
+      //  rate_sum += *v;
+      //}
       feedbackRateTag.SetRate(rate_sum);
       payloadCopy -> AddPacketTag(feedbackRateTag);
 
@@ -862,11 +862,11 @@ ForwardingStrategy::SatisfyPendingInterestDTCC (Ptr<Face> inFace,
         double alpha = 0.2;
         if(m_consumerNeighbour)
         {
-          newRate = f_rate - d * f_pitsizedif;
+          newRate = f_rate + d * f_pitsizedif;
         }
         else
         {
-          newRate = f_rate + d * (b_pitsizedif - f_pitsizedif);
+          newRate = f_rate - d * (b_pitsizedif - f_pitsizedif);
         }
         if (newRate < 1) newRate = 1;
         if (newRate > faceLimits->GetMaxRate()) newRate = faceLimits->GetMaxRate();
@@ -1378,8 +1378,8 @@ ForwardingStrategy::TrySendOutInterest (Ptr<Face> inFace,
 
   Ptr<Node> node = inFace -> GetNode();
   //uint32_t nodeID = node -> GetId();
-  Ptr<Limits> faceLimits = outFace -> GetObject<Limits>();
-  double rate = faceLimits -> GetCurrentLimit();
+  // Ptr<Limits> faceLimits = outFace -> GetObject<Limits>();
+  // double rate = faceLimits -> GetCurrentLimit();
   uint32_t faceid = outFace->GetId();
 
   pitEntry->AddOutgoing (outFace);  
@@ -1409,10 +1409,12 @@ ForwardingStrategy::TrySendOutInterest (Ptr<Face> inFace,
   Interest* mutableInterest = const_cast<Interest*>(imutableInterest);
   mutableInterest->SetPayload(payload);
   
+  /*
   NS_LOG_LOGIC("Node: " << nodeID
               << " interfaceID: " << faceid
                << " pitsize: " << m_pit->GetSize()
               << " rate: " << rate << " seq#: " << seq);
+  */
 
 //  pitEntry->AddOutgoing (outFace);
 
@@ -1493,13 +1495,14 @@ void
 ForwardingStrategy::InterestEnqueue (Ptr<DelayedInterest> di)
 {
   NS_LOG_FUNCTION(this);
+  m_iq.Enqueue(di);
 }
 
 Ptr<DelayedInterest>
 ForwardingStrategy::InterestDequeue (Ptr<Face> outFace, Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION(this);
-  return 0;
+  return m_iq.Dequeue();
 }
 
 void
