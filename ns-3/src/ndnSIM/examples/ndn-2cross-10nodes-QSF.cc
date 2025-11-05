@@ -104,8 +104,8 @@ main (int argc, char *argv[])
 
   ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerCbr");
   consumerHelper.SetAttribute ("Frequency", StringValue ("70")); // 200 interests a second
-  // consumerHelper.SetAttribute("LifeTime", StringValue("4s"));
-  // consumerHelper.SetAttribute("RetxTimer", StringValue("4s"));
+  consumerHelper.SetAttribute("LifeTime", StringValue("10s"));
+  consumerHelper.SetAttribute("RetxTimer", StringValue("10s"));
   // consumerHelper.SetAttribute("Randomize", StringValue("exponential"));
   // consumerHelper.SetAttribute("Randomize", StringValue("uniform"));
 

@@ -85,14 +85,17 @@ BestRoute::DoPropagateInterest (Ptr<Face> inFace,
       NS_LOG_DEBUG ("Trying " << boost::cref(metricFace));
       if (metricFace.GetStatus () == fib::FaceMetric::NDN_FIB_RED) // all non-read faces are in front
         break;
-        
-      TrySendOutInterest(inFace, metricFace.GetFace (), interest, pitEntry);
-/*
-      if (!TrySendOutInterest (inFace, metricFace.GetFace (), interest, pitEntry))
+      if (m_interestBuffering)
+      {
+        TrySendOutInterest(inFace, metricFace.GetFace (), interest, pitEntry);
+      }
+      else
+      {
+        if (!TrySendOutInterest (inFace, metricFace.GetFace (), interest, pitEntry))
         {
           continue;
         }
-*/
+      }
       propagatedCount++;
       break; // do only once
     }

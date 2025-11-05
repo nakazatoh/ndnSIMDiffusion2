@@ -92,7 +92,8 @@ public:
     factory.SetTypeId (fibEntry->m_faces.begin ()->GetFace ()->GetObject<Limits> ()->GetInstanceTypeId ());
 
     Ptr<LimitsRate> limits = factory.template Create<LimitsRate> ();
-    limits->RegisterAvailableSlotCallback(MakeCallback(&LimitsRate::RetrySendOutInterest, limits));
+    if (ForwardingStrategy::m_interestBuffering)
+      limits->RegisterAvailableSlotCallback(MakeCallback(&LimitsRate::RetrySendOutInterest, limits));
     uint32_t nodeId;
     limits->SetNodeId(nodeId = fibEntry->m_faces.begin()->GetFace()->GetNode()->GetId());
     fibEntry->AggregateObject (limits);
@@ -161,14 +162,17 @@ PerFibLimits<Parent>::CanSendOutInterest (Ptr<Face> inFace,
 {
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix () << " seq#: " << pitEntry->GetPrefix().get(-1).toSeqNum());
 
-  Ptr<Fib> fib = outFace->GetNode()->GetObject<Fib>();
-  Ptr<fib::Entry> fibEntry;
-  uint32_t totalLength = 0;
-  for (fibEntry = fib->Begin(); fibEntry = fib->Next(fibEntry); fibEntry != fib->End())
+  if (ForwardingStrategy::m_interestBuffering)
   {
-    totalLength += fibEntry->template GetObject<Limits>()->GetQueueLength();
+    Ptr<Fib> fib = outFace->GetNode()->GetObject<Fib>();
+    Ptr<fib::Entry> fibEntry;
+    uint32_t totalLength = 0;
+    for (fibEntry = fib->Begin(); fibEntry = fib->Next(fibEntry); fibEntry != fib->End())
+    {
+      totalLength += fibEntry->template GetObject<Limits>()->GetQueueLength();
+    }
+    NS_LOG_DEBUG("IQLength " << totalLength);
   }
-  NS_LOG_DEBUG("IQLength " << totalLength);
   Ptr<Limits> fibLimits = pitEntry->GetFibEntry ()->template GetObject<Limits> ();
   // no checks for the limit here. the check should be somewhere elese
   if (fibLimits->IsBelowLimit ())
@@ -232,20 +236,35 @@ PerFibLimits<Parent>::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix () << "seq#:" << pitEntry->GetPrefix().get(-1).toSeqNum());
 
   Ptr<Limits> fibLimits = pitEntry->GetFibEntry ()->template GetObject<Limits> ();
-  bool result = fibLimits->RemoveInterest(pitEntry->GetInterest());
-  NS_LOG_INFO (this << " InterestQueue lenght: " << fibLimits->GetQueueLength() << " result: " << result);
-
-  if (pitEntry->GetOutgoingCount() != 0)
+  if (ForwardingStrategy::m_interestBuffering)
   {
-    for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
-       face != pitEntry->GetOutgoing ().end ();
-         face ++)
+    bool result = fibLimits->RemoveInterest(pitEntry->GetInterest());
+    NS_LOG_INFO (this << " InterestQueue lenght: " << fibLimits->GetQueueLength() << " result: " << result);
+
+    if (pitEntry->GetOutgoingCount() != 0)
     {
-      for (uint32_t i = 0; i <= face->m_retxCount; i++)
-        fibLimits->ReturnLimit ();
+      for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
+        face != pitEntry->GetOutgoing ().end ();
+        face ++)
+      {
+        for (uint32_t i = 0; i <= face->m_retxCount; i++)
+          fibLimits->ReturnLimit ();
+      }
     }
   }
-
+  else
+  {
+    {
+      for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
+        face != pitEntry->GetOutgoing ().end ();
+        face ++)
+      {
+        for (uint32_t i = 0; i <= face->m_retxCount; i++)
+          fibLimits->ReturnLimit ();
+      }
+    }
+  }
+  
   super::WillEraseTimedOutPendingInterest (pitEntry);
 }
 

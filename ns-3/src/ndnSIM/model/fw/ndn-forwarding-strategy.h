@@ -527,6 +527,7 @@ protected:
   std::vector<std::vector<double> > m_interestRateTable;
   uint32_t m_selectSatPI;
   InterestQueue m_iq;
+  bool m_interestBuffering;
 ////////////////////////
 
   bool m_cacheUnsolicitedDataFromApps;

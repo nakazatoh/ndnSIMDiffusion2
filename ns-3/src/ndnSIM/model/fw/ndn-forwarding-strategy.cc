@@ -118,6 +118,10 @@ TypeId ForwardingStrategy::GetTypeId (void)
                    UintegerValue(0),
                    MakeUintegerAccessor(&ForwardingStrategy::m_selectSatPI),
                    MakeUintegerChecker<uint32_t>(0, 2))
+    .AddAttribute ("InterestBuffering", "Excessive Interests are buffered in queues",
+                   BooleanValue (true),
+                   MakeBooleanAccessor (&ForwardingStrategy::m_interestBuffering),
+                   MakeBooleanChecker ())
     ;
   return tid;
 }
@@ -1122,7 +1126,6 @@ ForwardingStrategy::SatisfyPendingInterestQSF (Ptr<Face> inFace,
 
         inFace->SetFPitsize(f_pitsize);
         f_dataQSize = pitsize_out_fib - f_pitsize;
-        NS_LOG_DEBUG("pitsize_out: " << pitsize_out << " pitsize_out_fib: " << pitsize_out_fib << " f_dataQSize: " << f_dataQSize);
         f_pitsize_portion = f_pitsize * pitsize_out / totalOutPitsize;
         f_pitsizedif = pitsize_out - f_pitsize_portion;
         b_pitsize = incoming.m_face->GetBPitsize();
@@ -1353,31 +1356,42 @@ ForwardingStrategy::TrySendOutInterest (Ptr<Face> inFace,
   uint32_t nodeID = inFace->GetNode() -> GetId();
   uint32_t seq = interest->GetName ().get (-1).toSeqNum ();
 
-  Ptr<DelayedInterest> di = Create<DelayedInterest>();
-  di->m_inFace = inFace;
-  di->m_outFace = outFace;
-  di->m_interest = interest;
-  di->m_pitEntry = pitEntry;
-  di->m_fs = this;
-  InterestEnqueue(di);
+  if (m_interestBuffering)
+  {
+    Ptr<DelayedInterest> di = Create<DelayedInterest>();
+    di->m_inFace = inFace;
+    di->m_outFace = outFace;
+    di->m_interest = interest;
+    di->m_pitEntry = pitEntry;
+    di->m_fs = this;
+    InterestEnqueue(di);
 
-  if (!CanSendOutInterest (inFace, outFace, interest, pitEntry))
+    if (!CanSendOutInterest (inFace, outFace, interest, pitEntry))
     {
       return true;
     }
-  di = InterestDequeue(outFace, pitEntry);
-  inFace = di->m_inFace;
-  outFace = di->m_outFace;
-  interest = di->m_interest;
-  pitEntry = di->m_pitEntry;
-  nodeID = inFace->GetNode() -> GetId();
-  seq = interest->GetName ().get (-1).toSeqNum ();
-  NS_LOG_LOGIC("Dequeue: Node: " << nodeID 
-               << " interfaceID: " << inFace -> GetId() 
-               << " seq#: " << seq);
+    di = InterestDequeue(outFace, pitEntry);
+    inFace = di->m_inFace;
+    outFace = di->m_outFace;
+    interest = di->m_interest;
+    pitEntry = di->m_pitEntry;
+    nodeID = inFace->GetNode() -> GetId();
+    seq = interest->GetName ().get (-1).toSeqNum ();
+    NS_LOG_LOGIC("Dequeue: Node: " << nodeID 
+                 << " interfaceID: " << inFace -> GetId() 
+                 << " seq#: " << seq);
 
-  Ptr<Node> node = inFace -> GetNode();
-  //uint32_t nodeID = node -> GetId();
+    Ptr<Node> node = inFace -> GetNode();
+    //uint32_t nodeID = node -> GetId();
+  }
+  else
+  {
+    if (!CanSendOutInterest (inFace, outFace, interest, pitEntry))
+    {
+      return false;
+    }
+  }
+  
   // Ptr<Limits> faceLimits = outFace -> GetObject<Limits>();
   // double rate = faceLimits -> GetCurrentLimit();
   uint32_t faceid = outFace->GetId();

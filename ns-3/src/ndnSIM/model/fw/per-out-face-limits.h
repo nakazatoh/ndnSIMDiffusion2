@@ -79,7 +79,10 @@ public:
   {
     ObjectFactory factory (m_limitType);
     Ptr<LimitsRate> limits = factory.template Create<LimitsRate> ();
-    limits->RegisterAvailableSlotCallback(MakeCallback(&LimitsRate::RetrySendOutInterest, limits));
+    if (ForwardingStrategy::m_interestBuffering)
+    {
+      limits->RegisterAvailableSlotCallback(MakeCallback(&LimitsRate::RetrySendOutInterest, limits));
+    }
     limits->SetNodeId(face->GetNode()->GetId());
     face->AggregateObject (limits);
 
@@ -158,7 +161,10 @@ PerOutFaceLimits<Parent>::CanSendOutInterest (Ptr<Face> inFace,
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
   
   Ptr<Limits> faceLimits = outFace->template GetObject<Limits> ();
-  NS_LOG_DEBUG("IQLenght " << faceLimits->GetQueueLength());
+  if (ForwardingStrategy::m_interestBuffering)
+  {
+    NS_LOG_DEBUG("IQLenght " << faceLimits->GetQueueLength());
+  }
   if (faceLimits->IsBelowLimit ())
     {
       if (super::CanSendOutInterest (inFace, outFace, interest, pitEntry))
@@ -249,8 +255,11 @@ PerOutFaceLimits<Parent>::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitE
     // Ptr<Face> face = metricFace.GetFace();
     // Ptr<Limits> faceLimits = face->GetObject<Limits>();
     Ptr<Limits> faceLimits = pitEntry->GetInterestQueueLimits();
-    bool result = faceLimits->RemoveInterest(pitEntry->GetInterest());
-    NS_LOG_INFO (this << " InterestQueue length: " << faceLimits->GetQueueLength() << " result: " << result);
+    if (ForwardingStrategy::m_interestBuffering)
+    {
+      bool result = faceLimits->RemoveInterest(pitEntry->GetInterest());
+      NS_LOG_INFO (this << " InterestQueue length: " << faceLimits->GetQueueLength() << " result: " << result);
+    }
   }
 
   super::WillEraseTimedOutPendingInterest (pitEntry);
