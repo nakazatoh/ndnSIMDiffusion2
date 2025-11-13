@@ -78,7 +78,7 @@ main (int argc, char *argv[])
 
   // Install NDN stack on all nodes
   ndn::StackHelper ndnHelper;
-  ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute::PerOutFaceLimits","Limit","ns3::ndn::Limits::Rate","SelectSatPI","1");
+  ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute::PerOutFaceLimits","Limit","ns3::ndn::Limits::Rate","SelectSatPI","3","InterestBuffering","false");
   ndnHelper.EnableLimits(true, Seconds(0.2),1250,40);
   ndnHelper.SetContentStore ("ns3::ndn::cs::Lru", "MaxSize", "0");
   ndnHelper.SetPit ("ns3::ndn::pit::SerializedSize", "MaxSize", "0");
@@ -175,10 +175,10 @@ main (int argc, char *argv[])
   s << std::setw(2) << std::setfill('0') << localTime->tm_min;
   s << std::setw(2) << std::setfill('0') << localTime->tm_sec;
 
-  std::string drop_trace("drop-trace-2cross-10nodes-DTCC.txt");
-  std::string rate_trace("rate-trace-2cross-10nodes-DTCC.txt");
-  std::string aggregate_trace("aggregate-trace-2cross-10nodes-DTCC.txt");
-  std::string app_delay_trace("app-delays-trace-2cross-10nodes-DTCC.txt");
+  std::string drop_trace("drop-trace-2cross-10nodes-DCQL-WOIQ.txt");
+  std::string rate_trace("rate-trace-2cross-10nodes-DCQL-WOIQ.txt");
+  std::string aggregate_trace("aggregate-trace-2cross-10nodes-DCQL-WOIQ.txt");
+  std::string app_delay_trace("app-delays-trace-2cross-10nodes-DCQL-WOIQ.txt");
 
   // L2RateTracer::InstallAll ("20220621-3_drop-trace-5src-1213.txt", Seconds (0.1));
   L2RateTracer::InstallAll (s.str() + drop_trace, Seconds (0.1));

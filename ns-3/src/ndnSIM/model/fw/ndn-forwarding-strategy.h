@@ -296,6 +296,11 @@ protected:
                               Ptr<Data> data,
                               Ptr<pit::Entry> pitEntry);
 
+  virtual void
+  SatisfyPendingInterestDCQL (Ptr<Face> inFace,
+                              Ptr<Data> data,
+                              Ptr<pit::Entry> pitEntry);
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   /**

@@ -77,6 +77,12 @@ def build(bld):
         obj = bld.create_ns3_program('ndn-2cross-10nodes-QSF', all_modules)
         obj.source = 'ndn-2cross-10nodes-QSF.cc'
 
+        obj = bld.create_ns3_program('ndn-2cross-10nodes-DTCC-WOIQ', all_modules)
+        obj.source = 'ndn-2cross-10nodes-DTCC-WOIQ.cc'
+
+        obj = bld.create_ns3_program('ndn-2cross-10nodes-DCQL-WOIQ', all_modules)
+        obj.source = 'ndn-2cross-10nodes-DCQL-WOIQ.cc'
+
         obj = bld.create_ns3_program('ndn-dumbbell-8nodes-1bottleneck', all_modules)
         obj.source = 'ndn-dumbbell-8nodes-1bottleneck.cc'
 
