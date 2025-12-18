@@ -211,6 +211,7 @@ private:
    */
   void AddHeader (Ptr<Packet> p, uint16_t protocolNumber);
 
+public:
   /**
    * Removes, from a packet of data, all headers and trailers that
    * relate to the protocol implemented by the agent
@@ -221,6 +222,7 @@ private:
    */
   bool ProcessHeader (Ptr<Packet> p, uint16_t& param);
 
+private:
   /**
    * Start Sending a Packet Down the Wire.
    *

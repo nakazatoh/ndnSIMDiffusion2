@@ -156,8 +156,9 @@ LimitsRate::LeakBucket (double interval)
       newInterval = 1.001 / m_bucketLeak;
     }
 
-  if (m_bucketMax - bucketOld < 1.0 &&
-      m_bucketMax - m_bucket >= 1.0) // limit number of times this stuff is called
+  // if (m_bucketMax - bucketOld < 1.0 &&
+    //  m_bucketMax - m_bucket >= 1.0) // limit number of times this stuff is called
+  if (m_bucketMax - m_bucket >= 1.0)
     {
       this->FireAvailableSlotCallback ();
     }

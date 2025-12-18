@@ -129,7 +129,10 @@ bool
 Face::SendInterest (Ptr<const Interest> interest)
 {
   NS_LOG_FUNCTION (this << boost::cref (*this) << interest->GetName ());
-  
+  const Name& name = interest->GetName();
+  uint32_t seq = name.get(-1).toSeqNum();
+  Ptr<Packet> p = Wire::FromInterest (interest);
+  NS_LOG_INFO ("face: " << m_id << " interest: " << interest << " packet: " << p << " name: " << name << " seq#: " << seq);
   /////////////////////////////////////
   /*
   Ptr<Pit> pit = m_node->GetObject<Pit> ();
@@ -147,13 +150,18 @@ Face::SendInterest (Ptr<const Interest> interest)
       return false;
     }
 
-  return Send (Wire::FromInterest (interest));
+  //return Send (Wire::FromInterest (interest));
+  return Send (p);
 }
 
 bool
 Face::SendData (Ptr<const Data> data)
 {
   NS_LOG_FUNCTION (this << data);
+  const Name& name = data->GetName();
+  uint32_t seq = name.get(-1).toSeqNum();
+  Ptr<Packet> p = Wire::FromData (data);
+  NS_LOG_INFO ("face: " << m_id << " data: " << data << " packet: " << p << " name: " << name << " seq#: " << seq);
   
   /////////////////////////////////////
   /*
@@ -172,7 +180,8 @@ Face::SendData (Ptr<const Data> data)
       return false;
     }
 
-  return Send (Wire::FromData (data));
+  // return Send (Wire::FromData (data));
+  return Send(p);
 }
 
 bool
@@ -238,6 +247,9 @@ Face::ReceiveInterest (Ptr<Interest> interest)
       // no tracing here. If we were off while receiving, we shouldn't even know that something was there
       return false;
     }
+  const Name& name = interest->GetName();
+  uint32_t seq = name.get(-1).toSeqNum();
+  NS_LOG_INFO ("face: " << m_id << " interest: " << interest << " name: " << name << " seq#: " << seq);
 
   m_upstreamInterestHandler (this, interest);
   return true;
@@ -251,6 +263,9 @@ Face::ReceiveData (Ptr<Data> data)
       // no tracing here. If we were off while receiving, we shouldn't even know that something was there
       return false;
     }
+  const Name& name = data->GetName();
+  uint32_t seq = name.get(-1).toSeqNum();
+  NS_LOG_INFO ("face: " << m_id << " data: " << data << " name: " << name << " seq#: " << seq);
 
   m_upstreamDataHandler (this, data);
   m_arrival_time[m_a_t_index] = Simulator::Now().ToDouble(Time::S);

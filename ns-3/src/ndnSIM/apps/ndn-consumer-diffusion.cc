@@ -140,12 +140,13 @@ ConsumerDiffusion::GetRandomize () const
 ///////////////////////////////////////////////////
 
 void
-ConsumerDiffusion::OnData (const Ptr<const Data> &contentObject,
-                               const Ptr<const Packet> &payload)
+//ConsumerDiffusion::OnData (const Ptr<const Data> &contentObject,
+//                               const Ptr<const Packet> &payload)
+ConsumerDiffusion::OnData (Ptr<const Data> data)
 {
-  Consumer::OnData (contentObject); // tracing inside
+  Consumer::OnData (data); // tracing inside
   FwFeedbackRateTag feedbackRateTag;
-  if (contentObject->GetPayload ()->PeekPacketTag (feedbackRateTag))
+  if (data->GetPayload ()->PeekPacketTag (feedbackRateTag))
     {
       m_frequency = feedbackRateTag.GetRate();
     }

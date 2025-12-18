@@ -51,8 +51,9 @@ public:
   // OnNack (const Ptr<const Interest> &interest);
 
   virtual void
-  OnData (const Ptr<const Data> &contentObject,
-                    const Ptr<const Packet> &payload);
+//  OnData (const Ptr<const Data> &contentObject,
+//                    const Ptr<const Packet> &payload);
+  OnData (Ptr<const Data> data);
 
 protected:
   /**

@@ -528,11 +528,12 @@ protected:
 
 /////////////////////////////////////////////
   double ad;
-  bool m_consumerNeighbour;
-  std::vector<std::vector<double> > m_interestRateTable;
+  bool m_consumerNeighbour {false};
+  std::vector<std::vector<double> > m_interestRateTable {};
   uint32_t m_selectSatPI;
   InterestQueue m_iq;
   bool m_interestBuffering;
+  Time m_nxtAdjTime {Seconds(0.0)};
 ////////////////////////
 
   bool m_cacheUnsolicitedDataFromApps;

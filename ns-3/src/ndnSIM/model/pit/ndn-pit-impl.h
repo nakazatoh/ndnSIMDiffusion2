@@ -312,7 +312,7 @@ PitImpl<Policy>::CleanExpired ()
 {
   NS_LOG_LOGIC ("Cleaning PIT. Total: " << i_time.size ());
   Time now = Simulator::Now ();
-  double tm = now.ToDouble (Time::S);
+  // double tm = now.ToDouble (Time::S);
   if (!i_time.empty())
     for (typename time_index::iterator entry = i_time.begin(); entry != i_time.end(); entry++)
     {

@@ -1,3 +1,12 @@
 {
-    "C_Cpp.errorSquiggles": "Disabled"
+    "C_Cpp.errorSquiggles": "Disabled",
+    "files.associations": {
+        "*.ipp": "cpp",
+        "array": "cpp",
+        "hash_map": "cpp",
+        "bitset": "cpp",
+        "slist": "cpp",
+        "initializer_list": "cpp",
+        "valarray": "cpp"
+    }
 }
