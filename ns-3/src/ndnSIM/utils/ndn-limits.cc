@@ -46,7 +46,7 @@ Limits::Limits ()
   , m_handler (MakeNullCallback<void> ())
   , m_linkDelay (0)
   , m_f_qSize (0.0)
-  , m_rtt (0.1)
+  , m_rtt (1.0)
 {
 }
 
@@ -143,6 +143,12 @@ Limits::FireAvailableSlotCallback ()
   {
     return m_rtt;
   }
-    
+
+  void
+  Limits::SetUpdateMode(uint32_t mode)
+  {
+    m_updateMode = mode;
+  }
+
 } // namespace ndn
 } // namespace ns3

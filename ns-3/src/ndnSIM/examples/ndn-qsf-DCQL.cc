@@ -86,8 +86,8 @@ main (int argc, char *argv[])
   // Install NDN stack on all nodes
   ndn::StackHelper ndnHelper;
   ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute::PerOutFaceLimits","Limit","ns3::ndn::Limits::Rate", "SelectSatPI", "3","InterestBuffering","true");
-  ndnHelper.EnableLimits(true, Seconds(0.1),4500,40);
-  ndnHelper.SetContentStore ("ns3::ndn::cs::Lru", "MaxSize", "1000");
+  ndnHelper.EnableLimits(true, Seconds(0.06),4500,40);
+  ndnHelper.SetContentStore ("ns3::ndn::cs::Lru", "MaxSize", "3000");
   ndnHelper.SetPit ("ns3::ndn::pit::SerializedSize", "MaxSize", "0");
   ndnHelper.SetPit ("ns3::ndn::pit::SerializedSize", "MaxPitEntryLifetime", "0");
   //ndnHelper.InstallAll ();
@@ -114,7 +114,7 @@ main (int argc, char *argv[])
   ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerDiffusion");
   consumerHelper.SetAttribute ("LifeTime", StringValue("10s"));
   consumerHelper.SetAttribute ("RetxTimer", StringValue("10s"));
-  consumerHelper.SetAttribute ("InitialFrequency", StringValue ("195")); // 195 interests a second
+  consumerHelper.SetAttribute ("InitialFrequency", StringValue ("1945")); // 195 interests a second
 //  ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerWindow");
 //  consumerHelper.SetAttribute ("Window", StringValue("5"));
 //  consumerHelper.SetAttribute ("PayloadSize", StringValue("1250"));

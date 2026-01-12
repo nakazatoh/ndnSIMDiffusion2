@@ -84,6 +84,8 @@ public:
       limits->RegisterAvailableSlotCallback(MakeCallback(&LimitsRate::RetrySendOutInterest, limits));
     }
     limits->SetNodeId(face->GetNode()->GetId());
+    limits->SetUpdateMode(1); // rate update with three times of link delay
+    // limits->SetUpdateMode(2); // rate update with the average of twice of link delay and rtt
     face->AggregateObject (limits);
 
     super::AddFace (face);
@@ -169,6 +171,7 @@ PerOutFaceLimits<Parent>::CanSendOutInterest (Ptr<Face> inFace,
     {
       if (super::CanSendOutInterest (inFace, outFace, interest, pitEntry))
         {
+          pitEntry->SetInitialInterestTime(Simulator::Now());
           faceLimits->BorrowLimit ();
           return true;
         }
@@ -202,6 +205,7 @@ PerOutFaceLimits<Parent>::SendOutInterestFromQ (Ptr<Limits> faceLimits)
       if (super::CanSendOutInterest (di->m_inFace, di->m_outFace, di->m_interest, di->m_pitEntry))
         {
           Ptr<DelayedInterest> di = faceLimits->Dequeue();
+          di->m_pitEntry->SetInitialInterestTime(Simulator::Now());
           faceLimits->BorrowLimit ();
           ForwardingStrategy::RetrySendOutInterest(di->m_inFace, di->m_outFace, di->m_interest, di->m_pitEntry);
           return;
@@ -272,6 +276,8 @@ PerOutFaceLimits<Parent>::WillSatisfyPendingInterest (Ptr<Face> inFace,
                                                       Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
+  double rtt = (Simulator::Now() - pitEntry->GetInitialInterestTime()).ToDouble(Time::S);
+  inFace->GetObject<Limits>()->AddRTT(rtt);
 
   for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
        face != pitEntry->GetOutgoing ().end ();

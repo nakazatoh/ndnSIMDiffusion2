@@ -79,7 +79,7 @@ main (int argc, char *argv[])
   // Install NDN stack on all nodes
   ndn::StackHelper ndnHelper;
   ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute::PerOutFaceLimits","Limit","ns3::ndn::Limits::Rate","SelectSatPI","3","InterestBuffering","true");
-  ndnHelper.EnableLimits(true, Seconds(0.2),1250,40);
+  ndnHelper.EnableLimits(true, Seconds(0.12),1250,40);
   ndnHelper.SetContentStore ("ns3::ndn::cs::Lru", "MaxSize", "0");
   ndnHelper.SetPit ("ns3::ndn::pit::SerializedSize", "MaxSize", "0");
   ndnHelper.SetPit ("ns3::ndn::pit::SerializedSize", "MaxPitEntryLifetime", "0");
@@ -99,8 +99,8 @@ main (int argc, char *argv[])
   Ptr<Node> producer2 = Names::Find<Node> ("Dst2");
   Ptr<Node> producer3 = Names::Find<Node> ("Dst3");
 
-  ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerCbr");
-  consumerHelper.SetAttribute ("Frequency", StringValue ("70")); // 200 interests a second
+  ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerDiffusion");
+  consumerHelper.SetAttribute ("InitialFrequency", StringValue ("70")); // 200 interests a second
   consumerHelper.SetAttribute("LifeTime", StringValue("10s"));
   consumerHelper.SetAttribute("RetxTimer", StringValue("10s"));
   // consumerHelper.SetAttribute("Randomize", StringValue("exponential"));
@@ -115,12 +115,12 @@ main (int argc, char *argv[])
   // that will express interests in /dst2 namespace
 
   //lee2005
-  consumerHelper.SetAttribute ("Frequency", StringValue ("40")); // 10 interests a second
+  consumerHelper.SetAttribute ("InitialFrequency", StringValue ("40")); // 10 interests a second
   //
   consumerHelper.SetPrefix ("/dst2");
   ApplicationContainer app2 = consumerHelper.Install (consumer2);
 
-  consumerHelper.SetAttribute ("Frequency", StringValue ("40")); 
+  consumerHelper.SetAttribute ("InitialFrequency", StringValue ("40")); 
   // consumerHelper.SetAttribute("Randomize", StringValue("exponential"));
   consumerHelper.SetPrefix ("/dst3");
   ApplicationContainer app3 = consumerHelper.Install (consumer3);
@@ -175,10 +175,10 @@ main (int argc, char *argv[])
   s << std::setw(2) << std::setfill('0') << localTime->tm_min;
   s << std::setw(2) << std::setfill('0') << localTime->tm_sec;
 
-  std::string drop_trace("drop-trace-2cross-10nodes-DCQL-WOIQ.txt");
-  std::string rate_trace("rate-trace-2cross-10nodes-DCQL-WOIQ.txt");
-  std::string aggregate_trace("aggregate-trace-2cross-10nodes-DCQL-WOIQ.txt");
-  std::string app_delay_trace("app-delays-trace-2cross-10nodes-DCQL-WOIQ.txt");
+  std::string drop_trace("drop-trace-2cross-10nodes-DCQL.txt");
+  std::string rate_trace("rate-trace-2cross-10nodes-DCQL.txt");
+  std::string aggregate_trace("aggregate-trace-2cross-10nodes-DCQL.txt");
+  std::string app_delay_trace("app-delays-trace-2cross-10nodes-DCQL.txt");
 
   // L2RateTracer::InstallAll ("20220621-3_drop-trace-5src-1213.txt", Seconds (0.1));
   L2RateTracer::InstallAll (s.str() + drop_trace, Seconds (0.1));

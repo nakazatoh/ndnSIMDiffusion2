@@ -96,6 +96,7 @@ public:
       limits->RegisterAvailableSlotCallback(MakeCallback(&LimitsRate::RetrySendOutInterest, limits));
     uint32_t nodeId;
     limits->SetNodeId(nodeId = fibEntry->m_faces.begin()->GetFace()->GetNode()->GetId());
+    limits->SetUpdateMode(0); // rate update with RTT
     fibEntry->AggregateObject (limits);
     Simulator::ScheduleWithContext(nodeId, Seconds (limits->GetRTT()), &LimitsRate::RateProbing, limits);
     NS_LOG_DEBUG(this << " nodeId: " << nodeId);
@@ -179,6 +180,7 @@ PerFibLimits<Parent>::CanSendOutInterest (Ptr<Face> inFace,
     {
       if (super::CanSendOutInterestFromFib (inFace, outFace, interest, pitEntry))
         {
+          pitEntry->SetInitialInterestTime(Simulator::Now());
           fibLimits->BorrowLimit ();
           return true;
         }
@@ -200,6 +202,7 @@ PerFibLimits<Parent>::SendOutInterestFromQ (Ptr<Limits> fibLimits)
         {
           Ptr<DelayedInterest> di = fibLimits->Dequeue();
           di->m_pitEntry->SetInterestQueueLimits(0);
+          di->m_pitEntry->SetInitialInterestTime(Simulator::Now());
           fibLimits->BorrowLimit ();
           ForwardingStrategy::RetrySendOutInterest(di->m_inFace, di->m_outFace, di->m_interest, di->m_pitEntry);
           return;
@@ -275,8 +278,9 @@ PerFibLimits<Parent>::WillSatisfyPendingInterest (Ptr<Face> inFace,
                                                   Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
-
+  double rtt = (Simulator::Now() - pitEntry->GetInitialInterestTime()).ToDouble(Time::S);
   Ptr<Limits> fibLimits = pitEntry->GetFibEntry ()->template GetObject<Limits> ();
+  fibLimits->AddRTT(rtt);
 
   for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
        face != pitEntry->GetOutgoing ().end ();

@@ -49,6 +49,7 @@ Entry::Entry (Pit &container,
   , m_maxRetxCount (0)
   , m_creationTime (Simulator::Now ())
   , m_iQLimits (0)
+  , m_initialInterestTime (Seconds(0.0))
 {
   NS_LOG_FUNCTION (this);
 

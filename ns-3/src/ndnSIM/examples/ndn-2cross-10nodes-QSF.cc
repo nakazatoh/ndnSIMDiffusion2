@@ -102,8 +102,8 @@ main (int argc, char *argv[])
   Ptr<Node> producer2 = Names::Find<Node> ("Dst2");
   Ptr<Node> producer3 = Names::Find<Node> ("Dst3");
 
-  ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerCbr");
-  consumerHelper.SetAttribute ("Frequency", StringValue ("70")); // 200 interests a second
+  ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerDiffusion");
+  consumerHelper.SetAttribute ("InitialFrequency", StringValue ("70")); // 200 interests a second
   consumerHelper.SetAttribute("LifeTime", StringValue("10s"));
   consumerHelper.SetAttribute("RetxTimer", StringValue("10s"));
   // consumerHelper.SetAttribute("Randomize", StringValue("exponential"));
@@ -118,12 +118,12 @@ main (int argc, char *argv[])
   // that will express interests in /dst2 namespace
 
   //lee2005
-  consumerHelper.SetAttribute ("Frequency", StringValue ("40")); // 10 interests a second
+  consumerHelper.SetAttribute ("InitialFrequency", StringValue ("40")); // 10 interests a second
   //
   consumerHelper.SetPrefix ("/dst2");
   ApplicationContainer app2 = consumerHelper.Install (consumer2);
 
-  consumerHelper.SetAttribute ("Frequency", StringValue ("40")); 
+  consumerHelper.SetAttribute ("InitialFrequency", StringValue ("40")); 
   // consumerHelper.SetAttribute("Randomize", StringValue("exponential"));
   consumerHelper.SetPrefix ("/dst3");
   ApplicationContainer app3 = consumerHelper.Install (consumer3);

@@ -63,7 +63,7 @@ public:
   SetLimits (double rate, double delay)
   {
     m_maxRate = rate;
-    m_maxDelay = delay;
+    m_rtt = m_maxDelay = delay;
   }    
 
   /**
@@ -243,6 +243,12 @@ public:
    * @return the average RTT value
    */
   virtual double GetRTT();
+
+  /**
+   * @brief Set update mode of current limits
+   * @param mode update mode 0: rtt 1: fixed delay
+   */
+  void SetUpdateMode(uint32_t mode);
   
   ////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
@@ -262,7 +268,9 @@ protected:
   uint32_t m_nodeId;
   double m_f_qSize;
   double m_rtt;
- 
+  Time m_nxtAdjTime {Seconds(0.0)}; 
+  uint32_t m_updateMode {0}; // 0: rtt, 1: delay
+
 private:
   double m_maxRate;
   double m_maxDelay;

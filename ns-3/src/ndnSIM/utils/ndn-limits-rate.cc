@@ -103,6 +103,20 @@ void
 LimitsRate::UpdateCurrentLimit (double limit)
 {
   NS_ASSERT_MSG (limit >= 0.0, "Limit should be greater or equal to zero");
+  if (Simulator::Now() < m_nxtAdjTime)
+    return;
+  if (m_updateMode == 0)
+  {
+    m_nxtAdjTime = Simulator::Now() + Seconds(m_rtt);
+  }
+  else if (m_updateMode == 1)
+  {
+    m_nxtAdjTime = Simulator::Now() + Seconds(GetLinkDelay() * 3);
+  }
+  else
+  {
+    m_nxtAdjTime = Simulator::Now() + Seconds((GetLinkDelay() * 2 + m_rtt) / 2);
+  }
 
   m_bucketLeak = std::min (limit, GetMaxRate ());
   m_bucketMax  = m_bucketLeak * GetMaxDelay () + 1.0;

@@ -263,6 +263,9 @@ ForwardingStrategy::OnInterest (Ptr<Face> inFace,
                   case 2:
                     SatisfyPendingInterestQSF(0, contentObject, pitEntry);
                     break;
+                  case 3:
+                    SatisfyPendingInterestDCQL(0, contentObject, pitEntry);
+                    break;
                   default:
                     throw std::out_of_range("m_selectSatPI out of range");
                 }
@@ -1324,11 +1327,14 @@ ForwardingStrategy::SatisfyPendingInterestQSF (Ptr<Face> inFace,
         // rate = (1 - alpha) * oldRate + alpha * newRate;
         rate = newRate;
         if (rate < 1) rate = 1;
-        if (Simulator::Now() > m_nxtAdjTime)
-        {
-          fibLimits -> UpdateCurrentLimit(rate);
-          m_nxtAdjTime = Simulator::Now() + Seconds(0.06);
-        }
+        // if (Simulator::Now() > m_nxtAdjTime)
+        //{
+        fibLimits -> UpdateCurrentLimit(rate);
+          // m_nxtAdjTime = Simulator::Now() + Seconds(0.06);
+          // NS_LOG_DEBUG("m_nxtAdjTime: " << (Simulator::Now().ToDouble(Time::S) + inFace->GetObject<Limits>()->GetMaxDelay()) << " MaxDelay: " << inFace->GetObject<Limits>()->GetMaxDelay());
+          // m_nxtAdjTime = Simulator::Now() + Seconds(inFace->GetObject<Limits>()->GetMaxDelay());
+          // NS_LOG_DEBUG("m_nxtAdjTime: " << m_nxtAdjTime.ToDouble(Time::S));
+        //}
         rate = fibLimits -> GetCurrentLimit();
         NS_LOG_DEBUG("Node: " << nodeID << " Interest-in-face: " << outFace_data 
           << " Interest-out-face: " << infaceId << " b_pitsize: " << b_pitsize 
@@ -1442,7 +1448,8 @@ ForwardingStrategy::SatisfyPendingInterestDCQL (Ptr<Face> inFace,
       << " pitsize_in: " << inPitsize << " pitsize_out: 1" 
       << " f_pitsize: 1" << " f_pitsize_portion: 1" << " rateLimit: NA f_rate: NA " 
       << " data: " << data << " name: " << name << " seq#: " << seq
-      << " queueLength: " << queueLength << " f_queueLength: 0");
+      << " queueLength: " << queueLength << " f_queueLength: 0 queueLength_portion: " 
+      << queueLength / inPitsize << " interestQueueLength: 0");
 
     if (pitsizeTagPresent)
     {
@@ -1491,6 +1498,7 @@ ForwardingStrategy::SatisfyPendingInterestDCQL (Ptr<Face> inFace,
       uint32_t totalOutPitsize = 0; //Total outgoing pit size for the face this data arrived
 
       bool ExistOutFace_data=false; //このデータが出て行くFaceに関連するPITエントリかどうかを調べるフラグ。
+      std::set<Ptr<Face> > outFacesForIncomingFace;
 
       Ptr<pit::Entry> pitEntry2 = m_pit -> Begin(); //PITエントリの最初
 
@@ -1521,11 +1529,23 @@ ForwardingStrategy::SatisfyPendingInterestDCQL (Ptr<Face> inFace,
             }
             totalOutPitsize++;
           }
+          if(ExistOutFace_data)
+          {
+            outFacesForIncomingFace.insert(out_itr->m_face);
+          }
         }
 
         pitEntry2 = m_pit -> Next(pitEntry2);
         ExistOutFace_data =false;
       }  //while() close//
+      // NS_LOG_DEBUG("# elements in outFacesForIncomingFace: " << outFacesForIncomingFace.size());
+
+      uint32_t interestQLengthForIncomingFace = 0;
+      for(std::set<Ptr<Face> >::iterator itr = outFacesForIncomingFace.begin(); itr != outFacesForIncomingFace.end(); ++itr)
+      {
+        interestQLengthForIncomingFace += (*itr)->GetObject<Limits>()->GetQueueLength();
+      }
+      // NS_LOG_DEBUG("# interest queue length: " << interestQLengthForIncomingFace);
 
       double pitsize_in = inPitsize;
       double pitsize_out = outPitsize;
@@ -1536,6 +1556,7 @@ ForwardingStrategy::SatisfyPendingInterestDCQL (Ptr<Face> inFace,
       FeedbackQueueSizeTag feedbackQueueSizeTag;
 
       uint32_t queueLength;
+      double queueLength_portion;
       Ptr<NetDeviceFace> netDeviceFace;
       Ptr<NetDevice> netDevice;
       Ptr<PointToPointNetDevice> p2pNetDevice;
@@ -1550,6 +1571,7 @@ ForwardingStrategy::SatisfyPendingInterestDCQL (Ptr<Face> inFace,
       {
         queueLength = 0;
       }
+      queueLength_portion = queueLength * pitsize_out / pitsize_in;
 
       bool pitsizeTagPresent = data -> GetPayload() ->  PeekPacketTag(feedbackPitsizeTag);
       data -> GetPayload() ->  PeekPacketTag(feedbackRateTag);
@@ -1565,6 +1587,7 @@ ForwardingStrategy::SatisfyPendingInterestDCQL (Ptr<Face> inFace,
       // double b_pitsizedif = b_pitsize - pitsize_in;
       double rate;
       double newRate;
+      double interestQueueLength = 0;
 
       // double tm = Simulator::Now ().ToDouble (Time::S);
       Ptr<Packet> payloadOriginal = data->GetPayload()->Copy();
@@ -1581,7 +1604,8 @@ ForwardingStrategy::SatisfyPendingInterestDCQL (Ptr<Face> inFace,
           << " f_pitsize: 0" << " f_qLength_portion: 0"
           << " rateLimit: " << rate  << " f_rate: NA" 
           << " data: " << data << " name: " << name << " seq#: " << seq
-          << " queueLength: " << queueLength << " f_queueLength: 0");
+          << " queueLength: " << queueLength << " f_queueLength: 0 queueLength_portion: "
+          << queueLength_portion << " interestQueueLength: " << interestQueueLength);
       } 
       else
       {
@@ -1595,22 +1619,24 @@ ForwardingStrategy::SatisfyPendingInterestDCQL (Ptr<Face> inFace,
 
         Ptr<Limits> faceLimits = inFace -> GetObject<Limits>();
         rate = faceLimits -> GetCurrentLimit();
+        interestQueueLength = faceLimits->GetQueueLength();
                                 
         // double d = 0.12; //0.1 * 1500 * 8 / 10000;
         double d = 0.1 * faceLimits->GetMaxRate();
         double oldRate = rate;
-        double alpha = 0.2;
+        double alpha = 0.25;
         if(m_consumerNeighbour)
         {
-          newRate = f_rate + d * f_qLength_portion;
+          newRate = f_rate - d * f_qLength_portion;
         }
         else
         {
-          newRate = f_rate - d * (queueLength - f_qLength_portion);
+          newRate = f_rate + d * (queueLength_portion + interestQueueLength - f_qLength_portion);
+          // newRate = f_rate + d * (queueLength_portion - f_qLength_portion);
         }
         if (newRate < 1) newRate = 1;
         if (newRate > faceLimits->GetMaxRate()) newRate = faceLimits->GetMaxRate();
-        rate = (1 - alpha) * oldRate + alpha * newRate;
+        rate = (1.0 - alpha) * oldRate + alpha * newRate;
         if (rate < 1) rate = 1;
         faceLimits -> UpdateCurrentLimit(rate);
         rate = faceLimits -> GetCurrentLimit();
@@ -1620,7 +1646,9 @@ ForwardingStrategy::SatisfyPendingInterestDCQL (Ptr<Face> inFace,
           << " f_pitsize: " << f_pitsize << " f_qLength_portion: " << f_qLength_portion
           << " rateLimit: " << rate << " f_rate: " << f_rate 
           << " data: " << data << " name: " << name << " seq#: " << seq
-          << " queueLength: "<< queueLength << " f_queueLength: " << f_queueLength);
+          << " queueLength: "<< queueLength << " f_queueLength: " << f_queueLength
+          << " queueLength_portion: " << queueLength_portion << " interestQueueLength: "
+          << interestQueueLength);
          
         m_interestRateTable[outFace_data][infaceId] = rate;
 
@@ -1644,7 +1672,8 @@ ForwardingStrategy::SatisfyPendingInterestDCQL (Ptr<Face> inFace,
       feedbackRateTag.SetRate(rate);
       payloadCopy -> AddPacketTag(feedbackRateTag);
 
-      feedbackQueueSizeTag.SetQueueSize(queueLength);
+      feedbackQueueSizeTag.SetQueueSize(queueLength + interestQLengthForIncomingFace);
+      // feedbackQueueSizeTag.SetQueueSize(queueLength);
       payloadCopy->AddPacketTag(feedbackQueueSizeTag);
 
       data->SetPayload (payloadCopy);

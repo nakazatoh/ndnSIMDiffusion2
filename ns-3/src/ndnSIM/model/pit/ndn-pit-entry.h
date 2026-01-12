@@ -269,6 +269,19 @@ public:
   GetCreationTime ();
 
   /**
+   * @brief Set initial interest packet send time
+   * @param t: the time of initial interest packet is sent
+   */
+  inline void
+  SetInitialInterestTime(Time t);
+  
+  /**
+   * @breif Get initial interestc packet send time
+   */
+  inline Time
+  GetInitialInterestTime();
+
+  /**
    * @brief Set the pointer to the Limits if the corresponding interest is queued
    *        Otherwise the pointer is null.
    * @param iQLimits: the pointer to the Limits.
@@ -304,6 +317,7 @@ protected:
 
   std::list< boost::shared_ptr<fw::Tag> > m_fwTags; ///< @brief Forwarding strategy tags
   Time m_creationTime; // nakazato: Time when PIT entry is created
+  Time m_initialInterestTime;
 
   Ptr<Limits> m_iQLimits;
 };
@@ -384,6 +398,19 @@ Entry::RemoveFwTag ()
           return;
         }
     }
+}
+
+inline void
+Entry::SetInitialInterestTime(Time t)
+{
+  if (m_initialInterestTime == 0)
+    m_initialInterestTime = t;
+}
+
+inline Time
+Entry::GetInitialInterestTime()
+{
+  return m_initialInterestTime;
 }
 
 inline Time
