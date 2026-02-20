@@ -84,7 +84,8 @@ public:
       limits->RegisterAvailableSlotCallback(MakeCallback(&LimitsRate::RetrySendOutInterest, limits));
     }
     limits->SetNodeId(face->GetNode()->GetId());
-    limits->SetUpdateMode(1); // rate update with three times of link delay
+    limits->SetUpdateMode(0); // rate update with rtt
+    // limits->SetUpdateMode(1); // rate update with three times of link delay
     // limits->SetUpdateMode(2); // rate update with the average of twice of link delay and rtt
     face->AggregateObject (limits);
 

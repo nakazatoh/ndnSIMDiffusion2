@@ -6525,10 +6525,10 @@ def register_Ns3NdnLimits_methods(root_module, cls):
                    'void', 
                    [param('double', 'delay')], 
                    is_virtual=True)
-    ## ndn-limits.h (module 'ndnSIM'): void ns3::ndn::Limits::UpdateCurrentLimit(double limit) [member function]
+    ## ndn-limits.h (module 'ndnSIM'): void ns3::ndn::Limits::UpdateCurrentLimit(double limit, double ratio) [member function]
     cls.add_method('UpdateCurrentLimit', 
                    'void', 
-                   [param('double', 'limit')], 
+                   [param('double', 'limit'), param('double', 'ratio')], 
                    is_pure_virtual=True, is_virtual=True)
     ## ndn-limits.h (module 'ndnSIM'): void ns3::ndn::Limits::FireAvailableSlotCallback() [member function]
     cls.add_method('FireAvailableSlotCallback', 

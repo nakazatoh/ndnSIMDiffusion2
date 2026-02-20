@@ -103,6 +103,7 @@ public:
   /**
    * @brief Update a current value of the limit
    * @param limit Value of current limit.
+   * @param ratio Value to multiply with the update interval
    *
    * Note that interpretation of this value may be different in different ndn::Limit realizations
    *
@@ -110,7 +111,7 @@ public:
    * then the current limit will be limited to that maximum value
    */
   virtual void
-  UpdateCurrentLimit (double limit) = 0;
+  UpdateCurrentLimit (double limit, double ratio=1.0) = 0;
 
   /**
    * @brief Get value of the current limit
@@ -268,6 +269,7 @@ protected:
   uint32_t m_nodeId;
   double m_f_qSize;
   double m_rtt;
+  double m_rttDev;
   Time m_nxtAdjTime {Seconds(0.0)}; 
   uint32_t m_updateMode {0}; // 0: rtt, 1: delay
 

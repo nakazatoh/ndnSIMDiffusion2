@@ -58,7 +58,7 @@ PeriodicStatsPrinter (Ptr<Node> node, Time next)
   Simulator::Schedule (next, PeriodicStatsPrinter, node, next);
 }
 
-NS_LOG_COMPONENT_DEFINE("ndn-2cross-10nodes-DTCC");
+NS_LOG_COMPONENT_DEFINE("ndn-2cross-10nodes-DCQL");
 
 int
 main (int argc, char *argv[])

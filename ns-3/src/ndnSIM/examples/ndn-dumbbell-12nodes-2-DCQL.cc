@@ -48,17 +48,36 @@ PeriodicStatsPrinter (Ptr<Node> node, Time next)
   int pitsize;  
   pitsize = pit -> GetSize();
 
+  //if(node -> GetId() == 16 || node -> GetId() == 17 || node -> GetId() == 18 || node -> GetId() == 19 || node -> GetId() == 20) F_pitsize = 0;
+  
+  //int pitsizedif;
+  //pitsizedif = pitsize - F_pitsize;
+  //F_pitsize = pitsize;
+
+  /*
+  std::cout << Simulator::Now ().ToDouble (Time::S) << "\t"
+            << node->GetId () << "\t"
+            << Names::FindName (node) << "\t"      << std::endl;
+            << pitsize << "\t"
+            << pitsizedif <<"\n";
+  */
+
+  //191015 LEE write PITsize to file
+  //std::fstream file;
+  //file.open("210331_pitsize-congestion-topo-liner-dfcc-2src-ver2.txt",std::ios::out|std::ios::app);
   std::cout << Simulator::Now ().ToDouble (Time::S) << "\t"
        << node->GetId () << "\t"
        << Names::FindName (node) << "\t"
        << pitsize << "\n";
        //<< pitsizedif << "\n";
   //file.close();
+  //
+
 
   Simulator::Schedule (next, PeriodicStatsPrinter, node, next);
 }
 
-NS_LOG_COMPONENT_DEFINE("ndn-2cross-10nodes");
+NS_LOG_COMPONENT_DEFINE("ndn-dumbbell-12nodes-2");
 
 int
 main (int argc, char *argv[])
@@ -73,13 +92,14 @@ main (int argc, char *argv[])
   cmd.Parse (argc, argv);
 
   AnnotatedTopologyReader topologyReader ("", 25);
-  topologyReader.SetFileName ("src/ndnSIM/examples/topologies/topo-2cross-10nodes.txt");  //read topology
+  //topologyReader.SetFileName ("src/ndnSIM/examples/topologies/topo-ring-2src.txt");
+  topologyReader.SetFileName ("src/ndnSIM/examples/topologies/topo-dumbbell-12nodes-2.txt");  //read topology
   topologyReader.Read ();
 
   // Install NDN stack on all nodes
   ndn::StackHelper ndnHelper;
-  ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute","SelectSatPI","0");
-  // ndnHelper.EnableLimits(true, Seconds(0.2),1250,40);
+  ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute::PerOutFaceLimits","Limit","ns3::ndn::Limits::Rate","SelectSatPI","3","InterestBuffering","true");
+  ndnHelper.EnableLimits(true, Seconds(0.2),1250,40);
   ndnHelper.SetContentStore ("ns3::ndn::cs::Lru", "MaxSize", "0");
   ndnHelper.SetPit ("ns3::ndn::pit::SerializedSize", "MaxSize", "0");
   ndnHelper.SetPit ("ns3::ndn::pit::SerializedSize", "MaxPitEntryLifetime", "0");
@@ -94,15 +114,17 @@ main (int argc, char *argv[])
   Ptr<Node> consumer1 = Names::Find<Node> ("Src1");
   Ptr<Node> consumer2 = Names::Find<Node> ("Src2");
   Ptr<Node> consumer3 = Names::Find<Node> ("Src3");
+  Ptr<Node> consumer4 = Names::Find<Node> ("Src4");
   
   Ptr<Node> producer1 = Names::Find<Node> ("Dst1");
   Ptr<Node> producer2 = Names::Find<Node> ("Dst2");
   Ptr<Node> producer3 = Names::Find<Node> ("Dst3");
+  Ptr<Node> producer4 = Names::Find<Node> ("Dst4");
 
   ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerDiffusion");
   consumerHelper.SetAttribute ("InitialFrequency", StringValue ("70")); // 200 interests a second
-  // consumerHelper.SetAttribute("LifeTime", StringValue("4s"));
-  // consumerHelper.SetAttribute("RetxTimer", StringValue("4s"));
+  consumerHelper.SetAttribute("LifeTime", StringValue("4s"));
+  consumerHelper.SetAttribute("RetxTimer", StringValue("4s"));
   // consumerHelper.SetAttribute("Randomize", StringValue("exponential"));
   // consumerHelper.SetAttribute("Randomize", StringValue("uniform"));
 
@@ -115,15 +137,20 @@ main (int argc, char *argv[])
   // that will express interests in /dst2 namespace
 
   //lee2005
-  consumerHelper.SetAttribute ("InitialFrequency", StringValue ("40")); // 10 interests a second
+  consumerHelper.SetAttribute ("InitialFrequency", StringValue ("10")); // 10 interests a second
   //
   consumerHelper.SetPrefix ("/dst2");
   ApplicationContainer app2 = consumerHelper.Install (consumer2);
 
-  consumerHelper.SetAttribute ("InitialFrequency", StringValue ("40")); 
+  consumerHelper.SetAttribute ("InitialFrequency", StringValue ("30")); 
   // consumerHelper.SetAttribute("Randomize", StringValue("exponential"));
   consumerHelper.SetPrefix ("/dst3");
   ApplicationContainer app3 = consumerHelper.Install (consumer3);
+
+  consumerHelper.SetAttribute ("InitialFrequency", StringValue ("50")); // 50 interests a second
+  // consumerHelper.SetAttribute("Randomize", StringValue("none"));
+  consumerHelper.SetPrefix ("/dst4");
+  ApplicationContainer app4 = consumerHelper.Install (consumer4);
 
   // std::cout << "Number of Applications:" << consumer3->GetNApplications() << std::endl;
   // consumer3->GetApplication(0)->SetStopTime(Seconds(2.0));
@@ -132,7 +159,10 @@ main (int argc, char *argv[])
   // Simulator::Schedule(Seconds(2.0), std::bind(std::mem_fn(&Application::SetStartTime), consumer3->GetApplication(0), Seconds(4.0)));
   // Simulator::Schedule(Seconds(2.0), &Application::SetStartTime, consumer3->GetApplication(0), Seconds(4.0));
   
+  // consumerHelper.SetPrefix ("/dst5");
   // ---------------------------------------------------consumerHelper.Install (consumer5);
+
+
   
   ndn::AppHelper producerHelper ("ns3::ndn::Producer");
   producerHelper.SetAttribute ("PayloadSize", StringValue("1250"));  
@@ -155,12 +185,16 @@ main (int argc, char *argv[])
   producerHelper.SetPrefix ("/dst3");
   producerHelper.Install (producer3);
 
+  ndnGlobalRoutingHelper.AddOrigins ("/dst4", producer4);
+  producerHelper.SetPrefix ("/dst4");
+  producerHelper.Install (producer4);
+
   // Calculate and install FIBs
   ndn::GlobalRoutingHelper::CalculateRoutes ();
 
   app2.Start(Seconds(1.0));
-  app2.Stop(Seconds(9.0));
-  app3.Start(Seconds(4.0));
+  app2.Stop(Seconds(8.0));
+  app3.Start(Seconds(2.0));
   app3.Stop(Seconds(7.0));
 
   Simulator::Stop (Seconds (10.0));
@@ -175,10 +209,10 @@ main (int argc, char *argv[])
   s << std::setw(2) << std::setfill('0') << localTime->tm_min;
   s << std::setw(2) << std::setfill('0') << localTime->tm_sec;
 
-  std::string drop_trace("drop-trace-2cross-10nodes.txt");
-  std::string rate_trace("rate-trace-2cross-10nodes.txt");
-  std::string aggregate_trace("aggregate-trace-2cross-10nodes.txt");
-  std::string app_delay_trace("app-delays-trace-2cross-10nodes.txt");
+  std::string drop_trace("drop-trace-dumbbell-12nodes-2-DCQL.txt");
+  std::string rate_trace("rate-trace-dumbbell-12nodes-2-DCQL.txt");
+  std::string aggregate_trace("aggregate-trace-dumbbell-12nodes-2-DCQL.txt");
+  std::string app_delay_trace("app-delays-trace-dumbbell-12nodes-2-DCQL.txt");
 
   // L2RateTracer::InstallAll ("20220621-3_drop-trace-5src-1213.txt", Seconds (0.1));
   L2RateTracer::InstallAll (s.str() + drop_trace, Seconds (0.1));

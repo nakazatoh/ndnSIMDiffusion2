@@ -86,7 +86,7 @@ public:
    * @brief Update normalized amount that should be leaked every second (token bucket leak rate) and leak rate
    */
   virtual void
-  UpdateCurrentLimit (double limit);
+  UpdateCurrentLimit (double limit, double ratio=1.0);
 
   /**
    * @brief Get normalized amount that should be leaked every second (token bucket leak rate)

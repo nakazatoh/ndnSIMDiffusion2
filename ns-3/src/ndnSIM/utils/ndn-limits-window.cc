@@ -49,7 +49,7 @@ LimitsWindow::GetTypeId ()
 }
 
 void
-LimitsWindow::UpdateCurrentLimit (double limit)
+LimitsWindow::UpdateCurrentLimit (double limit, double ratio)
 {
   NS_ASSERT_MSG (limit >= 0.0, "Limit should be greater or equal to zero");
   

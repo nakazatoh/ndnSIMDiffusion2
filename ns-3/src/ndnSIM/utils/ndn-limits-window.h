@@ -70,7 +70,7 @@ public:
   }
   
   virtual void
-  UpdateCurrentLimit (double limit);
+  UpdateCurrentLimit (double limit, double ratio=1.0);
   
   virtual double
   GetCurrentLimit () const

@@ -47,6 +47,7 @@ Limits::Limits ()
   , m_linkDelay (0)
   , m_f_qSize (0.0)
   , m_rtt (1.0)
+  , m_rttDev (0.0)
 {
 }
 
@@ -135,7 +136,9 @@ Limits::FireAvailableSlotCallback ()
   Limits::AddRTT(double rtt)
   {
     NS_LOG_FUNCTION(this << "rtt:" << rtt);
+    double dev = rtt - m_rtt;
     m_rtt = m_rtt * 0.8 + rtt * 0.2;
+    m_rttDev += 0.1 * (std::abs(dev) - m_rtt);
   }
 
   double

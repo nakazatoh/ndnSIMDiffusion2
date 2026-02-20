@@ -1622,23 +1622,23 @@ ForwardingStrategy::SatisfyPendingInterestDCQL (Ptr<Face> inFace,
         interestQueueLength = faceLimits->GetQueueLength();
                                 
         // double d = 0.12; //0.1 * 1500 * 8 / 10000;
-        double d = 0.1 * faceLimits->GetMaxRate();
+        double d = 0.5; // 0.1 * faceLimits->GetMaxRate();
         double oldRate = rate;
         double alpha = 0.25;
         if(m_consumerNeighbour)
         {
-          newRate = f_rate - d * f_qLength_portion;
+          newRate = f_rate - d * 0.1 * faceLimits->GetMaxRate() * f_qLength_portion;
         }
         else
         {
-          newRate = f_rate + d * (queueLength_portion + interestQueueLength - f_qLength_portion);
+          newRate = f_rate + d * 0.1 * faceLimits->GetMaxRate() * (queueLength_portion + interestQueueLength - f_qLength_portion);
           // newRate = f_rate + d * (queueLength_portion - f_qLength_portion);
         }
         if (newRate < 1) newRate = 1;
         if (newRate > faceLimits->GetMaxRate()) newRate = faceLimits->GetMaxRate();
         rate = (1.0 - alpha) * oldRate + alpha * newRate;
         if (rate < 1) rate = 1;
-        faceLimits -> UpdateCurrentLimit(rate);
+        faceLimits -> UpdateCurrentLimit(rate, d);
         rate = faceLimits -> GetCurrentLimit();
         NS_LOG_DEBUG("Node: " << nodeID << " Interest-in-face: " << outFace_data 
           << " Interest-out-face: " << infaceId << " b_pitsize: " << b_pitsize 

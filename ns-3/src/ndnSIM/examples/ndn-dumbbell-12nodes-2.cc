@@ -77,7 +77,7 @@ PeriodicStatsPrinter (Ptr<Node> node, Time next)
   Simulator::Schedule (next, PeriodicStatsPrinter, node, next);
 }
 
-NS_LOG_COMPONENT_DEFINE("ndn-congestion-topo-plugin-5src");
+NS_LOG_COMPONENT_DEFINE("ndn-dumbbell-12nodes-2");
 
 int
 main (int argc, char *argv[])
@@ -98,7 +98,7 @@ main (int argc, char *argv[])
 
   // Install NDN stack on all nodes
   ndn::StackHelper ndnHelper;
-  ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute::PerOutFaceLimits","Limit","ns3::ndn::Limits::Rate");
+  ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute","SelectSatPI","0");
   ndnHelper.EnableLimits(true, Seconds(0.2),1250,40);
   ndnHelper.SetContentStore ("ns3::ndn::cs::Lru", "MaxSize", "0");
   ndnHelper.SetPit ("ns3::ndn::pit::SerializedSize", "MaxSize", "0");
@@ -121,8 +121,10 @@ main (int argc, char *argv[])
   Ptr<Node> producer3 = Names::Find<Node> ("Dst3");
   Ptr<Node> producer4 = Names::Find<Node> ("Dst4");
 
-  ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerCbr");
-  consumerHelper.SetAttribute ("Frequency", StringValue ("70")); // 200 interests a second
+  ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerDiffusion");
+  consumerHelper.SetAttribute ("InitialFrequency", StringValue ("70")); // 200 interests a second
+  consumerHelper.SetAttribute("LifeTime", StringValue("4s"));
+  consumerHelper.SetAttribute("RetxTimer", StringValue("4s"));
   // consumerHelper.SetAttribute("Randomize", StringValue("exponential"));
   // consumerHelper.SetAttribute("Randomize", StringValue("uniform"));
 
@@ -135,17 +137,17 @@ main (int argc, char *argv[])
   // that will express interests in /dst2 namespace
 
   //lee2005
-  consumerHelper.SetAttribute ("Frequency", StringValue ("10")); // 10 interests a second
+  consumerHelper.SetAttribute ("InitialFrequency", StringValue ("10")); // 10 interests a second
   //
   consumerHelper.SetPrefix ("/dst2");
   ApplicationContainer app2 = consumerHelper.Install (consumer2);
 
-  consumerHelper.SetAttribute ("Frequency", StringValue ("30")); 
+  consumerHelper.SetAttribute ("InitialFrequency", StringValue ("30")); 
   // consumerHelper.SetAttribute("Randomize", StringValue("exponential"));
   consumerHelper.SetPrefix ("/dst3");
   ApplicationContainer app3 = consumerHelper.Install (consumer3);
 
-  consumerHelper.SetAttribute ("Frequency", StringValue ("50")); // 50 interests a second
+  consumerHelper.SetAttribute ("InitialFrequency", StringValue ("50")); // 50 interests a second
   // consumerHelper.SetAttribute("Randomize", StringValue("none"));
   consumerHelper.SetPrefix ("/dst4");
   ApplicationContainer app4 = consumerHelper.Install (consumer4);

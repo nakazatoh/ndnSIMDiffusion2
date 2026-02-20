@@ -100,22 +100,28 @@ LimitsRate::SetLimits (double rate, double delay)
 
 
 void
-LimitsRate::UpdateCurrentLimit (double limit)
+LimitsRate::UpdateCurrentLimit (double limit, double ratio)
 {
   NS_ASSERT_MSG (limit >= 0.0, "Limit should be greater or equal to zero");
-  if (Simulator::Now() < m_nxtAdjTime)
-    return;
+  Time tm = Simulator::Now();
+  double tmd = tm.ToDouble (Time::S);
   if (m_updateMode == 0)
   {
-    m_nxtAdjTime = Simulator::Now() + Seconds(m_rtt);
+    if (tm < m_nxtAdjTime)
+      return;
+    m_nxtAdjTime = tm + ratio * Seconds(m_rtt + m_rttDev);
   }
   else if (m_updateMode == 1)
   {
-    m_nxtAdjTime = Simulator::Now() + Seconds(GetLinkDelay() * 3);
+    if (tm < m_nxtAdjTime)
+      return;
+    m_nxtAdjTime = tm + Seconds(ratio * (GetLinkDelay() * 2));
   }
   else
   {
-    m_nxtAdjTime = Simulator::Now() + Seconds((GetLinkDelay() * 2 + m_rtt) / 2);
+    if (tm < m_nxtAdjTime)
+      return;
+    m_nxtAdjTime = tm + Seconds((GetLinkDelay() * 2 + m_rtt + m_rttDev) / 2);
   }
 
   m_bucketLeak = std::min (limit, GetMaxRate ());
