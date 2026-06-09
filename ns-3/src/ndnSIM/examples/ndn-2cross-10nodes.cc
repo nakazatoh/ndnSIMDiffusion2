@@ -78,8 +78,8 @@ main (int argc, char *argv[])
 
   // Install NDN stack on all nodes
   ndn::StackHelper ndnHelper;
-  ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute","SelectSatPI","0");
-  // ndnHelper.EnableLimits(true, Seconds(0.2),1250,40);
+  ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute::PerOutFaceLimits","Limit","ns3::ndn::Limits::Rate","SelectSatPI","0");
+  ndnHelper.EnableLimits(true, Seconds(0.2),1250,40);
   ndnHelper.SetContentStore ("ns3::ndn::cs::Lru", "MaxSize", "0");
   ndnHelper.SetPit ("ns3::ndn::pit::SerializedSize", "MaxSize", "0");
   ndnHelper.SetPit ("ns3::ndn::pit::SerializedSize", "MaxPitEntryLifetime", "0");

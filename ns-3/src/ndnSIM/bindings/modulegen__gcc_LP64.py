@@ -6024,9 +6024,9 @@ def register_Ns3NdnForwardingStrategy_methods(root_module, cls):
                    'void', 
                    [param('ns3::Ptr< ns3::ndn::fib::Entry >', 'fibEntry')], 
                    is_virtual=True)
-    ## ndn-forwarding-strategy.h (module 'ndnSIM'): bool ns3::ndn::ForwardingStrategy::CanSendOutInterest(ns3::Ptr<ns3::ndn::Face> inFace, ns3::Ptr<ns3::ndn::Face> outFace, ns3::Ptr<ns3::ndn::Interest> interest, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
+    ## ndn-forwarding-strategy.h (module 'ndnSIM'): int32_t ns3::ndn::ForwardingStrategy::CanSendOutInterest(ns3::Ptr<ns3::ndn::Face> inFace, ns3::Ptr<ns3::ndn::Face> outFace, ns3::Ptr<ns3::ndn::Interest> interest, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
     cls.add_method('CanSendOutInterest', 
-                   'bool', 
+                   'int32_t', 
                    [param('ns3::Ptr< ns3::ndn::Face >', 'inFace'), param('ns3::Ptr< ns3::ndn::Face >', 'outFace'), param('ns3::Ptr< ns3::ndn::Interest >', 'interest'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
                    visibility='protected', is_virtual=True)
     ## ndn-forwarding-strategy.h (module 'ndnSIM'): bool ns3::ndn::ForwardingStrategy::DetectRetransmittedInterest(ns3::Ptr<ns3::ndn::Face> inFace, ns3::Ptr<ns3::ndn::Interest const> interest, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]

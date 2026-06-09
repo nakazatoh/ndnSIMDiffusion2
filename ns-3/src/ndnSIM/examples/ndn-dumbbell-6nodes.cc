@@ -38,81 +38,30 @@ using namespace ns3;
  */
 
 
-std::fstream file;
-int F_pitsize =0;
-
-void
-PeriodicStatsPrinter (Ptr<Node> node, Time next)
-{
-  Ptr<ndn::Pit> pit = node->GetObject<ndn::Pit> ();
-  int pitsize;  
-  pitsize = pit -> GetSize();
-
-  //if(node -> GetId() == 16 || node -> GetId() == 17 || node -> GetId() == 18 || node -> GetId() == 19 || node -> GetId() == 20) F_pitsize = 0;
-  
-  //int pitsizedif;
-  //pitsizedif = pitsize - F_pitsize;
-  //F_pitsize = pitsize;
-
-  /*
-  std::cout << Simulator::Now ().ToDouble (Time::S) << "\t"
-            << node->GetId () << "\t"
-            << Names::FindName (node) << "\t"      << std::endl;
-            << pitsize << "\t"
-            << pitsizedif <<"\n";
-  */
-
-  //191015 LEE write PITsize to file
-  //std::fstream file;
-  //file.open("210331_pitsize-congestion-topo-liner-dfcc-2src-ver2.txt",std::ios::out|std::ios::app);
-  std::cout << Simulator::Now ().ToDouble (Time::S) << "\t"
-       << node->GetId () << "\t"
-       << Names::FindName (node) << "\t"
-       << pitsize << "\n";
-       //<< pitsizedif << "\n";
-  //file.close();
-  //
-
-
-  Simulator::Schedule (next, PeriodicStatsPrinter, node, next);
-}
-
-NS_LOG_COMPONENT_DEFINE("ndn-simple-dumbbell-8nodes-1bottleneck");
+NS_LOG_COMPONENT_DEFINE("ndn-dumbbell-6nodes");
 
 int
 main (int argc, char *argv[])
 {
-  //LogComponentEnable("UdpEchoClientApplication",LOG_LEVEL_ALL);
-  //LogComponentEnable("UdpEchoSeverApplication",LOG_LEVEL_ALL);
-  //aikawa
-  Config::SetDefault("ns3::DropTailQueue::MaxPackets", StringValue("1000"));
-  Config::SetDefault("ns3::PointToPointNetDevice::Mtu", StringValue ("5000"));
+  Config::SetDefault("ns3::DropTailQueue::MaxPackets", StringValue("100"));
   //Config::SetDefault("ns3::ndn::Pit::PitEntryPruningTimeout",StringValue("9999"));
 
   CommandLine cmd;
   cmd.Parse (argc, argv);
 
   AnnotatedTopologyReader topologyReader ("", 25);
-  //topologyReader.SetFileName ("src/ndnSIM/examples/topologies/topo-ring-2src.txt");
-  topologyReader.SetFileName ("src/ndnSIM/examples/topologies/topo-qsf.txt");  //read topology
+  topologyReader.SetFileName ("src/ndnSIM/examples/topologies/topo-dumbbell-6nodes.txt");  //read topology
   topologyReader.Read ();
 
   // Install NDN stack on all nodes
   ndn::StackHelper ndnHelper;
-  ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute::PerOutFaceLimits","Limit","ns3::ndn::Limits::Rate", "SelectSatPI", "0");
-  ndnHelper.EnableLimits(true, Seconds(0.06),4500,40);
-  ndnHelper.SetContentStore ("ns3::ndn::cs::Lru", "MaxSize", "3000");
+  ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute::PerOutFaceLimits","Limit","ns3::ndn::Limits::Rate","SelectSatPI", "0");
+  ndnHelper.EnableLimits(true, Seconds(0.2),1250,40);
+  ndnHelper.SetContentStore ("ns3::ndn::cs::Lru", "MaxSize", "0");
   ndnHelper.SetPit ("ns3::ndn::pit::SerializedSize", "MaxSize", "0");
   ndnHelper.SetPit ("ns3::ndn::pit::SerializedSize", "MaxPitEntryLifetime", "0");
-  //ndnHelper.InstallAll ();
-  ndnHelper.Install(Names::Find<Node>("Rtr1"));
-  ndnHelper.Install(Names::Find<Node>("Rtr2"));
+  ndnHelper.InstallAll ();
 
-  ndnHelper.SetContentStore("ns3::ndn::cs::Lru", "MaxSize", "0");
-  ndnHelper.Install(Names::Find<Node>("Src1"));
-  ndnHelper.Install(Names::Find<Node>("Src2"));
-  ndnHelper.Install(Names::Find<Node>("Src3"));
-  ndnHelper.Install(Names::Find<Node>("Dst1"));
 
   // Installing global routing interface on all nodes
   ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
@@ -121,16 +70,14 @@ main (int argc, char *argv[])
   // Getting containers for the consumer/producer
   Ptr<Node> consumer1 = Names::Find<Node> ("Src1");
   Ptr<Node> consumer2 = Names::Find<Node> ("Src2");
-  Ptr<Node> consumer3 = Names::Find<Node> ("Src3");
-
+  
   Ptr<Node> producer1 = Names::Find<Node> ("Dst1");
+  Ptr<Node> producer2 = Names::Find<Node> ("Dst2");
 
-  ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerDiffusion");
-  consumerHelper.SetAttribute ("LifeTime", StringValue("10s"));
-  consumerHelper.SetAttribute ("RetxTimer", StringValue("10s"));
-  consumerHelper.SetAttribute ("InitialFrequency", StringValue ("1944")); // 195 interests a second
-//  ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerWindow");
-//  consumerHelper.SetAttribute ("Window", StringValue("5"));
+  ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerCbr");
+  consumerHelper.SetAttribute ("Frequency", StringValue ("50")); // 50 interests a second
+  consumerHelper.SetAttribute("LifeTime", StringValue("10s"));
+  consumerHelper.SetAttribute("RetxTimer", StringValue("10s"));
   // consumerHelper.SetAttribute("Randomize", StringValue("exponential"));
   // consumerHelper.SetAttribute("Randomize", StringValue("uniform"));
 
@@ -142,23 +89,13 @@ main (int argc, char *argv[])
   // on the second consumer node install a Consumer application
   // that will express interests in /dst2 namespace
 
-  //lee2005
-  // consumerHelper.SetAttribute ("Frequency", StringValue ("50")); // 10 interests a second
+  consumerHelper.SetAttribute ("Frequency", StringValue ("55")); // 50 interests a second
   //
-  // consumerHelper.SetPrefix ("/dst1");
+  consumerHelper.SetPrefix ("/dst2");
   ApplicationContainer app2 = consumerHelper.Install (consumer2);
-  // consumerHelper.SetPrefix ("/dst1");
-  ApplicationContainer app3 = consumerHelper.Install (consumer3);
-
-  // std::cout << "Number of Applications:" << consumer3->GetNApplications() << std::endl;
-  // consumer3->GetApplication(0)->SetStopTime(Seconds(2.0));
-  // consumer3->GetApplication(0)->SetStartTime(Seconds(4.0));
-  // std::function nodeSetStartTime = std::mem_fn(&Application::SetStartTime);
-  // Simulator::Schedule(Seconds(2.0), std::bind(std::mem_fn(&Application::SetStartTime), consumer3->GetApplication(0), Seconds(4.0)));
-  // Simulator::Schedule(Seconds(2.0), &Application::SetStartTime, consumer3->GetApplication(0), Seconds(4.0));
   
   ndn::AppHelper producerHelper ("ns3::ndn::Producer");
-  producerHelper.SetAttribute ("PayloadSize", StringValue("4500"));  
+  producerHelper.SetAttribute ("PayloadSize", StringValue("1250"));  
 
   // Register /dst1 prefix with global routing controller and
   // install producer that will satisfy Interests in /dst1 namespace
@@ -168,19 +105,17 @@ main (int argc, char *argv[])
 
   // Register /dst2 prefix with global routing controller and
   // install producer that will satisfy Interests in /dst2 namespace
-  // ndnGlobalRoutingHelper.AddOrigins ("/dst2", producer2);
-  // producerHelper.SetPrefix ("/dst2");
-  // producerHelper.Install (producer2);
+   ndnGlobalRoutingHelper.AddOrigins ("/dst2", producer2);
+   producerHelper.SetPrefix ("/dst2");
+   producerHelper.Install (producer2);
 
   // Calculate and install FIBs
   ndn::GlobalRoutingHelper::CalculateRoutes ();
 
-  app1.Start(Seconds(1.0));
-  // app2.Stop(Seconds(8.0));
-  app2.Start(Seconds(1.4));
-  app3.Start(Seconds(1.8));
+  app2.Start(Seconds(1.0));
+  app2.Stop(Seconds(8.0));
 
-  Simulator::Stop (Seconds (5.0));
+  Simulator::Stop (Seconds (10.0));
 
   time_t t = time(NULL);
   const tm* localTime = localtime(&t);
@@ -192,10 +127,10 @@ main (int argc, char *argv[])
   s << std::setw(2) << std::setfill('0') << localTime->tm_min;
   s << std::setw(2) << std::setfill('0') << localTime->tm_sec;
 
-  std::string drop_trace("drop-trace-qsf.txt");
-  std::string rate_trace("rate-trace-qsf.txt");
-  std::string aggregate_trace("aggregate-trace-qsf.txt");
-  std::string app_delay_trace("app-delays-trace-qsf.txt");
+  std::string drop_trace("drop-trace-dumbbell-6nodes.txt");
+  std::string rate_trace("rate-trace-dumbbell-6nodes.txt");
+  std::string aggregate_trace("aggregate-trace-dumbbell-6nodes.txt");
+  std::string app_delay_trace("app-delays-trace-dumbbell-6nodes.txt");
 
   // L2RateTracer::InstallAll ("20220621-3_drop-trace-5src-1213.txt", Seconds (0.1));
   L2RateTracer::InstallAll (s.str() + drop_trace, Seconds (0.1));

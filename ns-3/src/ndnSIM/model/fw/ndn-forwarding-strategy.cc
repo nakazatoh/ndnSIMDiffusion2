@@ -47,9 +47,10 @@
 #include "ns3/ndnSIM/utils/ndn-fw-hop-count-tag.h"
 /////////////////////////////////////////////////////////////////
 #include "ns3/ndnSIM/utils/ndn-fw-feedback-pitsize-tag.h"
-#include "ns3/ndnSIM/utils/ndn-fw-feedback-pitsize-difference-tag.h"
+// #include "ns3/ndnSIM/utils/ndn-fw-feedback-pitsize-difference-tag.h"
 #include "ns3/ndnSIM/utils/ndn-fw-feedback-rate-tag.h"
 #include "ns3/ndnSIM/utils/ndn-feedback-queuesize-tag.h"
+#include "ns3/ndnSIM/utils/ndn-feedback-interest-queuesize-tag.h"
 /////////////////////////////////////////////////////////////////
 #include <boost/ref.hpp>
 #include <boost/foreach.hpp>
@@ -506,11 +507,11 @@ ForwardingStrategy::SatisfyPendingInterest (Ptr<Face> inFace,
     // bool rateTagPresent = data->GetPayload()->PeekPacketTag(feedbackRateTag);
 
     Ptr<Packet> payloadCopy = data->GetPayload()->Copy();
-
+    double rate = incoming->m_face->GetObject<Limits>()->GetMaxRate();
     NS_LOG_DEBUG("Node: " << nodeID << " Interest-in-face: " << outFace_data 
       << " Interest-out-face: Cache" << " b_pitsize: " << incoming->m_face->GetBPitsize()
       << " pitsize_in: " << inPitsize << " pitsize_out: 1" 
-      << " f_pitsize: 1" << " f_pitsize_portion: 1" << " rateLimit: NA" << " f_rate: NA"
+      << " f_pitsize: 1" << " f_pitsize_portion: 1" << " rateLimit: " << rate << " f_rate: " << rate
       << " data: " << data << " name: " << name << " seq#: " << seq
       );
 
@@ -522,8 +523,7 @@ ForwardingStrategy::SatisfyPendingInterest (Ptr<Face> inFace,
       
     feedbackPitsizeTag.SetPitSize(inPitsize);
     payloadCopy -> AddPacketTag(feedbackPitsizeTag);
-    // double rate = incoming->m_face->GetObject<Limits>()->GetCurrentLimit();
-    feedbackRateTag.SetRate(0.0);
+    feedbackRateTag.SetRate(rate);
     payloadCopy -> AddPacketTag(feedbackRateTag);
 
     data->SetPayload (payloadCopy);
@@ -615,7 +615,8 @@ ForwardingStrategy::SatisfyPendingInterest (Ptr<Face> inFace,
       // double f_pitsizedif;
       double b_pitsize = incoming.m_face->GetBPitsize();
       // double b_pitsizedif = b_pitsize - pitsize_in;
-      double rate = 0.0;
+      double rate = inFace->GetObject<Limits>()->GetCurrentLimit();
+;
       double newRate;
 
       // double tm = Simulator::Now ().ToDouble (Time::S);
@@ -624,7 +625,7 @@ ForwardingStrategy::SatisfyPendingInterest (Ptr<Face> inFace,
 
       if (!pitsizeTagPresent) //for ndn-qsf.cc
       {
-        // rate = (incoming.m_face->GetObject<Limits>())->GetCurrentLimit();
+        rate = (incoming.m_face->GetObject<Limits>())->GetMaxRate();
         newRate = rate;
 
         NS_LOG_DEBUG("Node: " << nodeID << " Interest-in-face: " << outFace_data 
@@ -670,7 +671,7 @@ ForwardingStrategy::SatisfyPendingInterest (Ptr<Face> inFace,
       //{
       //  rate_sum += *v;
       //}
-      feedbackRateTag.SetRate(rate_sum);
+      feedbackRateTag.SetRate(rate);
       payloadCopy -> AddPacketTag(feedbackRateTag);
 
       data->SetPayload (payloadCopy);
@@ -1094,14 +1095,13 @@ ForwardingStrategy::SatisfyPendingInterestQSF (Ptr<Face> inFace,
 
     Ptr<Packet> payloadCopy = data->GetPayload()->Copy();
     double bw = fibEntry->GetBandwidth();
-
+    double rate = incoming->m_face->GetObject<Limits>()->GetMaxRate();
     uint32_t seq = data->GetName().get(-1).toSeqNum();
     NS_LOG_DEBUG("Node: " << nodeID << " Interest-in-face: " << outFace_data 
       << " Interest-out-face: Cache" << " b_pitsize: " << incoming->m_face->GetBPitsize()
       << " pitsize_in: " << pitsize_in << " pitsize_out: 1" 
-      << " f_pitsize: 1" << " f_pitsize_portion: 1" << " rateLimit: NA" 
-      << " seq#: " << seq << " f_rate: NA"
-      << " data: " << data << " name: " << name << " seq#: " << seq
+      << " f_pitsize: 1" << " f_pitsize_portion: 1" << " rateLimit: " << rate
+      << " f_rate: " << rate << " data: " << data << " name: " << name << " seq#: " << seq
       << " bandwidth: " << bw << " f_qSize: NA" << " dataQueueSize: " << dataQueueSize 
       << " iQLength: " << iQLength);
 
@@ -1114,7 +1114,6 @@ ForwardingStrategy::SatisfyPendingInterestQSF (Ptr<Face> inFace,
       
     f_pitsizeTag.SetPitSize(pitsize_in);
     payloadCopy -> AddPacketTag(f_pitsizeTag);
-    double rate = incoming->m_face->GetObject<Limits>()->GetMaxRate();
     f_rateTag.SetRate(rate);
     payloadCopy->AddPacketTag(f_rateTag);
     f_queueSizeTag.SetQueueSize(dataQueueSize);
@@ -1281,14 +1280,14 @@ ForwardingStrategy::SatisfyPendingInterestQSF (Ptr<Face> inFace,
         f_pitsize_portion = 0.0;
         f_pitsizedif = pitsize_out - f_pitsize_portion;
 
-        rate = fibLimits->GetCurrentLimit();
+        rate = fibLimits->GetMaxRate();
         newRate = rate;
         double bw = fibEntry->GetBandwidth();
         NS_LOG_DEBUG("Node: " << nodeID << " Interest-in-face: " << outFace_data 
           << " Interest-out-face: " << infaceId << " b_pitsize: " << b_pitsize 
           << " pitsize_in: " << pitsize_in << " pitsize_out: " << pitsize_out
           << " f_pitsize: " << f_pitsize << " f_pitsize_portion: " << f_pitsize_portion
-          << " rateLimit: " << rate << " f_rate: NA" 
+          << " rateLimit: " << rate << " f_rate: " << rate
           << " data: " << data << " name: " << name << " seq#: " << seq
           << " bandwidth: " << bw << " f_qSize: " << f_qSize << " dataQueueSize: " << dataQueueSize 
           << " iQLength: " << iQLength);
@@ -1311,16 +1310,22 @@ ForwardingStrategy::SatisfyPendingInterestQSF (Ptr<Face> inFace,
         iQLength = fibLimits->GetQueueLength();
 
         rate = fibLimits -> GetCurrentLimit();
-
         double bw = fibEntry->GetBandwidth();
-        if (bw > fibLimits->GetMaxRate()) bw = fibLimits->GetMaxRate();
-        if (f_qSize > 8.0)
-          newRate = bw * 0.9;
+        if (f_qSize > 0.0)
+        {
+          if (bw > fibLimits->GetMaxRate()) bw = fibLimits->GetMaxRate();
+          if (f_qSize > 8.0)
+            newRate = bw * 0.9;
+          else
+            newRate = bw;
+          // double oldRate = rate;
+          // double alpha = 0.2;
+          if (newRate < 1.0) newRate = 1.0;
+        }
         else
-          newRate = bw;
-        // double oldRate = rate;
-        // double alpha = 0.2;
-        if (newRate < 1.0) newRate = 1.0;
+        {
+          newRate = rate;
+        }
         if (f_qSize < 5.0)
           newRate = newRate * 1.05;
         if (newRate > fibLimits->GetMaxRate()) newRate = fibLimits->GetMaxRate();
@@ -1397,6 +1402,7 @@ ForwardingStrategy::SatisfyPendingInterestDCQL (Ptr<Face> inFace,
                                                 Ptr<Data> data,
                                                 Ptr<pit::Entry> pitEntry)
 {
+  double tm = Simulator::Now ().ToDouble (Time::S);
   const Name& name = data->GetName();
   uint32_t seq = name.get (-1).toSeqNum ();
   if (inFace == 0)
@@ -1425,6 +1431,7 @@ ForwardingStrategy::SatisfyPendingInterestDCQL (Ptr<Face> inFace,
     FwFeedbackPitsizeTag feedbackPitsizeTag;
     FwFeedbackRateTag feedbackRateTag;
     FeedbackQueueSizeTag feedbackQueueSizeTag;
+    FeedbackInterestQueueSizeTag feedbackInterestQueueSizeTag;
 
     uint32_t queueLength;
     if (Ptr<NetDeviceFace> netDeviceFace = incoming->m_face->GetObject<NetDeviceFace>())
@@ -1442,12 +1449,13 @@ ForwardingStrategy::SatisfyPendingInterestDCQL (Ptr<Face> inFace,
     // bool rateTagPresent = data->GetPayload()->PeekPacketTag(feedbackRateTag);
 
     Ptr<Packet> payloadCopy = data->GetPayload()->Copy();
+    double rate = incoming->m_face->GetObject<Limits>()->GetMaxRate();
 
     NS_LOG_DEBUG("Node: " << nodeID << " Interest-in-face: " << outFace_data 
       << " Interest-out-face: Cache" << " b_pitsize: " << incoming->m_face->GetBPitsize()
       << " pitsize_in: " << inPitsize << " pitsize_out: 1" 
-      << " f_pitsize: 1" << " f_pitsize_portion: 1" << " rateLimit: NA f_rate: NA " 
-      << " data: " << data << " name: " << name << " seq#: " << seq
+      << " f_pitsize: 1" << " f_pitsize_portion: 1" << " rateLimit: " << rate << " f_rate: " 
+      << rate << " data: " << data << " name: " << name << " seq#: " << seq
       << " queueLength: " << queueLength << " f_queueLength: 0 queueLength_portion: " 
       << queueLength / inPitsize << " interestQueueLength: 0");
 
@@ -1456,15 +1464,17 @@ ForwardingStrategy::SatisfyPendingInterestDCQL (Ptr<Face> inFace,
       payloadCopy->RemovePacketTag(feedbackPitsizeTag);
       payloadCopy->RemovePacketTag(feedbackRateTag);
       payloadCopy->RemovePacketTag(feedbackQueueSizeTag);
+      payloadCopy->RemovePacketTag(feedbackInterestQueueSizeTag);
     }
       
     feedbackPitsizeTag.SetPitSize(inPitsize);
     payloadCopy -> AddPacketTag(feedbackPitsizeTag);
-    double rate = incoming->m_face->GetObject<Limits>()->GetCurrentLimit();
     feedbackRateTag.SetRate(rate);
     payloadCopy -> AddPacketTag(feedbackRateTag);
     feedbackQueueSizeTag.SetQueueSize(queueLength);
     payloadCopy->AddPacketTag(feedbackQueueSizeTag);
+    feedbackInterestQueueSizeTag.SetQueueSize(0.0);
+    payloadCopy->AddPacketTag(feedbackInterestQueueSizeTag);
 
     data->SetPayload (payloadCopy);
 
@@ -1496,6 +1506,7 @@ ForwardingStrategy::SatisfyPendingInterestDCQL (Ptr<Face> inFace,
       uint32_t inPitsize=0; //このデータが出て行くFaceのピットのサイズ。
       uint32_t outPitsize = 0; //このデータに関連する出て行くピットサイズ。
       uint32_t totalOutPitsize = 0; //Total outgoing pit size for the face this data arrived
+      uint32_t totalOutPitsizeWInFace = 0;
 
       bool ExistOutFace_data=false; //このデータが出て行くFaceに関連するPITエントリかどうかを調べるフラグ。
       std::set<Ptr<Face> > outFacesForIncomingFace;
@@ -1511,7 +1522,7 @@ ForwardingStrategy::SatisfyPendingInterestDCQL (Ptr<Face> inFace,
           tmpInfaceId = in_itr -> m_face -> GetId();
           if(tmpInfaceId == outFace_data) // このデータが出て行くFaceに関するPITサイズの計算
           {
-            inPitsize++;
+            inPitsize++; // このDataが出て行くface (outFace_data) から入ってきたInterestに対応するpit entry数
             ExistOutFace_data = true;
           }
         }
@@ -1521,17 +1532,18 @@ ForwardingStrategy::SatisfyPendingInterestDCQL (Ptr<Face> inFace,
         {
           uint32_t tmpOutfaceId;
           tmpOutfaceId = out_itr -> m_face -> GetId();
-          if(tmpOutfaceId == infaceId)
+          if(tmpOutfaceId == infaceId) // infaceId: このDataが入ってきたfaceのID
           {		
             if(ExistOutFace_data) 
             {
-              outPitsize++;
+              outPitsize++; // このDataが出て行くfaceから入ってきて、かつこのDataが入ってきたfaceから出て行ったInterestに対応するpit entry数
             }
-            totalOutPitsize++;
+            totalOutPitsize++; // このデータが入ってきたfaceから出て行ったInteresに対応するpit entry数
           }
           if(ExistOutFace_data)
           {
             outFacesForIncomingFace.insert(out_itr->m_face);
+            totalOutPitsizeWInFace++; // このデータが出て行くfaceから入ってきたInterestに対応するoutgoing_faceの数
           }
         }
 
@@ -1540,11 +1552,12 @@ ForwardingStrategy::SatisfyPendingInterestDCQL (Ptr<Face> inFace,
       }  //while() close//
       // NS_LOG_DEBUG("# elements in outFacesForIncomingFace: " << outFacesForIncomingFace.size());
 
-      uint32_t interestQLengthForIncomingFace = 0;
-      for(std::set<Ptr<Face> >::iterator itr = outFacesForIncomingFace.begin(); itr != outFacesForIncomingFace.end(); ++itr)
-      {
-        interestQLengthForIncomingFace += (*itr)->GetObject<Limits>()->GetQueueLength();
-      }
+      // uint32_t interestQLengthForIncomingFace = 0;
+      uint32_t interestQLengthForIncomingFace = InterestCount(inFace, pitEntry, incoming.m_face); // このDataが入ってきたfaceのInterest queueに溜まっているInterestの内、このDataと出て行くfaceから入ってきた分
+      // for(std::set<Ptr<Face> >::iterator itr = outFacesForIncomingFace.begin(); itr != outFacesForIncomingFace.end(); ++itr)
+      // {
+        // interestQLengthForIncomingFace += (*itr)->GetObject<Limits>()->GetQueueLength();
+      // }
       // NS_LOG_DEBUG("# interest queue length: " << interestQLengthForIncomingFace);
 
       double pitsize_in = inPitsize;
@@ -1554,6 +1567,7 @@ ForwardingStrategy::SatisfyPendingInterestDCQL (Ptr<Face> inFace,
       FwFeedbackPitsizeTag feedbackPitsizeTag;
       FwFeedbackRateTag feedbackRateTag;
       FeedbackQueueSizeTag feedbackQueueSizeTag;
+      FeedbackInterestQueueSizeTag feedbackInterestQueueSizeTag;
 
       uint32_t queueLength;
       double queueLength_portion;
@@ -1565,21 +1579,23 @@ ForwardingStrategy::SatisfyPendingInterestDCQL (Ptr<Face> inFace,
       {
         netDevice = netDeviceFace->GetNetDevice();
         p2pNetDevice = netDevice->GetObject<PointToPointNetDevice>();
-        queueLength = p2pNetDevice->GetQueue()->GetNPackets();
+        queueLength = p2pNetDevice->GetQueue()->GetNPackets(); // queueLength: このDataが出て行くfaceのData queueの長さ
       }
       else
       {
         queueLength = 0;
       }
-      queueLength_portion = queueLength * pitsize_out / pitsize_in;
+      queueLength_portion = queueLength * pitsize_out / totalOutPitsizeWInFace; // queueLength_portion: queueLengthの内、このDataの入ってきたfaceから入ってきたData数の推定値
 
       bool pitsizeTagPresent = data -> GetPayload() ->  PeekPacketTag(feedbackPitsizeTag);
       data -> GetPayload() ->  PeekPacketTag(feedbackRateTag);
       data -> GetPayload() -> PeekPacketTag(feedbackQueueSizeTag);
+      data -> GetPayload() -> PeekPacketTag(feedbackInterestQueueSizeTag);
 
       double f_pitsize;
       double f_rate;
       uint32_t f_queueLength;
+      double f_interestQueueLength;
 
       double f_qLength_portion;
       // double f_pitsizedif;
@@ -1593,16 +1609,16 @@ ForwardingStrategy::SatisfyPendingInterestDCQL (Ptr<Face> inFace,
       Ptr<Packet> payloadOriginal = data->GetPayload()->Copy();
       Ptr<Packet> payloadCopy = payloadOriginal->Copy();
            
-      if(!pitsizeTagPresent)// for ndn-simple-dumbbell-8nodes-1bottleneck.cc
+      if(!pitsizeTagPresent) // Producerの隣接ルータの場合
       {
-        rate = (incoming.m_face->GetObject<Limits>())->GetCurrentLimit();
+        rate = (incoming.m_face->GetObject<Limits>())->GetMaxRate(); // rate: Dataが入ってきたfaceのrate制限
         newRate = rate;
         m_interestRateTable[outFace_data][infaceId] = rate;
         NS_LOG_DEBUG("Node: " << nodeID << " Interest-in-face: " << outFace_data 
           << " Interest-out-face: " << infaceId << " b_pitsize: " << b_pitsize 
           << " pitsize_in: " << pitsize_in << " pitsize_out: " << pitsize_out
           << " f_pitsize: 0" << " f_qLength_portion: 0"
-          << " rateLimit: " << rate  << " f_rate: NA" 
+          << " rateLimit: " << rate  << " f_rate: " << rate
           << " data: " << data << " name: " << name << " seq#: " << seq
           << " queueLength: " << queueLength << " f_queueLength: 0 queueLength_portion: "
           << queueLength_portion << " interestQueueLength: " << interestQueueLength);
@@ -1610,12 +1626,13 @@ ForwardingStrategy::SatisfyPendingInterestDCQL (Ptr<Face> inFace,
       else
       {
         f_pitsize = feedbackPitsizeTag.GetPitSize();
-        f_rate = feedbackRateTag.GetRate();
+        f_rate = feedbackRateTag.GetRate(); // f_rate: 上流ルータのrate制限
+        f_interestQueueLength = feedbackInterestQueueSizeTag.GetQueueSize(); // f_interestQueueLength: 上流ルータのInterest queueの長さ
         inFace->SetFPitsize(f_pitsize);
         //double f_pitsizedif = pitsize_out - f_pitsize;
         //f_pitsizedif = pitsize_out - f_pitsize_portion;
-        f_queueLength = feedbackQueueSizeTag.GetQueueSize();
-        f_qLength_portion = f_queueLength * pitsize_out / totalOutPitsize;
+        f_queueLength = feedbackQueueSizeTag.GetQueueSize(); // f_queueLength: 上流ルータのData queue長+Interest queue長
+        f_qLength_portion = f_queueLength * pitsize_out / totalOutPitsize; // f_qLength_portion: f_queueLengthの内、このDataと同一の経路をたどる分の推定値
 
         Ptr<Limits> faceLimits = inFace -> GetObject<Limits>();
         rate = faceLimits -> GetCurrentLimit();
@@ -1627,18 +1644,31 @@ ForwardingStrategy::SatisfyPendingInterestDCQL (Ptr<Face> inFace,
         double alpha = 0.25;
         if(m_consumerNeighbour)
         {
-          newRate = f_rate - d * 0.1 * faceLimits->GetMaxRate() * f_qLength_portion;
+          // newRate = f_rate - d * 0.1 * faceLimits->GetMaxRate() * f_qLength_portion;
+          newRate = f_rate * (1.0 - d * 0.1 * f_qLength_portion);
         }
         else
         {
-          newRate = f_rate + d * 0.1 * faceLimits->GetMaxRate() * (queueLength_portion + interestQueueLength - f_qLength_portion);
+          // newRate = f_rate + d * 0.1 * faceLimits->GetMaxRate() * (queueLength_portion + interestQueueLength - f_qLength_portion);
+          newRate = f_rate * (1.0 + d * 0.1 * (queueLength_portion + interestQueueLength - f_qLength_portion)); // 新たに設定するrate制限は上流ルータのrate制限に((このルータでのquque長) - (上流ルータでのqueue長))*0.05 を加えた値
           // newRate = f_rate + d * (queueLength_portion - f_qLength_portion);
         }
-        if (newRate < 1) newRate = 1;
+        double minRate = 1.0 / faceLimits->GetRTT(); // faceLimits->GetRTT(): Dataが入ってきたfaceで観測した平均RTT
+        if (newRate < minRate) newRate = minRate;
+        // if (newRate < 1) newRate = 1;
         if (newRate > faceLimits->GetMaxRate()) newRate = faceLimits->GetMaxRate();
-        rate = (1.0 - alpha) * oldRate + alpha * newRate;
+        rate = (1.0 - alpha) * oldRate + alpha * newRate; // rateの移動平均
         if (rate < 1) rate = 1;
-        faceLimits -> UpdateCurrentLimit(rate, d);
+        if (f_queueLength == 0 || f_queueLength > f_interestQueueLength)
+        {
+          faceLimits->SetUpdateMode(0);
+          faceLimits -> UpdateCurrentLimit(rate, d); // RTTの半分の時間経過でrateをアップデート
+        } 
+        else
+        {
+          faceLimits->SetUpdateMode(0);
+          faceLimits->UpdateCurrentLimit(rate, d);
+        }
         rate = faceLimits -> GetCurrentLimit();
         NS_LOG_DEBUG("Node: " << nodeID << " Interest-in-face: " << outFace_data 
           << " Interest-out-face: " << infaceId << " b_pitsize: " << b_pitsize 
@@ -1655,6 +1685,7 @@ ForwardingStrategy::SatisfyPendingInterestDCQL (Ptr<Face> inFace,
         payloadCopy->RemovePacketTag(feedbackPitsizeTag);
         payloadCopy->RemovePacketTag(feedbackRateTag);
         payloadCopy->RemovePacketTag(feedbackQueueSizeTag);
+        payloadCopy->RemovePacketTag(feedbackInterestQueueSizeTag);
 
       } //if(nodeID != 19  && nodeID != 20) close
       
@@ -1668,13 +1699,24 @@ ForwardingStrategy::SatisfyPendingInterestDCQL (Ptr<Face> inFace,
       {
         rate_sum += *v;
       }
+      double b_rate = incoming.m_face->GetObject<Limits>()->GetMaxRate();
       // feedbackRateTag.SetRate(rate_sum);
-      feedbackRateTag.SetRate(rate);
+      if (b_rate > 0)
+      {
+        feedbackRateTag.SetRate(std::min(rate, b_rate)); // Dataが出て行くfaceのリンク帯域と、このルータで設定するrate制限の小さい方の値を下流に送る
+      }
+      else
+      {
+        feedbackRateTag.SetRate(rate_sum); // 下流がConsumerである場合に送るrateの情報
+      }
       payloadCopy -> AddPacketTag(feedbackRateTag);
 
-      feedbackQueueSizeTag.SetQueueSize(queueLength + interestQLengthForIncomingFace);
+      feedbackQueueSizeTag.SetQueueSize(queueLength + interestQLengthForIncomingFace); // (このDataが出て行くfaceのData queue長) +（このDataが入ってきたfaceのInterest queue長の内、このDataが出て行くfaceから入ってきたInterestの数の推定値) を下流のルータに送る
       // feedbackQueueSizeTag.SetQueueSize(queueLength);
       payloadCopy->AddPacketTag(feedbackQueueSizeTag);
+
+      feedbackInterestQueueSizeTag.SetQueueSize(interestQLengthForIncomingFace);
+      payloadCopy->AddPacketTag(feedbackInterestQueueSizeTag);
 
       data->SetPayload (payloadCopy);
 
@@ -1808,7 +1850,7 @@ ForwardingStrategy::PropagateInterest (Ptr<Face> inFace,
     }
 }
 
-bool
+int32_t
 ForwardingStrategy::CanSendOutInterest (Ptr<Face> inFace,
                                         Ptr<Face> outFace,
                                         Ptr<Interest> interest,
@@ -1817,7 +1859,7 @@ ForwardingStrategy::CanSendOutInterest (Ptr<Face> inFace,
   if (outFace == inFace)
     {
       // NS_LOG_DEBUG ("Same as incoming");
-      return false; // same face as incoming, don't forward
+      return 0; // same face as incoming, don't forward
     }
 
   pit::Entry::out_iterator outgoing =
@@ -1827,15 +1869,15 @@ ForwardingStrategy::CanSendOutInterest (Ptr<Face> inFace,
     {
       
       if (!m_detectRetransmissions)
-        return false; // suppress
+        return 0; // suppress
       else if (outgoing->m_retxCount >= pitEntry->GetMaxRetxCount ())
         {
           // NS_LOG_DEBUG ("Already forwarded before during this retransmission cycle (" <<outgoing->m_retxCount << " >= " << pitEntry->GetMaxRetxCount () << ")");
-          return false; // already forwarded before during this retransmission cycle
+          return 0; // already forwarded before during this retransmission cycle
         }
    }
 
-  return true;
+  return 1;
 }
 
 void
@@ -1867,23 +1909,29 @@ ForwardingStrategy::TrySendOutInterest (Ptr<Face> inFace,
     di->m_fs = this;
     InterestEnqueue(di);
 
-    if (!CanSendOutInterest (inFace, outFace, interest, pitEntry))
+    switch (CanSendOutInterest (inFace, outFace, interest, pitEntry))
     {
+    case 0:
+      InterestDequeue(outFace, pitEntry);
+      return false;
+    case 2:
       return true;
-    }
-    di = InterestDequeue(outFace, pitEntry);
-    inFace = di->m_inFace;
-    outFace = di->m_outFace;
-    interest = di->m_interest;
-    pitEntry = di->m_pitEntry;
-    nodeID = inFace->GetNode() -> GetId();
-    seq = interest->GetName ().get (-1).toSeqNum ();
-    NS_LOG_LOGIC("Dequeue: Node: " << nodeID 
+    case 1:
+      di = InterestDequeue(outFace, pitEntry);
+      inFace = di->m_inFace;
+      outFace = di->m_outFace;
+      interest = di->m_interest;
+      pitEntry = di->m_pitEntry;
+      nodeID = inFace->GetNode() -> GetId();
+      seq = interest->GetName ().get (-1).toSeqNum ();
+      NS_LOG_LOGIC("Dequeue: Node: " << nodeID 
                  << " interfaceID: " << inFace -> GetId() 
                  << " seq#: " << seq);
 
-    Ptr<Node> node = inFace -> GetNode();
-    //uint32_t nodeID = node -> GetId();
+      Ptr<Node> node = inFace -> GetNode();
+      //uint32_t nodeID = node -> GetId();
+      break;
+    }
   }
   else
   {
@@ -1898,6 +1946,7 @@ ForwardingStrategy::TrySendOutInterest (Ptr<Face> inFace,
   uint32_t faceid = outFace->GetId();
 
   pitEntry->AddOutgoing (outFace);  
+  pitEntry->SetInitialInterestTime(Simulator::Now());
 
   Ptr<pit::Entry> pe = m_pit->Begin();
   double pc = 0;
@@ -2018,6 +2067,13 @@ ForwardingStrategy::InterestDequeue (Ptr<Face> outFace, Ptr<pit::Entry> pitEntry
 {
   NS_LOG_FUNCTION(this);
   return m_iq.Dequeue();
+}
+
+int32_t
+ForwardingStrategy::InterestCount (Ptr<Face> outFace, Ptr<pit::Entry> pitEntry, Ptr<Face> inFace)
+{
+  NS_LOG_FUNCTION(this);
+  return m_iq.CountInterests(inFace);
 }
 
 void

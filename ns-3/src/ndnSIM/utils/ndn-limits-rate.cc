@@ -107,21 +107,24 @@ LimitsRate::UpdateCurrentLimit (double limit, double ratio)
   double tmd = tm.ToDouble (Time::S);
   if (m_updateMode == 0)
   {
-    if (tm < m_nxtAdjTime)
+    if (tm < m_prvAdjTime + Seconds(ratio * (m_rtt + m_rttDev)))
       return;
-    m_nxtAdjTime = tm + ratio * Seconds(m_rtt + m_rttDev);
+    //m_nxtAdjTime = tm + Seconds(ratio * (m_rtt + m_rttDev));
+    m_prvAdjTime = tm;
   }
   else if (m_updateMode == 1)
   {
-    if (tm < m_nxtAdjTime)
+    if (tm < m_prvAdjTime + Seconds(ratio * (GetLinkDelay() * 2)))
       return;
-    m_nxtAdjTime = tm + Seconds(ratio * (GetLinkDelay() * 2));
+    //m_nxtAdjTime = tm + Seconds(ratio * (GetLinkDelay() * 2));
+    m_prvAdjTime = tm;
   }
   else
   {
-    if (tm < m_nxtAdjTime)
+    if (tm < m_prvAdjTime + Seconds((GetLinkDelay() * 2 + m_rtt + m_rttDev) / 2))
       return;
-    m_nxtAdjTime = tm + Seconds((GetLinkDelay() * 2 + m_rtt + m_rttDev) / 2);
+    //m_nxtAdjTime = tm + Seconds((GetLinkDelay() * 2 + m_rtt + m_rttDev) / 2);
+    m_prvAdjTime = tm;
   }
 
   m_bucketLeak = std::min (limit, GetMaxRate ());
@@ -204,7 +207,8 @@ LimitsRate::RetrySendOutInterest ()
 {
   NS_LOG_FUNCTION(this);
   Ptr<const DelayedInterest> di;
-  while ((di = m_iq.Peek()) != 0)
+  // while ((di = m_iq.Peek()) != 0)
+  if ((di = m_iq.Peek()) != 0)
   {
     Ptr<ForwardingStrategy> forwardingStrategy = di->m_fs;
     // Ptr<Limits> faceLimits = di->m_outFace->template GetObject<Limits> ();
@@ -236,7 +240,7 @@ LimitsRate::RateProbing()
     UpdateCurrentLimit(GetCurrentLimit() * 1.05);
   }
   NS_LOG_DEBUG(this << " f_qSize: " << m_f_qSize << " rtt: " << m_rtt << " m_bucketMax: " << m_bucketMax << " m_bucketLeak: " << m_bucketLeak);
-  Simulator::ScheduleWithContext (m_nodeId, Seconds (m_rtt), &LimitsRate::RateProbing, this);
+  Simulator::ScheduleWithContext (m_nodeId, Seconds (m_rtt + m_rttDev), &LimitsRate::RateProbing, this);
 }
 
 } // namespace ndn

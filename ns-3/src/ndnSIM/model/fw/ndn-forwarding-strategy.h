@@ -378,7 +378,7 @@ protected:
    *
    * @see DetectRetransmittedInterest
    */
-  virtual bool
+  virtual int32_t
   CanSendOutInterest (Ptr<Face> inFace,
                       Ptr<Face> outFace,
                       Ptr<Interest> interest,
@@ -446,10 +446,19 @@ protected:
    * @param outFace    proposed outgoing face of the Interest
    * @param pitEntry   reference to PIT entry (reference to corresponding FIB entry inside)
    */
-
   virtual Ptr<DelayedInterest>
   InterestDequeue(Ptr<Face> outFace,
                   Ptr<pit::Entry> pitEntry);
+
+  /**
+   * @brief Count the number of queued interests with the specifed incoming face
+   * @param outFace Pointer to outgoing face where the queue exists
+   * @param pitEntry   reference to PIT entry (reference to corresponding FIB entry inside)
+   * @param inFace Pointer to incoming face to look for
+   * @return the number of interests
+   */
+  virtual int32_t
+  InterestCount(Ptr<Face> outFace, Ptr<pit::Entry> pitEntry, Ptr<Face> inFace);
 
   /**
    * @brief Event fired just after forwarding the Interest

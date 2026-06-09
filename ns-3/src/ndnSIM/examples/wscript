@@ -44,6 +44,24 @@ def build(bld):
         obj = bld.create_ns3_program('ndn-grid-topo-plugin-red-queues', all_modules)
         obj.source = 'ndn-grid-topo-plugin-red-queues.cc'
 
+        obj = bld.create_ns3_program('ndn-dumbbell-6nodes', all_modules)
+        obj.source = 'ndn-dumbbell-6nodes.cc'
+
+        obj = bld.create_ns3_program('ndn-dumbbell-6nodes-QSF', all_modules)
+        obj.source = 'ndn-dumbbell-6nodes-QSF.cc'
+
+        obj = bld.create_ns3_program('ndn-dumbbell-6nodes-DCQL', all_modules)
+        obj.source = 'ndn-dumbbell-6nodes-DCQL.cc'
+
+        obj = bld.create_ns3_program('ndn-3to3-dumbbell', all_modules)
+        obj.source = 'ndn-3to3-dumbbell.cc'
+
+        obj = bld.create_ns3_program('ndn-3to3-dumbbell-QSF', all_modules)
+        obj.source = 'ndn-3to3-dumbbell-QSF.cc'
+
+        obj = bld.create_ns3_program('ndn-3to3-dumbbell-DCQL', all_modules)
+        obj.source = 'ndn-3to3-dumbbell-DCQL.cc'
+
         obj = bld.create_ns3_program('ndn-dumbbell-12nodes', all_modules)
         obj.source = 'ndn-dumbbell-12nodes.cc'
 
@@ -70,6 +88,15 @@ def build(bld):
 
         obj = bld.create_ns3_program('ndn-dumbbell-13nodes-QSF', all_modules)
         obj.source = 'ndn-dumbbell-13nodes-QSF.cc'
+
+        obj = bld.create_ns3_program('ndn-dumbbell-13nodes-rev', all_modules)
+        obj.source = 'ndn-dumbbell-13nodes-rev.cc'
+
+        obj = bld.create_ns3_program('ndn-dumbbell-13nodes-rev-DCQL', all_modules)
+        obj.source = 'ndn-dumbbell-13nodes-rev-DCQL.cc'
+
+        obj = bld.create_ns3_program('ndn-dumbbell-13nodes-rev-QSF', all_modules)
+        obj.source = 'ndn-dumbbell-13nodes-rev-QSF.cc'
 
         obj = bld.create_ns3_program('ndn-2cross-10nodes', all_modules)
         obj.source = 'ndn-2cross-10nodes.cc'

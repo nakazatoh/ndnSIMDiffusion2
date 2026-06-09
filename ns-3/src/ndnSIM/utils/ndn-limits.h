@@ -189,6 +189,14 @@ public:
   Dequeue ();
 
   /**
+   * @brief Count the number of interests with the specified incoming face
+   * @param inFace Incoming face to look for
+   * @return the number of interest with the specified incoming face
+   */
+  int32_t
+  CountInterests(Ptr<Face> inFace);
+
+  /**
    * @brief Read the front of the interest queue
    * @return the first element in the queue
    */
@@ -270,7 +278,7 @@ protected:
   double m_f_qSize;
   double m_rtt;
   double m_rttDev;
-  Time m_nxtAdjTime {Seconds(0.0)}; 
+  Time m_prvAdjTime {Seconds(0.0)}; 
   uint32_t m_updateMode {0}; // 0: rtt, 1: delay
 
 private:

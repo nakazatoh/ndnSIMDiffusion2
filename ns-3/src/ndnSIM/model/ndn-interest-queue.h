@@ -103,10 +103,17 @@ public:
 
   /**
    * @brief Remove the DelayedInterest instance specified by the specified interest
-   * @param Pointer to the interest to be removed
+   * @param interest Pointer to the interest to be removed
    * @return true if successfully remove the DelayedInterest instance
    */
   bool RemoveInterest(Ptr<const Interest> interest);
+
+  /**
+   * @bried Summarize the number of interests with the specifed inconming faces in the queue
+   * @param inFace Pointer to the incoming face to look for
+   * @return the number of interests with the specifed face in the queue
+   */
+  int32_t CountInterests(Ptr<Face> inFace);
 
 private:
   /// Traced callback: fired when an Interest is enqueued

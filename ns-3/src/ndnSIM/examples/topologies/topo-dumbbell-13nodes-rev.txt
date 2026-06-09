@@ -1,0 +1,35 @@
+#topo-dumbbell-12nodes-rev.txt
+
+router
+
+# node  comment     yPos    xPos
+Src1   NA        5       1
+Src2   NA        3       1
+Src3   NA        1       3
+Src4   NA        5       3
+Rtr1   NA        3       3
+Rtr2   NA        3       5
+Rtr3   NA        3       7
+Rtr4   NA        3       9
+Rtr5   NA        3       11
+Dst1   NA        1       13
+Dst2   NA        3       13
+Dst3   NA        1       13
+Dst4   NA        5       11
+
+
+link
+
+# srcNode   dstNode     bandwidth   metric  delay   queue
+Src1        Rtr1        1Mbps      1        10ms    100
+Src2        Rtr1        1Mbps      1        10ms    100
+Src3        Rtr2        1Mbps      1        10ms    100
+Src4        Rtr2        1Mbps      1        10ms    100
+Rtr1        Rtr2        1Mbps      1        10ms    100
+Rtr2        Rtr3        1Mbps      1        10ms    100
+Rtr3        Rtr4        1Mbps      1        10ms    100
+Rtr4        Rtr5        1Mbps      1        10ms    100
+Rtr4        Dst4        1Mbps    1        10ms    100
+Rtr5        Dst1        1Mbps    1        10ms    100
+Rtr5        Dst2        1Mbps      1        10ms    100
+Rtr5        Dst3        1Mbps    1        10ms    100

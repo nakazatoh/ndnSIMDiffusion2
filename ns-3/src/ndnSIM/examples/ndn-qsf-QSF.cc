@@ -107,13 +107,14 @@ main (int argc, char *argv[])
 
   Ptr<Node> producer1 = Names::Find<Node> ("Dst1");
 
-  ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerDiffusion");
+  // ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerDiffusion");
+  ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerCbr");
   consumerHelper.SetAttribute ("LifeTime", StringValue("10s"));
   consumerHelper.SetAttribute ("RetxTimer", StringValue("10s"));
-  consumerHelper.SetAttribute ("InitialFrequency", StringValue ("1945")); // 195 interests a second
+  // consumerHelper.SetAttribute ("InitialFrequency", StringValue ("1944")); // 195 interests a second
+  consumerHelper.SetAttribute ("Frequency", StringValue ("1920")); // 195 interests a second
 //  ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerWindow");
 //  consumerHelper.SetAttribute ("Window", StringValue("5"));
-//  consumerHelper.SetAttribute ("PayloadSize", StringValue("1250"));
   // consumerHelper.SetAttribute("Randomize", StringValue("exponential"));
   // consumerHelper.SetAttribute("Randomize", StringValue("uniform"));
 

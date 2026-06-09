@@ -20,6 +20,7 @@
 #include "ns3/trace-source-accessor.h"
 #include "ns3/enum.h"
 #include "ns3/uinteger.h"
+#include "ns3/ndn-face.h"
 #include "ns3/ndn-interest-queue.h"
 
 NS_LOG_COMPONENT_DEFINE ("InterestQueue");
@@ -168,6 +169,21 @@ InterestQueue::RemoveInterest(Ptr<const Interest> interest)
   return false;
 }
 
+int32_t
+InterestQueue::CountInterests(Ptr<Face> inFace)
+{
+  NS_LOG_FUNCTION(this << "inFace: " << inFace);
+  int32_t count = 0;
+  for (std::list<Ptr<DelayedInterest> >::iterator dii = m_delayed_interests.begin();
+    dii != m_delayed_interests.end(); dii++)
+  {
+    if ((*dii)->m_inFace == inFace)
+    {
+      count++;
+    }
+  }
+  return count;
+}
 
 } // namespace ndn
 } // namespace ns3

@@ -82,6 +82,12 @@ Limits::FireAvailableSlotCallback ()
     
     return di;
   }
+
+  int32_t
+  Limits::CountInterests(Ptr<Face> inFace)
+  {
+    return m_iq.CountInterests(inFace);
+  }
   
   Ptr<const DelayedInterest>
   Limits::Peek ()
@@ -136,9 +142,11 @@ Limits::FireAvailableSlotCallback ()
   Limits::AddRTT(double rtt)
   {
     NS_LOG_FUNCTION(this << "rtt:" << rtt);
+    if (rtt < m_linkDelay) rtt = m_linkDelay;
     double dev = rtt - m_rtt;
-    m_rtt = m_rtt * 0.8 + rtt * 0.2;
-    m_rttDev += 0.1 * (std::abs(dev) - m_rtt);
+    m_rtt += 0.2 * dev;
+    m_rttDev += 0.2 * (std::abs(dev) - m_rttDev);
+    NS_LOG_DEBUG("rtt: " << rtt << " m_rtt: " << m_rtt << " m_rttDev: " << m_rttDev);
   }
 
   double

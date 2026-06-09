@@ -96,6 +96,7 @@ public:
       limits->RegisterAvailableSlotCallback(MakeCallback(&LimitsRate::RetrySendOutInterest, limits));
     uint32_t nodeId;
     limits->SetNodeId(nodeId = fibEntry->m_faces.begin()->GetFace()->GetNode()->GetId());
+    limits->SetLinkDelay(fibEntry->m_faces.begin()->GetFace()->GetObject<Limits>()->GetLinkDelay());
     limits->SetUpdateMode(0); // rate update with RTT
     fibEntry->AggregateObject (limits);
     Simulator::ScheduleWithContext(nodeId, Seconds (limits->GetRTT()), &LimitsRate::RateProbing, limits);
@@ -105,7 +106,7 @@ public:
 
 protected:
   /// \copydoc ForwardingStrategy::CanSendOutInterest
-  virtual bool
+  virtual int32_t
   CanSendOutInterest (Ptr<Face> inFace,
                       Ptr<Face> outFace,
                       Ptr<Interest> interest,
@@ -119,6 +120,9 @@ protected:
 
   virtual Ptr<DelayedInterest>
   InterestDequeue (Ptr<Face> outFace, Ptr<pit::Entry> pitEntry);
+
+  virtual int32_t
+  InterestCount (Ptr<Face> outFace, Ptr<pit::Entry> pitEntry, Ptr<Face> inFace);
 
   /// \copydoc ForwardingStrategy::WillSatisfyPendingInterest
   virtual void
@@ -155,7 +159,7 @@ PerFibLimits<Parent>::GetTypeId (void)
 }
 
 template<class Parent>
-bool
+int32_t
 PerFibLimits<Parent>::CanSendOutInterest (Ptr<Face> inFace,
                                           Ptr<Face> outFace,
                                           Ptr<Interest> interest,
@@ -182,11 +186,15 @@ PerFibLimits<Parent>::CanSendOutInterest (Ptr<Face> inFace,
         {
           pitEntry->SetInitialInterestTime(Simulator::Now());
           fibLimits->BorrowLimit ();
-          return true;
+          return 1;
         }
+      else
+      {
+        return 0;
+      }
     }
   NS_LOG_INFO("Limit exceeded");
-  return false;
+  return 2;
 }
 
 template<class Parent>
@@ -230,6 +238,15 @@ PerFibLimits<Parent>::InterestDequeue(Ptr<Face> outFace, Ptr<pit::Entry> pitEntr
   Ptr<DelayedInterest> di = fibLimits->Dequeue();
   di->m_pitEntry->SetInterestQueueLimits(0);
   return di;
+}
+
+template<class Parent>
+int32_t
+PerFibLimits<Parent>::InterestCount (Ptr<Face> outFace, Ptr<pit::Entry> pitEntry, Ptr<Face> inFace)
+{
+  NS_LOG_FUNCTION(this);
+  Ptr<Limits> fibLimits = pitEntry->GetFibEntry()->template GetObject<Limits>();
+  return fibLimits->CountInterests(inFace);
 }
 
 template<class Parent>
@@ -280,7 +297,7 @@ PerFibLimits<Parent>::WillSatisfyPendingInterest (Ptr<Face> inFace,
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
   double rtt = (Simulator::Now() - pitEntry->GetInitialInterestTime()).ToDouble(Time::S);
   Ptr<Limits> fibLimits = pitEntry->GetFibEntry ()->template GetObject<Limits> ();
-  fibLimits->AddRTT(rtt);
+  if (inFace) fibLimits->AddRTT(rtt);
 
   for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
        face != pitEntry->GetOutgoing ().end ();

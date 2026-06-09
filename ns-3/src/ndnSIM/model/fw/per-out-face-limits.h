@@ -94,13 +94,13 @@ public:
   
 protected:
   /// \copydoc ForwardingStrategy::CanSendOutInterest
-  virtual bool
+  virtual int32_t
   CanSendOutInterest (Ptr<Face> inFace,
                       Ptr<Face> outFace,
                       Ptr<Interest> interest,
                       Ptr<pit::Entry> pitEntry);
 
-  virtual bool
+  virtual int32_t
   CanSendOutInterestFromFib (Ptr<Face> inFace,
                       Ptr<Face> outFace,
                       Ptr<Interest> interest,
@@ -114,6 +114,9 @@ protected:
 
   virtual Ptr<DelayedInterest>
   InterestDequeue (Ptr<Face> outFace, Ptr<pit::Entry> pitEntry);
+  
+  virtual int32_t
+  InterestCount (Ptr<Face> outFace, Ptr<pit::Entry> pitEntry, Ptr<Face> inFace);
 
   /// \copydoc ForwardingStrategy::WillSatisfyPendingInterest
   virtual void
@@ -155,7 +158,7 @@ PerOutFaceLimits<Parent>::GetTypeId (void)
 }
 
 template<class Parent>
-bool
+int32_t
 PerOutFaceLimits<Parent>::CanSendOutInterest (Ptr<Face> inFace,
                                               Ptr<Face> outFace,
                                               Ptr<Interest> interest,
@@ -172,17 +175,21 @@ PerOutFaceLimits<Parent>::CanSendOutInterest (Ptr<Face> inFace,
     {
       if (super::CanSendOutInterest (inFace, outFace, interest, pitEntry))
         {
-          pitEntry->SetInitialInterestTime(Simulator::Now());
+          // pitEntry->SetInitialInterestTime(Simulator::Now());
           faceLimits->BorrowLimit ();
-          return true;
+          return 1;
         }
+      else 
+      {
+        return 0;
+      }
     }
   NS_LOG_INFO("Limit exceeded");
-  return false;
+  return 2;
 }
 
 template<class Parent>
-bool
+int32_t
 PerOutFaceLimits<Parent>::CanSendOutInterestFromFib (Ptr<Face> inFace,
                                               Ptr<Face> outFace,
                                               Ptr<Interest> interest,
@@ -211,6 +218,13 @@ PerOutFaceLimits<Parent>::SendOutInterestFromQ (Ptr<Limits> faceLimits)
           ForwardingStrategy::RetrySendOutInterest(di->m_inFace, di->m_outFace, di->m_interest, di->m_pitEntry);
           return;
         }
+      else
+      {
+        Ptr<DelayedInterest> di = faceLimits->Dequeue();
+        // di->m_pitEntry->SetWaitingInVain(di->m_outFace);
+        // super::DidExhaustForwardingOptions (di->m_inFace, di->m_interest, di->m_pitEntry);
+        return;
+      }
     }
   NS_ABORT_MSG("Should not be posssible.");
 }
@@ -234,6 +248,15 @@ PerOutFaceLimits<Parent>::InterestDequeue(Ptr<Face> outFace, Ptr<pit::Entry> pit
   Ptr<DelayedInterest> di = faceLimits->Dequeue();
   di->m_pitEntry->SetInterestQueueLimits (0);
   return di;
+}
+
+template<class Parent>
+int32_t
+PerOutFaceLimits<Parent>::InterestCount(Ptr<Face> outFace, Ptr<pit::Entry> pitEntry, Ptr<Face> inFace)
+{
+  NS_LOG_FUNCTION(this);
+  Ptr<Limits> faceLimits = outFace->template GetObject<Limits>();
+  return faceLimits->CountInterests(inFace);
 }
 
 template<class Parent>
@@ -278,7 +301,8 @@ PerOutFaceLimits<Parent>::WillSatisfyPendingInterest (Ptr<Face> inFace,
 {
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
   double rtt = (Simulator::Now() - pitEntry->GetInitialInterestTime()).ToDouble(Time::S);
-  inFace->GetObject<Limits>()->AddRTT(rtt);
+  if (inFace)
+    inFace->GetObject<Limits>()->AddRTT(rtt);
 
   for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
        face != pitEntry->GetOutgoing ().end ();
